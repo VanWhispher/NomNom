@@ -2,7 +2,7 @@
 
 *(formerly MealScan)*
 
-**Version:** 1.9
+**Version:** 2.1
 **Owner:** Jupitor
 **Type:** Personal, single-user iOS web app (PWA)
 **Status:** Draft for build
@@ -14,6 +14,8 @@
 - *v1.4: added search-by-name — type a brand or food name to find matches in the personal library and the packaged-food database (Open Food Facts full-text search), instead of keying a barcode number.*
 - *v1.5: switched food recognition from Anthropic to Google Gemini; added meal categories (Breakfast/Lunch/Dinner/Snack); added sugar to per-item nutrition (now P/C/F + sugar); replaced the history button with day-by-day navigation (arrows at the top of Today) that also lets entries be backfilled to past days.*
 - *v1.6: fixed a timezone bug that broke the forward day-navigation arrow (date math is now consistently local).*
+- *v2.1: switched Open Food Facts to its current Search-a-licious API (`search.openfoodfacts.org/search`) since the legacy `/cgi/search.pl` endpoint is deprecated and returning errors; search now shows a clear message with an AI fallback if OFF is unreachable. Fixed food-item rows so the serving sits under the name, and made the Add/modal overlay full-bleed so it fully covers the tab bar.*
+- *v2.0: rebuilt the Today page to a richer layout — a colored hero header band (logo + settings gear + date nav) showing the big remaining number, a progress bar, and Target/Food/Exercise stat chips, over a tinted surface holding white cards for Macros, Food (per-meal groups with colored dots and tinted item rows), and Activity. Added four selectable theme presets (Baby Pink, Mint, Lavender, Coral) in a bottom-sheet Settings that still holds the Gemini API key, model, units, daily target, export, and clear-data. Fonts are now Baloo 2 (display) + DM Sans (body); tab bar gained icons.*
 - *v1.9: renamed MealScan -> **NomNom** with a cute redesign (rounded Nunito font, candy-pink palette, rounded cards + pill controls, soft shadows, kawaii rice-bowl icon). Photo scan now offers Take photo and Upload from gallery. Bottom-nav spacing is measured dynamically so content never hides behind the bar on any phone.*
 - *v1.8: added a bundled local database (`food-db.json`, ~250 items scraped from a Singapore calorie chart — food name, portion, calories per portion, no macros). Search now labels every result with its source (personal library / local database / Open Food Facts / AI estimate) and falls back to AI only when none match. Local-database items log by quantity of portion (e.g. "2 plate"). Editing a logged item now also offers Save to library and meal-category change.*
 - *v1.7: dropped the bundled Singapore-foods file. Search now flows library → Open Food Facts → and, when nothing is found, an automatic AI-estimate prompt (Gemini) that covers any dish by name including local food. Logging is no longer fixed to 100g: a serving-size selector (gram, tsp, tbsp, cup, bowl, plate, piece, slice, serving) with an editable grams-per-serving lets quantities be entered in natural units; the gram weight is always shown and stored, and entries display their serving label (e.g. "2 tbsp (30 g)").*
@@ -110,7 +112,7 @@ Three primary tabs in a bottom navigation bar with text labels (no emojis):
 
 ### 8.2b Input mode — Search by name
 - A single search box. As the user types, the **personal library** is filtered live (instant, local).
-- Pressing search queries the **packaged-food database** via Open Food Facts full-text search (`/cgi/search.pl?search_terms=...&json=1`), returning up to ~20 products.
+- Pressing search queries the **packaged-food database** via the Open Food Facts Search-a-licious API (`https://search.openfoodfacts.org/search?q=...`, reading `hits[]`), returning up to ~20 products.
 - **AI fallback:** if the term is found in neither the library nor Open Food Facts, the user is automatically prompted to **estimate it with AI** (Gemini, text prompt → per-100g JSON). A "None of these — estimate with AI" option is also offered alongside packaged results. This covers any food by name, including local hawker dishes, replacing the earlier bundled-database idea. AI values are labelled as estimates.
 - Each result is tappable → the shared logging step (choose serving size and quantity → log), with an optional "Save to library." The packaged (OFF) search is free and rate-limited and degrades gracefully; barcode and manual remain as fallbacks.
 
@@ -249,31 +251,31 @@ profile    = { sex, age, height, activity, goal, lossRate }
 
 ## 12. UI / design specification
 
-Cute but clean: soft candy-pink, rounded shapes, gentle shadows, and a friendly rounded typeface, with generous spacing and clear hierarchy.
+A friendly, modern tracker: a colored hero header band over a tinted surface of soft white cards, with four selectable theme palettes.
 
-### Principles
-- Rounded everything: cards/inputs ~13-18px radius; buttons, chips, and nav use full pills.
-- Candy-pink accent with a deeper pink for emphasis; soft white cards on a faint pink-tinted background.
-- Gentle low-opacity pink shadows for depth instead of hard borders.
-- Friendly rounded font ("Nunito"), bold weights. Kawaii rice-bowl icon. No emojis in UI copy.
+### Themes (selectable in Settings)
+- **Baby Pink** (#EF9CB4 / #E37D9A) — default, warm & playful
+- **Mint** (#3FC2A4 / #2EB89F) — fresh & calm
+- **Lavender** (#A285CF / #9274C7) — soft & dreamy
+- **Coral** (#FF7A57 / #FF6B4A) — vibrant & fun
 
-### Design tokens
-```
---font:'Nunito', system-ui, sans-serif;
---bg:#FFFBFD; --surface:#FFFFFF;
---text:#3E2F38; --text-soft:#AC8F9C; --divider:#F6E6EF;
---accent:#FF8FB3; --accent-strong:#FF689E; --accent-bg:#FFEFF5;
---radius:18px; --radius-sm:13px;
---shadow:0 6px 18px rgba(255,143,179,.18);
-```
+Selecting a theme sets CSS variables (`--header`, `--accent`, `--accent-strong`, `--accent-bg`, page gradient `--bg`) live; the choice persists in settings.
 
-### Components
-- **Cards:** budget, list rows, menu items, and empty states are white rounded cards with a soft pink shadow.
-- **Buttons/chips:** pill-shaped; primary is candy pink with white text; selected chips fill candy pink.
-- **Day navigator:** a rounded pill bar with pink arrows and a bold centre label.
-- **Tab bar:** white, rounded top corners, soft top shadow; active tab is bold candy pink. Content spacing below is computed from the bar's measured height for any device.
-- **Budget:** large candy-pink "remaining" number on a white card; soft-grey breakdown and P/C/F/sugar beneath.
-- **Logo:** "NomNom" wordmark in candy pink; kawaii bowl home-screen icon.
+### Today layout
+- **Hero band** (theme color, full-bleed): "NomNom" logo + circular settings gear; date navigator (circular prev/next + day label); large remaining-calorie number; progress bar (% of target); three translucent stat chips (Target / Food / Exercise).
+- **Surface** (tinted gradient) with white rounded cards:
+  - **Macros today** — Protein/Carbs/Fat/Sugar consumed, colored numbers with mini bars.
+  - **Food** — per-meal groups (colored dot + name + subtotal) with tinted, tappable item rows (name, serving, calories, chevron → edit).
+  - **Activity** — exercise rows with an icon, name, detail, and calories.
+
+### Fonts
+- Display/numbers: **Baloo 2** (700–800). Body: **DM Sans** (400–700).
+
+### Other surfaces
+- **Tab bar:** white, blurred, with icons + labels; active tab tinted in the theme color.
+- **FAB:** theme-colored "Add" pill with a soft tinted border, floating above the tab bar.
+- **Settings:** bottom sheet — theme presets on top, then API key / model / units / daily target / export / clear.
+- **Weight & Plan:** same theme color header band (logo + gear); existing card content inherits the theme palette.
 
 ## 13. Accuracy and known limitations
 
