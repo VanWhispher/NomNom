@@ -205,6 +205,56 @@
   .auth-tag{text-align:center;color:var(--text-soft);font-size:14px;margin:8px 0 20px;}
   .auth-or{text-align:center;color:var(--text-soft);font-size:12px;margin:14px 0;letter-spacing:.04em;}
   #auth-msg:not(:empty){margin-bottom:6px;}
+
+  /* Add sheet */
+  .seg{display:flex;gap:6px;padding:4px;background:var(--accent-bg);border-radius:14px;}
+  .seg button{flex:1;padding:9px 0;border:none;border-radius:10px;background:transparent;font-family:var(--body);font-weight:600;font-size:14px;color:var(--text-soft);cursor:pointer;}
+  .seg button.on{background:#fff;color:var(--accent-strong);box-shadow:0 1px 3px rgba(0,0,0,.08);}
+  .addtabs{margin:8px 0 2px;}
+  .add-search{display:flex;align-items:center;gap:10px;background:var(--accent-bg);border-radius:15px;padding:13px 15px;margin-top:14px;cursor:pointer;color:var(--text-soft);}
+  .add-search svg{width:20px;height:20px;flex:none;}
+  .add-search span{font-size:15px;}
+  .tiles{display:flex;gap:8px;margin-top:14px;}
+  .tile{flex:1;display:flex;flex-direction:column;align-items:center;gap:7px;background:none;border:none;cursor:pointer;padding:0;}
+  .tile-ic{display:flex;align-items:center;justify-content:center;width:54px;height:54px;border-radius:17px;background:var(--accent-bg);color:var(--accent-strong);}
+  .tile-ic svg{width:23px;height:23px;}
+  .tile>span:last-child{font-family:var(--body);font-weight:500;font-size:12px;color:var(--text-soft);}
+  .add-label{font-family:var(--body);font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-soft);margin:20px 2px 6px;}
+  .recent-row{display:flex;align-items:center;gap:12px;padding:10px 2px;border-bottom:1px solid var(--divider);}
+  .recent-ic{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:12px;background:var(--accent-bg);color:var(--accent-strong);flex:none;}
+  .recent-ic svg{width:21px;height:21px;}
+  .recent-main{flex:1;min-width:0;}
+  .recent-main .rn{font-family:var(--body);font-weight:600;font-size:14px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .recent-main .rs{font-size:12.5px;color:var(--text-soft);}
+  .recent-add{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:var(--accent);border:none;color:#fff;cursor:pointer;flex:none;}
+  .recent-add svg{width:16px;height:16px;}
+  .act-pick{display:flex;align-items:center;gap:13px;width:100%;background:var(--accent-bg);border:none;border-radius:18px;padding:14px 16px;cursor:pointer;text-align:left;margin-top:14px;}
+  .act-ic{display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:13px;background:#fff;color:var(--accent-strong);flex:none;}
+  .act-ic svg{width:23px;height:23px;}
+  .act-main{flex:1;}
+  .act-main .an{font-family:var(--display);font-weight:700;font-size:17px;color:var(--text);}
+  .act-main .as{font-size:13px;color:var(--text-soft);}
+  .act-pick .chev{width:18px;height:18px;color:var(--text-soft);flex:none;}
+  .act-list{margin-top:8px;flex-wrap:wrap;gap:6px;}
+  .act-opt{padding:8px 12px;border-radius:11px;border:1px solid var(--divider);background:#fff;font-family:var(--body);font-size:13px;color:var(--text);cursor:pointer;}
+  .act-opt.on{border-color:var(--accent-strong);color:var(--accent-strong);}
+  .add-card{background:var(--accent-bg);border-radius:18px;padding:16px;margin-top:14px;}
+  .add-card .seg{background:#fff;}
+  .add-card .seg button.on{background:var(--accent-bg);box-shadow:none;}
+  .add-card-h{font-family:var(--body);font-weight:600;font-size:14px;color:var(--text);margin-bottom:12px;}
+  .dur-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;font-family:var(--body);font-weight:600;font-size:14px;color:var(--text);}
+  .dur-v{color:var(--text-soft);font-size:13px;}
+  .dur-v b{font-family:var(--display);font-weight:800;font-size:24px;color:var(--text);}
+  .dur-row{display:flex;align-items:center;gap:12px;}
+  .step{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:11px;border:none;background:#fff;color:var(--accent-strong);cursor:pointer;flex:none;}
+  .step svg{width:16px;height:16px;}
+  .nn-range{-webkit-appearance:none;appearance:none;flex:1;height:6px;border-radius:6px;outline:none;background:var(--accent-bg);}
+  .nn-range::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;background:#fff;border:4px solid var(--accent);box-shadow:0 2px 6px rgba(0,0,0,.25);cursor:pointer;}
+  .nn-range::-moz-range-thumb{width:26px;height:26px;border-radius:50%;background:#fff;border:4px solid var(--accent);box-shadow:0 2px 6px rgba(0,0,0,.25);cursor:pointer;}
+  .burned{background:var(--accent);border-radius:18px;padding:20px 16px;text-align:center;margin-top:14px;}
+  .burned-l{font-size:13px;color:rgba(255,255,255,.9);}
+  .burned-n{font-family:var(--display);font-weight:800;font-size:46px;color:#fff;line-height:1.05;margin-top:2px;}
+  .burned-s{font-size:12px;color:rgba(255,255,255,.85);margin-top:2px;}
 </style>
 </head>
 <body>
@@ -225,8 +275,8 @@
 const KEY='mealscan_v1';
 /* ====== Supabase cloud config — paste your project's values to enable accounts & cloud sync.
    Leave both blank to keep the app local-only (no login). ====== */
-const SUPABASE_URL='https://jjupcfisuqnvjeokafnj.supabase.co';       // e.g. https://abcdefgh.supabase.co
-const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqdXBjZmlzdXFudmplb2thZm5qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNDIyNzUsImV4cCI6MjA5NzYxODI3NX0.aGnnEayj0yB6_x6U5bycwiFqtzqt2WaVHk1frGroZ5s';  // your project's anon (public) key
+const SUPABASE_URL='https://jjupcfisuqnvjeokafnj.supabase.co';
+const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqdXBjZmlzdXFudmplb2thZm5qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNDIyNzUsImV4cCI6MjA5NzYxODI3NX0.aGnnEayj0yB6_x6U5bycwiFqtzqt2WaVHk1frGroZ5s';
 let sb=null, user=null, CLOUD=false;
 const DEFAULT={
   settings:{apiKey:'',model:'gemini-2.5-flash',weightUnit:'kg',heightUnit:'cm',dailyTarget:null,theme:'pink'},
@@ -497,30 +547,147 @@ function openModal(title,bodyHtml){
 function closeModal(m){ if(m&&m.parentNode)m.remove(); render(); }
 function closeAllModals(){ $('modal-root').innerHTML=''; render(); }
 
-/* ---------- FAB action sheet ---------- */
-$('fab').onclick=()=>{
-  const m=openModal('Add',`
-    <div class="menu-item" id="a-food">Add food<div class="d">Photo, barcode, library, or manual</div></div>
-    <div class="menu-item" id="a-ex">Add exercise<div class="d">Credit calories back to today</div></div>
-  `);
-  m.querySelector('#a-food').onclick=()=>{m.remove();openAddFood();};
-  m.querySelector('#a-ex').onclick=()=>{m.remove();openExercise();};
-};
+/* ---------- bottom-sheet helper (slide up + swipe down, like Settings) ---------- */
+function makeSheet(innerHtml){
+  const overlay=el(`<div class="sheet-overlay"><div class="sheet" id="sheet">
+    <div class="sheet-handle" id="sheet-handle"><div class="sheet-grip"></div></div>
+    ${innerHtml}
+  </div></div>`);
+  $('modal-root').appendChild(overlay);
+  const sheet=overlay.querySelector('#sheet');
+  sheet.style.transform='translateY(100%)';
+  requestAnimationFrame(()=>{sheet.style.transition='transform .28s cubic-bezier(.22,.61,.36,1)';sheet.style.transform='translateY(0)';});
+  let closed=false;
+  const close=()=>{
+    if(closed)return; closed=true;
+    sheet.style.transition='transform .25s ease-in';sheet.style.transform='translateY(100%)';
+    overlay.style.transition='background .25s';overlay.style.background='rgba(0,0,0,0)';
+    setTimeout(()=>{overlay.remove();render();},240);
+  };
+  overlay.onclick=(e)=>{if(e.target===overlay)close();};
+  let startY=0,dY=0,drag=false;
+  sheet.addEventListener('touchstart',e=>{startY=e.touches[0].clientY;dY=0;drag=false;sheet.style.transition='none';},{passive:true});
+  sheet.addEventListener('touchmove',e=>{const dy=e.touches[0].clientY-startY;if(sheet.scrollTop<=0&&dy>0){drag=true;dY=dy;sheet.style.transform=`translateY(${dy}px)`;e.preventDefault();}},{passive:false});
+  sheet.addEventListener('touchend',()=>{if(!drag){sheet.style.transition='';return;}drag=false;sheet.style.transition='transform .25s ease';if(dY>90){close();}else{sheet.style.transform='translateY(0)';}});
+  const handle=overlay.querySelector('#sheet-handle');
+  const ps=(y)=>{startY=y;dY=0;drag=true;sheet.style.transition='none';};
+  const pm=(y)=>{if(!drag)return;dY=Math.max(0,y-startY);sheet.style.transform=`translateY(${dY}px)`;};
+  const pe=()=>{if(!drag)return;drag=false;sheet.style.transition='transform .25s ease';if(dY>90){close();}else{sheet.style.transform='translateY(0)';}};
+  handle.addEventListener('mousedown',e=>{e.preventDefault();ps(e.clientY);const mm=ev=>pm(ev.clientY),mu=()=>{pe();document.removeEventListener('mousemove',mm);document.removeEventListener('mouseup',mu);};document.addEventListener('mousemove',mm);document.addEventListener('mouseup',mu);});
+  return {overlay,sheet,close};
+}
 
-/* ---------- ADD FOOD menu ---------- */
-function openAddFood(){
-  const m=openModal('Add food',`
-    <div class="menu-item" id="f-search">Search by name<div class="d">Find in your library and packaged foods</div></div>
-    <div class="menu-item" id="f-photo">Scan a photo<div class="d">AI identifies items; you set the weight</div></div>
-    <div class="menu-item" id="f-bar">Scan a barcode<div class="d">Exact packaged-food nutrition</div></div>
-    <div class="menu-item" id="f-lib">From library<div class="d">Re-log a saved meal</div></div>
-    <div class="menu-item" id="f-man">Enter manually<div class="d">Type the values yourself</div></div>
-  `);
-  m.querySelector('#f-search').onclick=()=>{m.remove();openSearch();};
-  m.querySelector('#f-photo').onclick=()=>{m.remove();openPhoto();};
-  m.querySelector('#f-bar').onclick=()=>{m.remove();openBarcode();};
-  m.querySelector('#f-lib').onclick=()=>{m.remove();openLibrary();};
-  m.querySelector('#f-man').onclick=()=>{m.remove();openManual();};
+/* ---------- Add sheet icons ---------- */
+const IC_SEARCH='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>';
+const IC_CAMERA='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5A1.5 1.5 0 014.5 7H6l1.2-2h9.6L18 7h1.5A1.5 1.5 0 0121 8.5v9A1.5 1.5 0 0119.5 19h-15A1.5 1.5 0 013 17.5z"/><circle cx="12" cy="13" r="3.2"/></svg>';
+const IC_BARCODE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6v12M7.5 6v12M11 6v12M14 6v12M17.5 6v12M20 6v12"/></svg>';
+const IC_BOOK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h12a1 1 0 011 1v15l-7-3.5L5 20V5a1 1 0 011-1z"/></svg>';
+const IC_PEN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>';
+const IC_FORK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11h14a7 7 0 01-14 0z"/><path d="M9 7c0-1.5 1-2 1.5-3M13 7c0-1.5 1-2 1.5-3"/></svg>';
+const IC_DUMBBELL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 12h12M3.5 9v6M7 8v8M17 8v8M20.5 9v6"/></svg>';
+const IC_PLUS='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>';
+const IC_MINUS='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 12h14"/></svg>';
+const IC_CHEV='<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>';
+
+function recentFoods(n){
+  const seen=new Set(), out=[];
+  for(let i=state.entries.length-1;i>=0 && out.length<n;i--){
+    const e=state.entries[i]; const key=(e.name||'').toLowerCase();
+    if(!e.name||seen.has(key))continue; seen.add(key);
+    const sub=`${e.servingLabel||(e.grams?r0(e.grams)+' g':'')} · ${r0(e.calories)} kcal`;
+    out.push({name:e.name,sub,entry:e});
+  }
+  return out;
+}
+function relogFood(r){
+  state.entries.push(Object.assign({},r.entry,{id:uid(),date:viewDate,meal:defaultMeal()}));
+  save();
+}
+
+/* ---------- ADD sheet (Food / Exercise tabs) ---------- */
+$('fab').onclick=()=>openAdd();
+function openAdd(){
+  const sh=makeSheet(`
+    <div class="seg addtabs" id="add-tabs">
+      <button data-tab="food" class="on">Food</button>
+      <button data-tab="exercise">Exercise</button>
+    </div>
+    <div id="add-body"></div>`);
+  const body=sh.overlay.querySelector('#add-body');
+  const tabs=sh.overlay.querySelectorAll('#add-tabs button');
+  const go=(fn)=>{sh.close();setTimeout(fn,200);};
+
+  function renderFood(){
+    const recents=recentFoods(8);
+    body.innerHTML=`
+      <div class="add-search" id="af-search">${IC_SEARCH}<span>Search for a food…</span></div>
+      <div class="tiles">
+        <button class="tile" id="af-scan"><span class="tile-ic">${IC_CAMERA}</span><span>Scan food</span></button>
+        <button class="tile" id="af-bar"><span class="tile-ic">${IC_BARCODE}</span><span>Barcode</span></button>
+        <button class="tile" id="af-lib"><span class="tile-ic">${IC_BOOK}</span><span>Library</span></button>
+        <button class="tile" id="af-man"><span class="tile-ic">${IC_PEN}</span><span>Manual</span></button>
+      </div>
+      ${recents.length?`<div class="add-label">Recent</div><div>${recents.map((r,i)=>`
+        <div class="recent-row">
+          <span class="recent-ic">${IC_FORK}</span>
+          <div class="recent-main"><div class="rn">${esc(r.name)}</div><div class="rs">${esc(r.sub)}</div></div>
+          <button class="recent-add" data-rl="${i}" aria-label="Re-log">${IC_PLUS}</button>
+        </div>`).join('')}</div>`:''}`;
+    body.querySelector('#af-search').onclick=()=>go(openSearch);
+    body.querySelector('#af-scan').onclick=()=>go(openPhoto);
+    body.querySelector('#af-bar').onclick=()=>go(openBarcode);
+    body.querySelector('#af-lib').onclick=()=>go(openLibrary);
+    body.querySelector('#af-man').onclick=()=>go(openManual);
+    body.querySelectorAll('[data-rl]').forEach(b=>b.onclick=()=>{relogFood(recents[+b.dataset.rl]);sh.close();});
+  }
+
+  function renderExercise(){
+    const wkg=latestWeightKg();
+    const acts=[...QUICK,...Object.keys(MET).filter(a=>!QUICK.includes(a))];
+    let activity='Walking',intensity='moderate',minutes=30,showList=false;
+    const calc=()=>Math.round(MET[activity][intensity]*(wkg||60)*(minutes/60));
+    function draw(){
+      body.innerHTML=`
+        <button class="act-pick" id="ex-actbtn"><span class="act-ic">${IC_DUMBBELL}</span>
+          <div class="act-main"><div class="an">${esc(activity)}</div><div class="as">${QUICK.includes(activity)?'Quick pick':'Activity'}</div></div>
+          ${IC_CHEV}</button>
+        <div class="act-list" id="ex-actlist" style="display:${showList?'flex':'none'}">
+          ${acts.map(a=>`<button class="act-opt${a===activity?' on':''}" data-a="${esc(a)}">${esc(a)}</button>`).join('')}</div>
+        <div class="add-card"><div class="add-card-h">Intensity</div>
+          <div class="seg" id="ex-int">
+            <button data-i="light"${intensity==='light'?' class="on"':''}>Light</button>
+            <button data-i="moderate"${intensity==='moderate'?' class="on"':''}>Moderate</button>
+            <button data-i="vigorous"${intensity==='vigorous'?' class="on"':''}>Vigorous</button>
+          </div></div>
+        <div class="add-card"><div class="dur-h"><span>Duration</span><span class="dur-v"><b id="ex-minv">${minutes}</b> min</span></div>
+          <div class="dur-row"><button class="step" id="ex-dec">${IC_MINUS}</button>
+            <input type="range" class="nn-range" id="ex-rng" min="5" max="120" step="1" value="${minutes}">
+            <button class="step" id="ex-inc">${IC_PLUS}</button></div></div>
+        <div class="burned"><div class="burned-l">Calories burned</div>
+          <div class="burned-n" id="ex-kcal">${calc()}</div>
+          <div class="burned-s">kcal · estimated from intensity, time${wkg?' &amp; weight':''}</div></div>
+        ${wkg?'':'<div class="hint" style="text-align:center;margin-top:8px">Using an estimated 60&nbsp;kg — log your weight for a more accurate burn.</div>'}
+        <button class="btn btn-primary btn-block" id="ex-save" style="margin-top:16px">Save exercise</button>`;
+      const rng=body.querySelector('#ex-rng');
+      const fill=()=>{const pct=Math.round((minutes-5)/115*100);rng.style.background=`linear-gradient(90deg,var(--accent) 0%,var(--accent) ${pct}%,var(--accent-bg) ${pct}%,var(--accent-bg) 100%)`;};
+      const upd=()=>{body.querySelector('#ex-minv').textContent=minutes;body.querySelector('#ex-kcal').textContent=calc();rng.value=minutes;fill();};
+      fill();
+      body.querySelector('#ex-actbtn').onclick=()=>{showList=!showList;body.querySelector('#ex-actlist').style.display=showList?'flex':'none';};
+      body.querySelectorAll('#ex-actlist .act-opt').forEach(o=>o.onclick=()=>{activity=o.dataset.a;showList=false;draw();});
+      body.querySelectorAll('#ex-int button').forEach(b=>b.onclick=()=>{intensity=b.dataset.i;body.querySelectorAll('#ex-int button').forEach(x=>x.classList.toggle('on',x===b));body.querySelector('#ex-kcal').textContent=calc();});
+      rng.oninput=()=>{minutes=+rng.value;upd();};
+      body.querySelector('#ex-dec').onclick=()=>{minutes=Math.max(5,minutes-1);upd();};
+      body.querySelector('#ex-inc').onclick=()=>{minutes=Math.min(120,minutes+1);upd();};
+      body.querySelector('#ex-save').onclick=()=>{
+        state.exercise.push({id:uid(),date:viewDate,activity,intensity,minutes,met:MET[activity][intensity],caloriesBurned:calc()});
+        save();sh.close();
+      };
+    }
+    draw();
+  }
+
+  tabs.forEach(b=>b.onclick=()=>{tabs.forEach(x=>x.classList.toggle('on',x===b));b.dataset.tab==='food'?renderFood():renderExercise();});
+  renderFood();
 }
 
 /* ---------- SEARCH BY NAME ---------- */
