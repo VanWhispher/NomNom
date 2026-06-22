@@ -191,6 +191,7 @@
   .sheet-handle{padding:10px 0 8px;cursor:grab;touch-action:none;}
   .sheet-handle:active{cursor:grabbing;}
   .sheet-grip{width:40px;height:5px;border-radius:3px;background:#E7E0D5;margin:0 auto;}
+  #add-body{min-height:60vh;}
   .sheet h2{font-family:var(--display);font-weight:700;font-size:20px;margin:6px 0 2px;}
   .sheet .sub-h{font-family:var(--display);font-weight:700;font-size:15px;margin:22px 0 2px;color:var(--text);}
   .preset{display:flex;align-items:center;gap:13px;padding:13px 16px;border-radius:14px;border:2px solid var(--divider);background:#fff;width:100%;text-align:left;margin-top:10px;}
@@ -251,10 +252,11 @@
   .dur-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;font-family:var(--body);font-weight:600;font-size:14px;color:var(--text);}
   .dur-v{color:var(--text-soft);font-size:13px;}
   .dur-v b{font-family:var(--display);font-weight:800;font-size:24px;color:var(--text);}
-  .dur-row{display:flex;align-items:center;gap:12px;}
-  .step{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:11px;border:none;background:#fff;color:var(--accent-strong);cursor:pointer;flex:none;}
-  .step svg{width:16px;height:16px;}
-  .nn-range{-webkit-appearance:none;appearance:none;flex:1;height:6px;border-radius:6px;outline:none;background:var(--accent-bg);}
+  .dur-row{display:flex;align-items:center;gap:14px;}
+  .step{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;border:none;background:#fff;color:var(--accent-strong);cursor:pointer;flex:none;box-shadow:0 3px 9px rgba(216,85,122,.20);}
+  .step:active{transform:scale(.94);}
+  .step svg{width:18px;height:18px;}
+  .nn-range{-webkit-appearance:none;appearance:none;flex:1;height:7px;border-radius:7px;outline:none;background:var(--accent-bg);}
   .nn-range::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;background:#fff;border:4px solid var(--accent);box-shadow:0 2px 6px rgba(216,85,122,.4);cursor:pointer;}
   .nn-range::-moz-range-thumb{width:26px;height:26px;border-radius:50%;background:#fff;border:4px solid var(--accent);box-shadow:0 2px 6px rgba(216,85,122,.4);cursor:pointer;}
   .burned{background:var(--accent);border-radius:18px;padding:20px 16px;text-align:center;margin-top:14px;}
@@ -274,7 +276,7 @@
   .choose-main .cc{font-size:12.5px;color:var(--text-soft);}
   .choose-chk{color:var(--accent-strong);flex:none;}
   .choose-chk svg{width:20px;height:20px;}
-  .scan-frame{position:relative;width:100%;aspect-ratio:1/1;max-height:300px;border-radius:22px;overflow:hidden;background:linear-gradient(150deg,#2b2230,#16131b);display:flex;align-items:flex-end;justify-content:center;cursor:pointer;margin-top:6px;}
+  .scan-frame{position:relative;width:100%;aspect-ratio:4/3;border-radius:18px;overflow:hidden;background:linear-gradient(150deg,#2b2230,#16131b);display:flex;align-items:flex-end;justify-content:center;cursor:pointer;margin-top:6px;}
   .scan-frame .corners span{position:absolute;width:30px;height:30px;border:3px solid rgba(255,255,255,.85);}
   .scan-frame .corners span:nth-child(1){top:26px;left:26px;border-right:none;border-bottom:none;border-radius:7px 0 0 0;}
   .scan-frame .corners span:nth-child(2){top:26px;right:26px;border-left:none;border-bottom:none;border-radius:0 7px 0 0;}
@@ -301,6 +303,7 @@
   .mfield{background:var(--accent-bg);border-radius:15px;padding:10px 14px;}
   .mfield label{display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-soft);margin-bottom:2px;}
   .mfield input{width:100%;border:none;background:none;font-family:var(--body);font-size:16px;color:var(--text);outline:none;padding:0;}
+  .mfield select{width:100%;border:none;background:none;font-family:var(--body);font-size:16px;color:var(--text);outline:none;padding:0;-webkit-appearance:none;appearance:none;cursor:pointer;}
   .mrow{display:flex;gap:10px;}
   .mrow .mfield{flex:1;min-width:0;}
   .mcal{display:flex;align-items:center;justify-content:space-between;background:var(--accent);border-radius:16px;padding:15px 18px;margin-top:12px;}
@@ -728,7 +731,7 @@ function openAdd(){
     }
     body.innerHTML=`
       <div class="sub-head"><button class="circ-back" id="sc-back">${IC_BACK}</button><h3>Scan food</h3></div>
-      <div class="scan-frame" id="sc-frame"><video id="sc-video" playsinline muted style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:22px"></video><div class="corners"><span></span><span></span><span></span><span></span></div><div class="scan-line"></div><div class="scan-hint" id="sc-hint">Starting camera…</div></div>
+      <div class="scan-frame" id="sc-frame"><video id="sc-video" playsinline muted style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:18px"></video><div class="corners"><span></span><span></span><span></span><span></span></div><div class="scan-line"></div><div class="scan-hint" id="sc-hint">Starting camera…</div></div>
       <button class="btn btn-primary btn-block" id="sc-shot" style="margin-top:14px">Capture photo</button>
       <button class="dashed-btn" id="sc-up">${IC_UPLOAD} Upload a photo instead</button>
       <input type="file" accept="image/*" id="sc-file" style="display:none">
@@ -762,14 +765,12 @@ function openAdd(){
       <div class="sub-head"><button class="circ-back" id="bc-back">${IC_BACK}</button><h3>Scan a barcode</h3></div>
       <div id="reader"></div>
       <div class="bc-hint" id="bc-hint">Point your camera at a product barcode</div>
-      <div class="field" style="margin-top:10px"><input type="number" inputmode="numeric" id="bc-num" placeholder="…or type the barcode number"></div>
-      <div class="btn-row"><button class="btn" id="bc-scan">Restart camera</button><button class="btn btn-primary" id="bc-look">Look up</button></div>
       <div id="bc-stage"></div>`;
     const stage=body.querySelector('#bc-stage'), hint=body.querySelector('#bc-hint');
     body.querySelector('#bc-back').onclick=()=>{stopScanner();renderFood();};
-    const onDetect=(txt)=>{ if(!running)return; stopScanner(); body.querySelector('#bc-num').value=txt; doLookup(txt); };
+    const onDetect=(txt)=>{ if(!running)return; stopScanner(); doLookup(txt); };
     const startScan=async()=>{
-      if(typeof Html5Qrcode==='undefined'){ hint.textContent='Camera scanning isn’t available here — type the barcode number instead.'; return; }
+      if(typeof Html5Qrcode==='undefined'){ hint.textContent='Camera scanning isn’t available here — you can also type the barcode number into “Search for a food”.'; return; }
       await stopScanner();
       const opts={};
       if(typeof Html5QrcodeSupportedFormats!=='undefined'){
@@ -781,28 +782,15 @@ function openAdd(){
         await scanner.start({facingMode:'environment'},
           {fps:10, qrbox:(w,h)=>{const bw=Math.min(w-20,300);return {width:bw,height:Math.max(110,Math.round(bw*0.55))};}, aspectRatio:1.3333, experimentalFeatures:{useBarCodeDetectorIfSupported:true}},
           onDetect, ()=>{});
-      }catch(e){ running=false; hint.textContent='Couldn’t start the camera — type the barcode number instead.'; }
+      }catch(e){ running=false; hint.textContent='Couldn’t start the camera — you can also type the barcode number into “Search for a food”.'; }
     };
-    body.querySelector('#bc-scan').onclick=startScan;
-    body.querySelector('#bc-look').onclick=()=>doLookup(body.querySelector('#bc-num').value.trim());
     async function doLookup(code){
-      if(!code){stage.innerHTML=`<div class="err">Enter a barcode number.</div>`;return;}
-      await stopScanner();
       stage.innerHTML=`<div class="spinner">${ONDB?'Looking up product…':'Loading food database (first time only, ~10 MB)…'}</div>`;
-      try{ await ensureONDB(); const hit=ONBYEAN&&ONBYEAN.get(String(code)); if(hit){ result(hit[0],{calories:hit[1],protein_g:hit[2],carbs_g:hit[3],fat_g:hit[4],sugar_g:hit[5]},'opennutrition',hit[6]); return; } }catch(e){}
-      stage.innerHTML=`<div class="spinner">Looking up product…</div>`;
-      try{
-        const res=await fetch(`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(code)}.json?fields=product_name,nutriments`);
-        const data=await res.json();
-        if(!data.product){ stage.innerHTML=`<div class="err">Product not found. Try entering it manually.</div><button class="btn btn-block" id="bc-man" style="margin-top:10px">Enter manually</button>`; stage.querySelector('#bc-man').onclick=renderManual; return; }
-        const n=data.product.nutriments||{};
-        result(data.product.product_name||('Item '+code),{calories:+(n['energy-kcal_100g']||0),protein_g:+(n['proteins_100g']||0),carbs_g:+(n['carbohydrates_100g']||0),fat_g:+(n['fat_100g']||0),sugar_g:+(n['sugars_100g']||0)},'barcode');
-      }catch(e){ stage.innerHTML=`<div class="err">Lookup failed. Check your connection or enter manually.</div>`; }
-    }
-    function result(name,per,source,g){
+      const r=await barcodeLookup(code);
+      if(!r){ stage.innerHTML=`<div class="err">No product found for that barcode. Scan again, or enter it manually.</div><button class="btn btn-block" id="bc-man" style="margin-top:10px">Enter manually</button><button class="btn btn-block" id="bc-again" style="margin-top:8px">Scan again</button>`; stage.querySelector('#bc-man').onclick=renderManual; stage.querySelector('#bc-again').onclick=renderBarcode; return; }
       body.innerHTML=`<div class="sub-head"><button class="circ-back" id="bc-b2">${IC_BACK}</button><h3>Add item</h3></div><div id="bc-stage2"></div>`;
       body.querySelector('#bc-b2').onclick=renderBarcode;
-      weighAndLog(null,body.querySelector('#bc-stage2'),name,per,source,g,()=>sh.close());
+      weighAndLog(null,body.querySelector('#bc-stage2'),r.name,r.per,r.source,r.g,()=>sh.close());
     }
     startScan();
   }
@@ -810,33 +798,21 @@ function openAdd(){
   function renderLibrary(){
     camStop();
     body.innerHTML=`<div class="sub-head"><button class="circ-back" id="lb-back">${IC_BACK}</button><h3>Library</h3></div>
-      <div class="seg" id="lib-tabs"><button data-t="recent" class="on">Recent</button><button data-t="saved">Saved</button><button data-t="mine">My foods</button></div>
-      <div id="lib-body" style="margin-top:10px"></div>`;
+      <div id="lib-body" style="margin-top:6px"></div>`;
     body.querySelector('#lb-back').onclick=renderFood;
     const lb=body.querySelector('#lib-body');
-    const tabs=body.querySelectorAll('#lib-tabs button');
     const rowHtml=(name,sub,attr)=>`<div class="recent-row"><span class="recent-ic">${IC_FORK}</span><div class="recent-main"><div class="rn">${esc(name)}</div><div class="rs">${esc(sub)}</div></div><button class="recent-add" ${attr} aria-label="Add">${IC_PLUS}</button></div>`;
-    const distinct=()=>{const seen=new Set(),out=[];for(let i=state.entries.length-1;i>=0;i--){const e=state.entries[i],k=(e.name||'').toLowerCase();if(!e.name||seen.has(k))continue;seen.add(k);out.push({name:e.name,sub:`${e.servingLabel||(e.grams?r0(e.grams)+' g':'')} · ${r0(e.calories)} kcal`,entry:e});}return out;};
-    function quickList(list){
-      if(!list.length){lb.innerHTML=`<div class="empty" style="border:none">Nothing logged yet.</div>`;return;}
-      lb.innerHTML=list.map((r,i)=>rowHtml(r.name,r.sub,`data-i="${i}"`)).join('');
-      lb.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>{relogFood(list[+b.dataset.i]);sh.close();});
-    }
-    function showSaved(){
-      const lib2=state.library;
-      if(!lib2.length){lb.innerHTML=`<div class="empty" style="border:none">Your library is empty. Tick “Save to library” after logging to reuse items here.</div>`;return;}
-      lb.innerHTML=lib2.map(l=>{const sub=l.perServing?`${r0(l.perServing.calories)} kcal per ${esc(l.perServing.portion)}`:`${r0(l.per_100g.calories)} kcal/100g`;return rowHtml(l.name,sub,`data-lib="${l.id}"`);}).join('');
-      lb.querySelectorAll('[data-lib]').forEach(b=>b.onclick=()=>{
-        const l=state.library.find(x=>x.id===b.dataset.lib);
-        body.innerHTML=`<div class="sub-head"><button class="circ-back" id="lb-b2">${IC_BACK}</button><h3>Add item</h3></div><div id="lb-stage"></div>`;
-        body.querySelector('#lb-b2').onclick=renderLibrary;
-        const stage=body.querySelector('#lb-stage');
-        if(l.perServing)logServing(null,stage,l.name,l.perServing.calories,l.perServing.portion,'library',()=>sh.close());
-        else weighAndLog(null,stage,l.name,l.per_100g,'library',l.lastGrams,()=>sh.close());
-      });
-    }
-    tabs.forEach(b=>b.onclick=()=>{tabs.forEach(x=>x.classList.toggle('on',x===b));const t=b.dataset.t;t==='recent'?quickList(recentFoods(20)):t==='mine'?quickList(distinct()):showSaved();});
-    quickList(recentFoods(20));
+    const lib2=state.library;
+    if(!lib2.length){lb.innerHTML=`<div class="empty" style="border:none">Your library is empty. Tick “Save to library” after logging an item to reuse it here.</div>`;return;}
+    lb.innerHTML=lib2.map(l=>{const sub=l.perServing?`${r0(l.perServing.calories)} kcal per ${esc(l.perServing.portion)}`:`${r0(l.per_100g.calories)} kcal/100g`;return rowHtml(l.name,sub,`data-lib="${l.id}"`);}).join('');
+    lb.querySelectorAll('[data-lib]').forEach(b=>b.onclick=()=>{
+      const l=state.library.find(x=>x.id===b.dataset.lib);
+      body.innerHTML=`<div class="sub-head"><button class="circ-back" id="lb-b2">${IC_BACK}</button><h3>Add item</h3></div><div id="lb-stage"></div>`;
+      body.querySelector('#lb-b2').onclick=renderLibrary;
+      const stage=body.querySelector('#lb-stage');
+      if(l.perServing)logServing(null,stage,l.name,l.perServing.calories,l.perServing.portion,'library',()=>sh.close());
+      else weighAndLog(null,stage,l.name,l.per_100g,'library',l.lastGrams,()=>sh.close());
+    });
   }
 
   function renderManual(){
@@ -845,27 +821,44 @@ function openAdd(){
       <div class="mfield"><label>Food name</label><input id="mn-name" placeholder="e.g. Avocado toast"></div>
       <div style="margin-top:12px"><label class="mlbl">Meal</label><div class="seg" id="mn-meal">${MEALS.map(x=>`<button data-meal="${x}"${x===defaultMeal()?' class="on"':''}>${x}</button>`).join('')}</div></div>
       <div class="mrow" style="margin-top:12px">
-        <div class="mfield"><label>Serving (g)</label><input type="number" inputmode="decimal" id="mn-serv" value="100"></div>
+        <div class="mfield"><label>Serving</label><input type="number" inputmode="decimal" id="mn-amt" value="1"></div>
+        <div class="mfield"><label>Unit</label><select id="mn-unit" class="munit">${UNITS.map(x=>`<option value="${x.u}"${x.u==='serving'?' selected':''}>${x.u}</option>`).join('')}</select></div>
         <div class="mfield"><label>Servings</label><input type="number" inputmode="decimal" id="mn-qty" value="1"></div>
       </div>
+      <div class="hint" id="mn-est" style="margin-top:6px"></div>
       <div class="mcal"><label>Calories</label><div class="calwrap"><input type="number" inputmode="numeric" id="mn-cal" placeholder="0"><span class="calu">kcal</span></div></div>
       <div class="mrow" style="margin-top:12px">
         <div class="mfield"><label>Protein</label><input type="number" inputmode="decimal" id="mn-p" value="0"></div>
         <div class="mfield"><label>Carbs</label><input type="number" inputmode="decimal" id="mn-c" value="0"></div>
         <div class="mfield"><label>Fat</label><input type="number" inputmode="decimal" id="mn-f" value="0"></div>
       </div>
+      <div class="hint" style="margin-top:6px">Enter the calories &amp; macros for one serving.</div>
       <div class="toggle-row" style="margin-top:12px"><input type="checkbox" id="mn-lib" style="width:auto"><label for="mn-lib" style="margin:0">Save to library</label></div>
       <button class="btn btn-primary btn-block" id="mn-save" style="margin-top:14px">Add food</button>`;
     body.querySelector('#mn-back').onclick=renderFood;
     let meal=defaultMeal();
     body.querySelectorAll('#mn-meal button').forEach(b=>b.onclick=()=>{meal=b.dataset.meal;body.querySelectorAll('#mn-meal button').forEach(x=>x.classList.toggle('on',x===b));});
+    const amtEl=body.querySelector('#mn-amt'), unitEl=body.querySelector('#mn-unit'), qtyEl=body.querySelector('#mn-qty'), estEl=body.querySelector('#mn-est');
+    const unitG=()=>(UNITS.find(x=>x.u===unitEl.value)||{g:1}).g;
+    const perG=()=>(+amtEl.value||0)*unitG();
+    function updEst(){
+      const ps=perG(), qty=+qtyEl.value||1, tot=ps*qty;
+      estEl.textContent = unitEl.value==='gram'
+        ? (qty>1?`Logging ${r0(ps)} g × ${r1(qty)} = ${r0(tot)} g`:`Logging ${r0(ps)} g`)
+        : `Each serving ≈ ${r0(ps)} g${qty>1?` · total ≈ ${r0(tot)} g`:''}`;
+    }
+    amtEl.oninput=updEst; qtyEl.oninput=updEst;
+    unitEl.onchange=()=>{ amtEl.value = unitEl.value==='gram' ? 100 : 1; updEst(); };
+    updEst();
     body.querySelector('#mn-save').onclick=()=>{
       const name=body.querySelector('#mn-name').value.trim()||'Item';
-      const servG=+body.querySelector('#mn-serv').value||0, qty=+body.querySelector('#mn-qty').value||1;
+      const amt=+amtEl.value||0, unit=unitEl.value, qty=+qtyEl.value||1, ps=perG(), grams=ps*qty;
       const cal=+body.querySelector('#mn-cal').value||0, p=+body.querySelector('#mn-p').value||0, c=+body.querySelector('#mn-c').value||0, f=+body.querySelector('#mn-f').value||0;
-      const grams=servG*qty;
-      state.entries.push({id:uid(),date:viewDate,meal,name,grams,servingLabel:`${r1(qty)} × ${r0(servG)} g`,calories:cal*qty,protein_g:p*qty,carbs_g:c*qty,fat_g:f*qty,sugar_g:0,source:'manual'});
-      if(body.querySelector('#mn-lib').checked && servG>0) addToLibrary(name,{calories:cal*100/servG,protein_g:p*100/servG,carbs_g:c*100/servG,fat_g:f*100/servG,sugar_g:0},servG);
+      let perLabel = unit==='gram' ? `${r0(ps)} g` : `${r1(amt)} ${unit}`;
+      let servingLabel = qty>1 ? `${r1(qty)} × ${perLabel}` : perLabel;
+      if(unit!=='gram') servingLabel += ` (≈ ${r0(grams)} g)`;
+      state.entries.push({id:uid(),date:viewDate,meal,name,grams,servingLabel,calories:cal*qty,protein_g:p*qty,carbs_g:c*qty,fat_g:f*qty,sugar_g:0,source:'manual'});
+      if(body.querySelector('#mn-lib').checked && ps>0) addToLibrary(name,{calories:cal*100/ps,protein_g:p*100/ps,carbs_g:c*100/ps,fat_g:f*100/ps,sugar_g:0},ps);
       save();sh.close();
     };
   }
@@ -930,12 +923,22 @@ function openAdd(){
 }
 
 /* ---------- SEARCH BY NAME ---------- */
+async function barcodeLookup(code){
+  code=String(code);
+  try{ await ensureONDB(); const hit=ONBYEAN&&ONBYEAN.get(code); if(hit) return {name:hit[0],per:{calories:hit[1],protein_g:hit[2],carbs_g:hit[3],fat_g:hit[4],sugar_g:hit[5]},source:'opennutrition',g:hit[6]}; }catch(e){}
+  try{
+    const res=await fetch(`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(code)}.json?fields=product_name,nutriments`);
+    const data=await res.json();
+    if(data.product){ const n=data.product.nutriments||{}; return {name:data.product.product_name||('Item '+code),per:{calories:+(n['energy-kcal_100g']||0),protein_g:+(n['proteins_100g']||0),carbs_g:+(n['carbohydrates_100g']||0),fat_g:+(n['fat_100g']||0),sugar_g:+(n['sugars_100g']||0)},source:'barcode'}; }
+  }catch(e){}
+  return null;
+}
 function openSearch(){
   const m=openModal('Search by name',`
     <div class="field"><label>Food or brand name</label>
-      <input id="sf-q" placeholder="e.g. chicken rice, Big Mac, Milo" autocomplete="off"></div>
+      <input id="sf-q" placeholder="Name or barcode number" autocomplete="off"></div>
     <div class="btn-row"><button class="btn btn-primary btn-block" id="sf-go">Also search packaged foods</button></div>
-    <div class="hint">Your library, the local database, and OpenNutrition (13,000+ foods with macros) match as you type — all offline. The button also checks Open Food Facts for packaged items; barcode scanning is most reliable for branded products.</div>
+    <div class="hint">Your library, the local database, and OpenNutrition (13,000+ foods with macros) match as you type — all offline. Type or paste a product’s barcode number to look it up. The button also checks Open Food Facts for packaged items.</div>
     <div id="sf-lib"></div>
     <div id="sf-results"></div>
   `);
@@ -949,9 +952,18 @@ function openSearch(){
     const stage=el('<div></div>'); m.querySelector('#m-body').innerHTML=''; m.querySelector('#m-body').appendChild(stage);
     logServing(m,stage,name,cal,portion,source);
   }
+  async function doBarcode(code){
+    const stage=el('<div></div>'); m.querySelector('#m-body').innerHTML=''; m.querySelector('#m-body').appendChild(stage);
+    stage.innerHTML=`<div class="spinner">${ONDB?'Looking up product…':'Loading food database (first time only, ~10 MB)…'}</div>`;
+    const r=await barcodeLookup(code);
+    if(!r){ stage.innerHTML=`<div class="err">No product found for barcode ${esc(code)} in OpenNutrition or Open Food Facts.</div><div class="field"><button class="btn btn-block" id="bc-back2">Back to search</button></div>`; stage.querySelector('#bc-back2').onclick=()=>{m.remove();openSearch();}; return; }
+    weighAndLog(m,stage,r.name,r.per,r.source,r.g);
+  }
   function renderLocal(){
     const term=q.value.trim().toLowerCase();
+    const raw=q.value.trim(); const isBC=/^\d{8,14}$/.test(raw);
     let html='';
+    if(isBC) html+=`<div class="section-label">Barcode</div><div class="row tappable" data-bc="1"><div><div class="name">Look up barcode ${esc(raw)}</div><div class="sub">Search packaged products by number</div></div></div>`;
     const libM=term?state.library.filter(l=>l.name.toLowerCase().includes(term)):[];
     if(libM.length)html+=`<div class="section-label">Personal library</div>`+libM.map(l=>{
       const sub=l.perServing?`${r0(l.perServing.calories)} kcal per ${esc(l.perServing.portion)}`:`${r0(l.per_100g.calories)} kcal/100g`;
@@ -970,6 +982,7 @@ function openSearch(){
     if(term && (libM.length||dbMatches.length||onMatches.length))
       html+=`<div class="hint" style="padding:14px 4px 0">Nutrition data from <a href="https://www.opennutrition.app" target="_blank" rel="noopener">OpenNutrition</a> &amp; Open Food Facts contributors.</div>`;
     libBox.innerHTML=html;
+    const bcRow=libBox.querySelector('[data-bc]'); if(bcRow)bcRow.onclick=()=>doBarcode(raw);
     libBox.querySelectorAll('[data-lib]').forEach(n=>n.onclick=()=>{const l=state.library.find(x=>x.id===n.dataset.lib);if(l.perServing)pickServing(l.name,l.perServing.calories,l.perServing.portion,'library');else pickPer(l.name,l.per_100g,'library',l.lastGrams);});
     libBox.querySelectorAll('[data-db]').forEach(n=>n.onclick=()=>{const f=dbMatches[+n.dataset.db];pickServing(f.name,f.calories,f.portion,'local');});
     libBox.querySelectorAll('[data-on]').forEach(n=>n.onclick=()=>{const f=onMatches[+n.dataset.on];pickPer(f[0],{calories:f[1],protein_g:f[2],carbs_g:f[3],fat_g:f[4],sugar_g:f[5]},'opennutrition',f[6]);});
@@ -1215,17 +1228,14 @@ function logServing(m,stage,name,calories,portion,source,onDone){
 function openBarcode(){
   const m=openModal('Scan a barcode',`
     <div id="reader"></div>
-    <div class="bc-hint">Point your camera at a product barcode</div>
-    <div class="field" style="margin-top:10px"><input type="number" inputmode="numeric" id="bc-num" placeholder="…or type the barcode number"></div>
-    <div class="btn-row"><button class="btn" id="bc-scan">Restart camera</button><button class="btn btn-primary" id="bc-look">Look up</button></div>
+    <div class="bc-hint" id="bc-hint">Point your camera at a product barcode</div>
     <div id="bc-stage"></div>
   `);
-  const stage=m.querySelector('#bc-stage');
+  const stage=m.querySelector('#bc-stage'), hint=m.querySelector('#bc-hint');
   let scanner=null, running=false;
   const stopScanner=()=>{ if(scanner&&running){running=false;try{return scanner.stop().then(()=>{try{scanner.clear();}catch(_){}}).catch(()=>{});}catch(_){}} return Promise.resolve(); };
-  m.querySelector('#bc-look').onclick=()=>doLookup(m.querySelector('#bc-num').value.trim());
   const startScan=async()=>{
-    if(typeof Html5Qrcode==='undefined'){stage.innerHTML=`<div class="hint">Camera scanning unavailable here — type the barcode number instead.</div>`;return;}
+    if(typeof Html5Qrcode==='undefined'){hint.textContent='Camera scanning isn’t available here — type the barcode number into “Search for a food”.';return;}
     await stopScanner();
     const opts={};
     if(typeof Html5QrcodeSupportedFormats!=='undefined'){opts.formatsToSupport=[Html5QrcodeSupportedFormats.EAN_13,Html5QrcodeSupportedFormats.EAN_8,Html5QrcodeSupportedFormats.UPC_A,Html5QrcodeSupportedFormats.UPC_E,Html5QrcodeSupportedFormats.CODE_128,Html5QrcodeSupportedFormats.CODE_39,Html5QrcodeSupportedFormats.ITF,Html5QrcodeSupportedFormats.QR_CODE];}
@@ -1233,36 +1243,18 @@ function openBarcode(){
       scanner=new Html5Qrcode('reader',opts); running=true;
       await scanner.start({facingMode:'environment'},
         {fps:10,qrbox:(w,h)=>{const bw=Math.min(w-20,300);return {width:bw,height:Math.max(110,Math.round(bw*0.55))};},aspectRatio:1.3333,experimentalFeatures:{useBarCodeDetectorIfSupported:true}},
-        (txt)=>{ if(!running)return; stopScanner(); m.querySelector('#bc-num').value=txt; doLookup(txt); },()=>{});
-    }catch(e){running=false;stage.innerHTML=`<div class="hint">Could not start the camera — type the barcode number instead.</div>`;}
+        (txt)=>{ if(!running)return; stopScanner(); doLookup(txt); },()=>{});
+    }catch(e){running=false;hint.textContent='Couldn’t start the camera — type the barcode number into “Search for a food”.';}
   };
-  m.querySelector('#bc-scan').onclick=startScan;
   async function doLookup(code){
-    if(!code){stage.innerHTML=`<div class="err">Enter a barcode number.</div>`;return;}
     await stopScanner();
     m.querySelector('#reader').innerHTML='';
     stage.innerHTML=`<div class="spinner">${ONDB?'Looking up product…':'Loading food database (first time only, ~10 MB)…'}</div>`;
-    // 1) offline: OpenNutrition cached database (313k barcodes)
-    try{
-      await ensureONDB();
-      const hit=ONBYEAN && ONBYEAN.get(String(code));
-      if(hit){
-        const per={calories:hit[1],protein_g:hit[2],carbs_g:hit[3],fat_g:hit[4],sugar_g:hit[5]};
-        weighAndLog(m,stage,hit[0],per,'opennutrition',hit[6]); return;
-      }
-    }catch(e){/* fall through to online */}
-    // 2) online: Open Food Facts
-    stage.innerHTML=`<div class="spinner">Looking up product…</div>`;
-    try{
-      const res=await fetch(`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(code)}.json?fields=product_name,nutriments`);
-      const data=await res.json();
-      if(!data.product){stage.innerHTML=`<div class="err">Product not found in OpenNutrition or Open Food Facts. Try entering it manually.</div><div class="btn-row"><button class="btn" id="man">Enter manually</button></div>`;stage.querySelector('#man').onclick=()=>{m.remove();openManual();};return;}
-      const n=data.product.nutriments||{};
-      const per={calories:+(n['energy-kcal_100g']||0),protein_g:+(n['proteins_100g']||0),carbs_g:+(n['carbohydrates_100g']||0),fat_g:+(n['fat_100g']||0),sugar_g:+(n['sugars_100g']||0)};
-      const name=data.product.product_name||('Item '+code);
-      weighAndLog(m,stage,name,per,'barcode');
-    }catch(e){stage.innerHTML=`<div class="err">Lookup failed. Check your connection or enter manually.</div>`;}
+    const r=await barcodeLookup(code);
+    if(!r){stage.innerHTML=`<div class="err">Product not found in OpenNutrition or Open Food Facts. Try entering it manually.</div><div class="btn-row"><button class="btn" id="man">Enter manually</button></div>`;stage.querySelector('#man').onclick=()=>{m.remove();openManual();};return;}
+    weighAndLog(m,stage,r.name,r.per,r.source,r.g);
   }
+  startScan();
 }
 
 /* shared: weigh a known per-100g item and log */
