@@ -675,6 +675,11 @@ function openPhoto(){
   m.querySelector('#photo-cam').onchange=handle;
   m.querySelector('#photo-gal').onchange=handle;
 }
+function genConfig(model){
+  const cfg={responseMimeType:'application/json',maxOutputTokens:2048};
+  if(/flash/i.test(model)) cfg.thinkingConfig={thinkingBudget:0}; // disable "thinking" so JSON isn't truncated
+  return cfg;
+}
 async function analyzePhoto(b64){
   const model=state.settings.model||'gemini-2.5-flash';
   const url=`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(state.settings.apiKey)}`;
@@ -686,7 +691,7 @@ async function analyzePhoto(b64){
         {inline_data:{mime_type:'image/jpeg',data:b64}},
         {text:VISION_PROMPT}
       ]}],
-      generationConfig:{responseMimeType:'application/json'}
+      generationConfig:genConfig(model)
     })
   });
   if(!res.ok){
@@ -696,24 +701,27 @@ async function analyzePhoto(b64){
   }
   const data=await res.json();
   const cand=(data.candidates||[])[0];
+  if(cand && cand.finishReason==='MAX_TOKENS') throw new Error('The AI response was cut off. Tap to try again, or use a clearer, closer photo.');
   let text=cand && cand.content && cand.content.parts ? cand.content.parts.map(p=>p.text).filter(Boolean).join('\n').trim() : '';
-  if(!text)throw new Error('Empty response from Gemini.');
+  if(!text)throw new Error('Empty response from Gemini. Try again or enter the food manually.');
   text=text.replace(/```json|```/g,'').trim();
   const s=text.indexOf('{'), e=text.lastIndexOf('}');
   if(s>=0&&e>=0)text=text.slice(s,e+1);
-  return JSON.parse(text);
+  try{ return JSON.parse(text); }
+  catch(err){ throw new Error('Could not read the AI response (it may have been cut off). Please try again.'); }
 }
 async function aiNutrition(name){
   const model=state.settings.model||'gemini-2.5-flash';
   const url=`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(state.settings.apiKey)}`;
   const prompt=`Give typical nutrition per 100 grams for this food, assuming the common Singapore version if relevant: "${name}". Respond with ONLY JSON, no markdown: {"name":"","per_100g":{"calories":0,"protein_g":0,"carbs_g":0,"fat_g":0,"sugar_g":0}}. If it is not a food, set calories to 0.`;
-  const res=await fetch(url,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{responseMimeType:'application/json'}})});
+  const res=await fetch(url,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:genConfig(model)})});
   if(!res.ok){let msg='Gemini API error '+res.status;try{const e=await res.json();if(e.error&&e.error.message)msg=e.error.message;}catch(_){}throw new Error(msg);}
   const data=await res.json();
   const cand=(data.candidates||[])[0];
+  if(cand && cand.finishReason==='MAX_TOKENS') throw new Error('The AI response was cut off. Please try again.');
   let text=cand&&cand.content&&cand.content.parts?cand.content.parts.map(p=>p.text).filter(Boolean).join('\n').trim():'';
   text=text.replace(/```json|```/g,'').trim();const s=text.indexOf('{'),e=text.lastIndexOf('}');if(s>=0&&e>=0)text=text.slice(s,e+1);
-  return JSON.parse(text);
+  try{ return JSON.parse(text); }catch(err){ throw new Error('Could not read the AI response. Please try again.'); }
 }
 function showConfirm(m,stage,result){
   const items=result.items.map(it=>({
