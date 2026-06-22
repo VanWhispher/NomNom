@@ -212,9 +212,11 @@
   .seg button{flex:1;padding:9px 0;border:none;border-radius:10px;background:transparent;font-family:var(--body);font-weight:600;font-size:14px;color:var(--text-soft);cursor:pointer;}
   .seg button.on{background:#fff;color:var(--accent-strong);box-shadow:0 1px 3px rgba(0,0,0,.08);}
   .addtabs{margin:8px 0 2px;}
-  .add-search{display:flex;align-items:center;gap:10px;background:var(--accent-bg);border-radius:15px;padding:13px 15px;margin-top:14px;cursor:pointer;color:var(--text-soft);}
-  .add-search svg{width:20px;height:20px;flex:none;}
-  .add-search span{font-size:15px;}
+  .add-search{display:flex;align-items:center;gap:10px;background:var(--accent-bg);border-radius:15px;padding:13px 15px;margin-top:14px;color:var(--text-soft);}
+  .add-search .as-ic{flex:none;display:flex;color:var(--text-soft);}
+  .add-search .as-ic svg{width:20px;height:20px;}
+  .add-search input{flex:1;border:none;background:none;outline:none;font-family:var(--body);font-size:15px;color:var(--text);min-width:0;}
+  .add-search input::placeholder{color:var(--text-soft);}
   .tiles{display:flex;gap:8px;margin-top:14px;}
   .tile{flex:1;display:flex;flex-direction:column;align-items:center;gap:7px;background:none;border:none;cursor:pointer;padding:0;}
   .tile-ic{display:flex;align-items:center;justify-content:center;width:54px;height:54px;border-radius:17px;background:var(--accent-bg);color:var(--accent-strong);}
@@ -256,9 +258,10 @@
   .step{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;border:none;background:#fff;color:var(--accent-strong);cursor:pointer;flex:none;box-shadow:0 3px 9px rgba(216,85,122,.20);}
   .step:active{transform:scale(.94);}
   .step svg{width:18px;height:18px;}
-  .nn-range{-webkit-appearance:none;appearance:none;flex:1;height:7px;border-radius:7px;outline:none;background:var(--accent-bg);}
-  .nn-range::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;background:#fff;border:4px solid var(--accent);box-shadow:0 2px 6px rgba(216,85,122,.4);cursor:pointer;}
-  .nn-range::-moz-range-thumb{width:26px;height:26px;border-radius:50%;background:#fff;border:4px solid var(--accent);box-shadow:0 2px 6px rgba(216,85,122,.4);cursor:pointer;}
+  .nn-slider{position:relative;flex:1;height:26px;display:flex;align-items:center;touch-action:none;cursor:pointer;}
+  .nn-track{position:absolute;left:0;right:0;height:7px;border-radius:7px;background:var(--accent-bg);}
+  .nn-fill{position:absolute;left:0;height:7px;border-radius:7px;background:var(--accent);width:0;}
+  .nn-thumb{position:absolute;left:0;width:26px;height:26px;border-radius:50%;background:#fff;border:4px solid var(--accent);box-shadow:0 2px 6px rgba(216,85,122,.4);}
   .burned{background:var(--accent);border-radius:18px;padding:20px 16px;text-align:center;margin-top:14px;}
   .burned-l{font-size:13px;color:rgba(255,255,255,.9);}
   .burned-n{font-family:var(--display);font-weight:800;font-size:46px;color:#fff;line-height:1.05;margin-top:2px;}
@@ -276,7 +279,8 @@
   .choose-main .cc{font-size:12.5px;color:var(--text-soft);}
   .choose-chk{color:var(--accent-strong);flex:none;}
   .choose-chk svg{width:20px;height:20px;}
-  .scan-frame{position:relative;width:100%;aspect-ratio:4/3;border-radius:18px;overflow:hidden;background:linear-gradient(150deg,#2b2230,#16131b);display:flex;align-items:flex-end;justify-content:center;cursor:pointer;margin-top:6px;}
+  .scan-frame{position:relative;width:100%;aspect-ratio:3/4;border-radius:18px;overflow:hidden;background:#16131b;cursor:pointer;margin-top:6px;}
+  .scan-frame video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}
   .scan-frame .corners span{position:absolute;width:30px;height:30px;border:3px solid rgba(255,255,255,.85);}
   .scan-frame .corners span:nth-child(1){top:26px;left:26px;border-right:none;border-bottom:none;border-radius:7px 0 0 0;}
   .scan-frame .corners span:nth-child(2){top:26px;right:26px;border-left:none;border-bottom:none;border-radius:0 7px 0 0;}
@@ -284,7 +288,7 @@
   .scan-frame .corners span:nth-child(4){bottom:46px;right:26px;border-left:none;border-top:none;border-radius:0 0 7px 0;}
   .scan-line{position:absolute;left:26px;right:26px;top:48%;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);box-shadow:0 0 9px var(--accent);animation:scanmove 2.4s ease-in-out infinite;}
   @keyframes scanmove{0%,100%{transform:translateY(-58px)}50%{transform:translateY(58px)}}
-  .scan-hint{position:relative;color:rgba(255,255,255,.92);font-size:13px;padding-bottom:18px;}
+  .scan-hint{position:absolute;left:0;right:0;bottom:16px;text-align:center;color:rgba(255,255,255,.92);font-size:13px;}
   #reader{width:100%;border-radius:18px;overflow:hidden;background:#16131b;min-height:180px;}
   #reader video{width:100%!important;display:block;border-radius:18px;}
   #reader img{display:none!important;}
@@ -692,35 +696,67 @@ function openAdd(){
     <div id="add-body"></div>`);
   const body=sh.overlay.querySelector('#add-body');
   const tabs=sh.overlay.querySelectorAll('#add-tabs button');
+  const tabBar=sh.overlay.querySelector('#add-tabs');
+  const setTabs=(v)=>{tabBar.style.display=v?'':'none';};
   const go=(fn)=>{sh.close();setTimeout(fn,200);};
 
+  function addItemView(run){
+    setTabs(false);
+    body.innerHTML=`<div class="sub-head"><button class="circ-back" id="ai-back">${IC_BACK}</button><h3>Add item</h3></div><div id="ai-stage"></div>`;
+    body.querySelector('#ai-back').onclick=renderFood;
+    run(body.querySelector('#ai-stage'));
+  }
+
   function renderFood(){
-    camStop();
-    const recents=recentFoods(8);
+    camStop(); setTabs(true);
     body.innerHTML=`
-      <div class="add-search" id="af-search">${IC_SEARCH}<span>Search for a food…</span></div>
-      <div class="tiles">
-        <button class="tile" id="af-scan"><span class="tile-ic">${IC_CAMERA}</span><span>Scan food</span></button>
-        <button class="tile" id="af-bar"><span class="tile-ic">${IC_BARCODE}</span><span>Barcode</span></button>
-        <button class="tile" id="af-lib"><span class="tile-ic">${IC_BOOK}</span><span>Library</span></button>
-        <button class="tile" id="af-man"><span class="tile-ic">${IC_PEN}</span><span>Manual</span></button>
-      </div>
-      ${recents.length?`<div class="add-label">Recent</div><div>${recents.map((r,i)=>`
-        <div class="recent-row">
-          <span class="recent-ic">${IC_FORK}</span>
-          <div class="recent-main"><div class="rn">${esc(r.name)}</div><div class="rs">${esc(r.sub)}</div></div>
-          <button class="recent-add" data-rl="${i}" aria-label="Re-log">${IC_PLUS}</button>
-        </div>`).join('')}</div>`:''}`;
-    body.querySelector('#af-search').onclick=()=>go(openSearch);
-    body.querySelector('#af-scan').onclick=()=>renderScan();
-    body.querySelector('#af-bar').onclick=()=>renderBarcode();
-    body.querySelector('#af-lib').onclick=()=>renderLibrary();
-    body.querySelector('#af-man').onclick=()=>renderManual();
-    body.querySelectorAll('[data-rl]').forEach(b=>b.onclick=()=>{relogFood(recents[+b.dataset.rl]);sh.close();});
+      <div class="add-search"><span class="as-ic">${IC_SEARCH}</span><input id="af-q" placeholder="Search for a food…" autocomplete="off"></div>
+      <div id="af-main"></div>`;
+    const qEl=body.querySelector('#af-q'), main=body.querySelector('#af-main');
+    const rowHtml=(name,sub,attr,ic)=>`<div class="recent-row" ${attr}><span class="recent-ic">${ic||IC_FORK}</span><div class="recent-main"><div class="rn">${esc(name)}</div><div class="rs">${esc(sub)}</div></div><button class="recent-add" tabindex="-1" aria-label="Add">${IC_PLUS}</button></div>`;
+    function showHome(){
+      const recents=recentFoods(8);
+      main.innerHTML=`
+        <div class="tiles">
+          <button class="tile" id="af-scan"><span class="tile-ic">${IC_CAMERA}</span><span>Scan food</span></button>
+          <button class="tile" id="af-bar"><span class="tile-ic">${IC_BARCODE}</span><span>Barcode</span></button>
+          <button class="tile" id="af-lib"><span class="tile-ic">${IC_BOOK}</span><span>Library</span></button>
+          <button class="tile" id="af-man"><span class="tile-ic">${IC_PEN}</span><span>Manual</span></button>
+        </div>
+        ${recents.length?`<div class="add-label">Recent</div><div>${recents.map((r,i)=>`<div class="recent-row"><span class="recent-ic">${IC_FORK}</span><div class="recent-main"><div class="rn">${esc(r.name)}</div><div class="rs">${esc(r.sub)}</div></div><button class="recent-add" data-rl="${i}" aria-label="Re-log">${IC_PLUS}</button></div>`).join('')}</div>`:''}`;
+      main.querySelector('#af-scan').onclick=()=>renderScan();
+      main.querySelector('#af-bar').onclick=()=>renderBarcode();
+      main.querySelector('#af-lib').onclick=()=>renderLibrary();
+      main.querySelector('#af-man').onclick=()=>renderManual();
+      main.querySelectorAll('[data-rl]').forEach(b=>b.onclick=()=>{relogFood(recents[+b.dataset.rl]);sh.close();});
+    }
+    function showResults(term){
+      const low=term.toLowerCase(), isBC=/^\d{8,14}$/.test(term);
+      let html='';
+      if(isBC) html+=`<div class="add-label">Barcode</div>`+rowHtml('Look up barcode '+term,'Search packaged products','data-bc="1"',IC_BARCODE);
+      const libM=state.library.filter(l=>l.name.toLowerCase().includes(low)).slice(0,8);
+      if(libM.length) html+=`<div class="add-label">Saved</div>`+libM.map(l=>{const sub=l.perServing?`${r0(l.perServing.calories)} kcal per ${esc(l.perServing.portion)}`:`${r0(l.per_100g.calories)} kcal/100g`;return rowHtml(l.name,sub,`data-lib="${l.id}"`);}).join('');
+      const dbM=(DB||[]).filter(f=>f.name.toLowerCase().includes(low)).slice(0,12);
+      if(dbM.length) html+=`<div class="add-label">Local database</div>`+dbM.map((f,i)=>rowHtml(f.name,`${r0(f.calories)} kcal · ${esc(f.portion)}`,`data-db="${i}"`)).join('');
+      let onM=[];
+      if(low.length>=2){
+        if(ONDB){ onM=ONDB.filter(a=>a[0].toLowerCase().includes(low)).slice(0,25); if(onM.length) html+=`<div class="add-label">OpenNutrition</div>`+onM.map((f,i)=>rowHtml(f[0],`${r0(f[1])} kcal/100g`,`data-on="${i}"`)).join(''); }
+        else html+=`<div class="add-label">OpenNutrition</div><div class="empty" style="border:none" id="af-onload">Loading food database (first time, ~10 MB)…</div>`;
+      }
+      if(!html) html=`<div class="empty" style="border:none">No matches yet — try Scan, Barcode or Manual.</div>`;
+      main.innerHTML=html;
+      const bc=main.querySelector('[data-bc]'); if(bc)bc.onclick=()=>addItemView(async st=>{ st.innerHTML=`<div class="spinner">Looking up…</div>`; const r=await barcodeLookup(term); if(!r){st.innerHTML=`<div class="err">No product found for barcode ${esc(term)}.</div>`;return;} weighAndLog(null,st,r.name,r.per,r.source,r.g,()=>sh.close()); });
+      main.querySelectorAll('[data-lib]').forEach(n=>n.onclick=()=>{const l=state.library.find(x=>x.id===n.dataset.lib);addItemView(st=>{ if(l.perServing)logServing(null,st,l.name,l.perServing.calories,l.perServing.portion,'library',()=>sh.close()); else weighAndLog(null,st,l.name,l.per_100g,'library',l.lastGrams,()=>sh.close()); });});
+      main.querySelectorAll('[data-db]').forEach(n=>n.onclick=()=>{const f=dbM[+n.dataset.db];addItemView(st=>logServing(null,st,f.name,f.calories,f.portion,'local',()=>sh.close()));});
+      main.querySelectorAll('[data-on]').forEach(n=>n.onclick=()=>{const f=onM[+n.dataset.on];addItemView(st=>weighAndLog(null,st,f[0],{calories:f[1],protein_g:f[2],carbs_g:f[3],fat_g:f[4],sugar_g:f[5]},'opennutrition',f[6],()=>sh.close()));});
+      if(low.length>=2 && !ONDB) ensureONDB().then(()=>{ if(qEl.value.trim()===term) showResults(term); }).catch(()=>{const ld=main.querySelector('#af-onload'); if(ld)ld.textContent='Couldn’t load the food database here.';});
+    }
+    qEl.oninput=()=>{ const t=qEl.value.trim(); t?showResults(t):showHome(); };
+    showHome();
   }
 
   function renderScan(){
-    camStop();
+    camStop(); setTabs(false);
     if(!state.settings.apiKey){
       body.innerHTML=`<div class="sub-head"><button class="circ-back" id="sc-back">${IC_BACK}</button><h3>Scan food</h3></div>
         <div class="note">Add your Google Gemini API key in Settings to identify food from photos.</div>
@@ -731,7 +767,7 @@ function openAdd(){
     }
     body.innerHTML=`
       <div class="sub-head"><button class="circ-back" id="sc-back">${IC_BACK}</button><h3>Scan food</h3></div>
-      <div class="scan-frame" id="sc-frame"><video id="sc-video" playsinline muted style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:18px"></video><div class="corners"><span></span><span></span><span></span><span></span></div><div class="scan-line"></div><div class="scan-hint" id="sc-hint">Starting camera…</div></div>
+      <div class="scan-frame" id="sc-frame"><video id="sc-video" playsinline muted></video><div class="corners"><span></span><span></span><span></span><span></span></div><div class="scan-line"></div><div class="scan-hint" id="sc-hint">Starting camera…</div></div>
       <button class="btn btn-primary btn-block" id="sc-shot" style="margin-top:14px">Capture photo</button>
       <button class="dashed-btn" id="sc-up">${IC_UPLOAD} Upload a photo instead</button>
       <input type="file" accept="image/*" id="sc-file" style="display:none">
@@ -758,7 +794,7 @@ function openAdd(){
   }
 
   function renderBarcode(){
-    camStop();
+    camStop(); setTabs(false);
     let scanner=null, running=false;
     const stopScanner=()=>{ if(scanner&&running){ running=false; try{ return scanner.stop().then(()=>{try{scanner.clear();}catch(_){}}).catch(()=>{}); }catch(_){} } return Promise.resolve(); };
     body.innerHTML=`
@@ -796,7 +832,7 @@ function openAdd(){
   }
 
   function renderLibrary(){
-    camStop();
+    camStop(); setTabs(false);
     body.innerHTML=`<div class="sub-head"><button class="circ-back" id="lb-back">${IC_BACK}</button><h3>Library</h3></div>
       <div id="lib-body" style="margin-top:6px"></div>`;
     body.querySelector('#lb-back').onclick=renderFood;
@@ -816,7 +852,7 @@ function openAdd(){
   }
 
   function renderManual(){
-    camStop();
+    camStop(); setTabs(false);
     body.innerHTML=`<div class="sub-head"><button class="circ-back" id="mn-back">${IC_BACK}</button><h3>Enter manually</h3></div>
       <div class="mfield"><label>Food name</label><input id="mn-name" placeholder="e.g. Avocado toast"></div>
       <div style="margin-top:12px"><label class="mlbl">Meal</label><div class="seg" id="mn-meal">${MEALS.map(x=>`<button data-meal="${x}"${x===defaultMeal()?' class="on"':''}>${x}</button>`).join('')}</div></div>
@@ -871,6 +907,7 @@ function openAdd(){
     const calc=()=>Math.round(MET[activity][intensity]*(wkg||60)*(minutes/60));
 
     function chooseActivity(){
+      setTabs(false);
       body.innerHTML=`
         <div class="sub-head"><button class="circ-back" id="ca-back">${IC_BACK}</button><h3>Choose activity</h3></div>
         <div class="chooser">${acts.map(a=>`<button class="choose-row${a===activity?' on':''}" data-a="${esc(a)}">
@@ -882,6 +919,7 @@ function openAdd(){
     }
 
     function draw(){
+      setTabs(true);
       body.innerHTML=`
         <button class="act-pick" id="ex-actbtn"><span class="act-ic">${actMeta(activity).ic}</span>
           <div class="act-main"><div class="an">${esc(activity)}</div><div class="as">${actMeta(activity).cat}</div></div>
@@ -894,22 +932,28 @@ function openAdd(){
           </div></div>
         <div class="add-card"><div class="dur-h"><span>Duration</span><span class="dur-v"><b id="ex-minv">${minutes}</b> min</span></div>
           <div class="dur-row"><button class="step" id="ex-dec">${IC_MINUS}</button>
-            <input type="range" class="nn-range" id="ex-rng" min="5" max="120" step="1" value="${minutes}">
+            <div class="nn-slider" id="ex-slider"><div class="nn-track"></div><div class="nn-fill" id="ex-fill"></div><div class="nn-thumb" id="ex-thumb"></div></div>
             <button class="step" id="ex-inc">${IC_PLUS}</button></div></div>
         <div class="burned"><div class="burned-l">Calories burned</div>
           <div class="burned-n" id="ex-kcal">${calc()}</div>
           <div class="burned-s">kcal · estimated from intensity, time${wkg?' &amp; weight':''}</div></div>
         ${wkg?'':'<div class="hint" style="text-align:center;margin-top:8px">Using an estimated 60&nbsp;kg — log your weight for a more accurate burn.</div>'}
         <button class="btn btn-primary btn-block" id="ex-save" style="margin-top:16px">Save exercise</button>`;
-      const rng=body.querySelector('#ex-rng');
-      const fill=()=>{const p=(minutes-5)/115,off=(0.5-p)*26;const stop=`calc(${(p*100).toFixed(2)}% + ${off.toFixed(1)}px)`;rng.style.background=`linear-gradient(90deg,var(--accent) ${stop},var(--accent-bg) ${stop})`;};
-      const paint=()=>{body.querySelector('#ex-minv').textContent=minutes;body.querySelector('#ex-kcal').textContent=calc();fill();};
-      fill();
+      const MINm=5,MAXm=120;
+      const sl=body.querySelector('#ex-slider'), fillEl=body.querySelector('#ex-fill'), thumbEl=body.querySelector('#ex-thumb');
+      const place=()=>{const f=(minutes-MINm)/(MAXm-MINm);fillEl.style.width=(f*100)+'%';thumbEl.style.left='calc('+f+' * (100% - 26px))';};
+      const paint=()=>{body.querySelector('#ex-minv').textContent=minutes;body.querySelector('#ex-kcal').textContent=calc();place();};
+      const setFromX=(x)=>{const r=sl.getBoundingClientRect();let f=(x-r.left-13)/(r.width-26);f=Math.max(0,Math.min(1,f));minutes=Math.round(MINm+f*(MAXm-MINm));paint();};
+      let dragging=false;
+      sl.addEventListener('pointerdown',e=>{dragging=true;try{sl.setPointerCapture(e.pointerId);}catch(_){}setFromX(e.clientX);});
+      sl.addEventListener('pointermove',e=>{if(dragging)setFromX(e.clientX);});
+      sl.addEventListener('pointerup',()=>{dragging=false;});
+      sl.addEventListener('pointercancel',()=>{dragging=false;});
+      place();
       body.querySelector('#ex-actbtn').onclick=chooseActivity;
       body.querySelectorAll('#ex-int button').forEach(b=>b.onclick=()=>{intensity=b.dataset.i;body.querySelectorAll('#ex-int button').forEach(x=>x.classList.toggle('on',x===b));body.querySelector('#ex-kcal').textContent=calc();});
-      rng.oninput=()=>{minutes=+rng.value;paint();};
-      body.querySelector('#ex-dec').onclick=()=>{minutes=Math.max(5,minutes-1);rng.value=minutes;paint();};
-      body.querySelector('#ex-inc').onclick=()=>{minutes=Math.min(120,minutes+1);rng.value=minutes;paint();};
+      body.querySelector('#ex-dec').onclick=()=>{minutes=Math.max(MINm,minutes-1);paint();};
+      body.querySelector('#ex-inc').onclick=()=>{minutes=Math.min(MAXm,minutes+1);paint();};
       body.querySelector('#ex-save').onclick=()=>{
         state.exercise.push({id:uid(),date:viewDate,activity,intensity,minutes,met:MET[activity][intensity],caloriesBurned:calc()});
         save();sh.close();
