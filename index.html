@@ -237,7 +237,7 @@
   .set-chev{color:#D6C3CB;flex:none;display:flex;}
   .set-chev svg{width:16px;height:16px;}
   .seg{display:flex;gap:3px;padding:3px;background:rgba(43,42,38,.05);border-radius:11px;flex:none;}
-  .seg-btn{padding:6px 14px;border:none;border-radius:8px;background:transparent;font-family:var(--font);font-weight:600;font-size:13px;color:var(--text-soft);cursor:pointer;}
+  .seg-btn{padding:7px 20px;min-width:50px;text-align:center;border:none;border-radius:8px;background:transparent;font-family:var(--font);font-weight:600;font-size:13px;color:var(--text-soft);cursor:pointer;}
   .seg-btn.active{background:var(--surface);color:var(--accent-strong);box-shadow:0 1px 3px rgba(0,0,0,.1);}
   .set-themes{display:flex;justify-content:space-between;margin-top:2px;}
   .set-sw{display:flex;flex-direction:column;align-items:center;gap:8px;border:none;background:none;padding:0;cursor:pointer;}
@@ -247,7 +247,6 @@
   .set-sw.sel .lbl{color:var(--text);}
   .set-editbtn{padding:8px 16px;border:none;border-radius:11px;background:var(--accent-bg);color:var(--accent-strong);font-family:var(--font);font-weight:600;font-size:13px;cursor:pointer;flex:none;}
   .set-keyinput{width:100%;margin-top:10px;}
-  .set-badge{font-family:var(--font);font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--accent-strong);background:var(--accent-bg);padding:3px 8px;border-radius:999px;white-space:nowrap;}
   .set-pill{display:inline-flex;align-items:center;gap:9px;padding:9px 12px 9px 15px;border:none;border-radius:12px;background:var(--accent-bg);color:var(--accent-strong);font-family:var(--font);font-weight:600;font-size:13.5px;cursor:pointer;flex:none;}
   .set-pill svg{width:15px;height:15px;transition:transform .2s;}
   .set-pill.open svg{transform:rotate(180deg);}
@@ -814,6 +813,7 @@ function openAdd(){
         if(ONDB){ onM=ONDB.filter(a=>a[0].toLowerCase().includes(low)).slice(0,25); if(onM.length) html+=`<div class="add-label">OpenNutrition</div>`+onM.map((f,i)=>rowHtml(f[0],`${r0(f[1])} kcal/100g`,`data-on="${i}"`)).join(''); }
         else html+=`<div class="add-label">OpenNutrition</div><div class="empty" style="border:none" id="af-onload">Loading food database (first time, ~10 MB)…</div>`;
       }
+      if(!isBC && low.length>=2) html+=`<div class="add-label">Packaged &amp; branded</div><button class="btn btn-block" id="af-off" style="margin-top:2px">Search Open Food Facts for “${esc(term)}”</button><div id="af-offbox"></div>`;
       if(!isBC && low.length>=1) html+=`<div class="add-label">Not what you want?</div><button class="btn btn-block" id="af-ai" style="margin-top:2px">Estimate “${esc(term)}” with AI</button>`;
       if(!html) html=`<div class="empty" style="border:none">Type a food name to search or estimate with AI.</div>`;
       main.innerHTML=html;
@@ -827,7 +827,19 @@ function openAdd(){
       main.querySelectorAll('[data-lib]').forEach(n=>n.onclick=()=>{const l=state.library.find(x=>x.id===n.dataset.lib);addItemView(st=>{ if(l.perServing)logServing(null,st,l.name,l.perServing.calories,l.perServing.portion,'library',()=>sh.close()); else weighAndLog(null,st,l.name,l.per_100g,'library',l.lastGrams,()=>sh.close()); });});
       main.querySelectorAll('[data-db]').forEach(n=>n.onclick=()=>{const f=dbM[+n.dataset.db];addItemView(st=>logServing(null,st,f.name,f.calories,f.portion,'local',()=>sh.close()));});
       main.querySelectorAll('[data-on]').forEach(n=>n.onclick=()=>{const f=onM[+n.dataset.on];addItemView(st=>weighAndLog(null,st,f[0],{calories:f[1],protein_g:f[2],carbs_g:f[3],fat_g:f[4],sugar_g:f[5]},'opennutrition',f[6],()=>sh.close()));});
-      if(low.length>=2 && !ONDB) ensureONDB().then(()=>{ if(qEl.value.trim()===term) showResults(term); }).catch(()=>{const ld=main.querySelector('#af-onload'); if(ld)ld.textContent='Couldn’t load the food database here.';});
+      const offBtn=main.querySelector('#af-off');
+      if(offBtn) offBtn.onclick=async()=>{
+        const box=main.querySelector('#af-offbox');
+        offBtn.disabled=true; box.innerHTML=`<div class="empty" style="border:none">Searching Open Food Facts…</div>`;
+        try{
+          const items=await offTextSearch(term);
+          if(!items.length){ box.innerHTML=`<div class="empty" style="border:none">No Open Food Facts matches for “${esc(term)}”.</div>`; offBtn.disabled=false; offBtn.textContent='Search again'; return; }
+          box.innerHTML=items.map((it,i)=>rowHtml(it.name,`${it.brands?esc(it.brands)+' · ':''}${r0(it.per.calories)} kcal/100g · Open Food Facts`,`data-off="${i}"`)).join('');
+          box.querySelectorAll('[data-off]').forEach(n=>n.onclick=()=>{const it=items[+n.dataset.off];addItemView(st=>weighAndLog(null,st,it.name,it.per,'packaged',null,()=>sh.close()));});
+          offBtn.disabled=false; offBtn.textContent='Search Open Food Facts again';
+        }catch(e){ box.innerHTML=`<div class="err">${esc(e.message||'Open Food Facts search failed.')}</div>`; offBtn.disabled=false; }
+      };
+      if(low.length>=2 && !ONDB) ensureONDB().then(()=>{ if(qEl.value.trim()===term) showResults(term); }).catch(()=>{const ld=main.querySelector('#af-onload'); if(ld)ld.textContent='Offline database unavailable here — use Open Food Facts or AI below, or check it’s deployed next to the app over https.';});
     }
     qEl.oninput=()=>{ const t=qEl.value.trim(); t?showResults(t):showHome(); };
     showHome();
@@ -1054,6 +1066,22 @@ async function barcodeLookup(code){
     if(data.product){ const n=data.product.nutriments||{}; return {name:data.product.product_name||('Item '+code),per:{calories:+(n['energy-kcal_100g']||0),protein_g:+(n['proteins_100g']||0),carbs_g:+(n['carbohydrates_100g']||0),fat_g:+(n['fat_100g']||0),sugar_g:+(n['sugars_100g']||0)},source:'barcode'}; }
   }catch(e){}
   return null;
+}
+/* Open Food Facts text search via Search-a-licious (the legacy /cgi/search.pl is 503).
+   On-demand only — OFF rate-limits search to ~10/min and asks apps not to search-as-you-type. */
+async function offTextSearch(term){
+  const url=`https://search.openfoodfacts.org/search?q=${encodeURIComponent(term)}&page_size=20&fields=code,product_name,brands,nutriments`;
+  const r=await fetch(url,{headers:{'Accept':'application/json'}});
+  if(!r.ok) throw new Error('Open Food Facts search is unavailable right now ('+r.status+'). Try again shortly, scan the barcode, or estimate with AI.');
+  const data=await r.json();
+  const list=data.hits||data.products||[];
+  return list.map(p=>{
+    const n=p.nutriments||{}; const kcal=n['energy-kcal_100g'];
+    if(!p.product_name || kcal==null) return null;
+    return {name:p.product_name, brands:p.brands||'', per:{
+      calories:+kcal||0, protein_g:+(n['proteins_100g']||0), carbs_g:+(n['carbohydrates_100g']||0),
+      fat_g:+(n['fat_100g']||0), sugar_g:+(n['sugars_100g']||0)}};
+  }).filter(Boolean);
 }
 function openSearch(){
   const m=openModal('Search by name',`
@@ -1823,7 +1851,7 @@ function openSettings(){
       <div class="set-row" id="set-keyrow"></div>
       <div class="set-row" style="display:block">
         <div style="display:flex;align-items:center;gap:14px">
-          <div class="grow"><span class="set-rt">Model</span> <span class="set-badge">Free tier</span></div>
+          <div class="grow"><div class="set-rt">Model</div></div>
           <button class="set-pill" id="set-modelpill"><span id="set-modelname">Choose</span>${IC_CHEVD}</button>
         </div>
         <div id="set-modelmenu"></div>
