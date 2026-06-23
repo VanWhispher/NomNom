@@ -215,6 +215,57 @@
   .preset .pn{display:block;font-family:var(--display);font-weight:600;font-size:15px;color:var(--text);}
   .preset .pd{display:block;font-size:12px;color:var(--text-soft);margin-top:3px;}
 
+  /* ---- redesigned settings ---- */
+  .sheet.set-sheet{background:var(--bg);}
+  .set-sec{font-family:var(--font);font-weight:600;font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--text-soft);opacity:.85;padding:0 6px 8px;margin-top:20px;}
+  .set-card{background:var(--surface);border-radius:22px;padding:2px 16px;box-shadow:0 3px 14px rgba(43,42,38,.05);margin-bottom:4px;}
+  .set-card.pad{padding:18px;}
+  .set-prof{display:flex;align-items:center;gap:14px;padding:16px;}
+  .set-av{width:54px;height:54px;border-radius:18px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:800;font-size:22px;flex:none;}
+  .set-name{font-family:var(--display);font-weight:700;font-size:18px;color:var(--text);line-height:1.1;}
+  .set-email{font-size:13px;color:var(--text-soft);margin-top:2px;word-break:break-all;}
+  .set-row{display:flex;align-items:center;gap:14px;padding:14px 0;border-top:1px solid var(--divider);}
+  .set-row.first,.set-card>.set-row:first-child{border-top:none;}
+  .set-ico{width:38px;height:38px;border-radius:11px;background:var(--accent-bg);display:flex;align-items:center;justify-content:center;flex:none;color:var(--accent-strong);}
+  .set-ico svg{width:20px;height:20px;}
+  .set-ico.danger{background:#FBE9E5;color:#E5533A;}
+  .set-card .grow{flex:1;min-width:0;}
+  .set-rt{font-weight:600;font-size:15px;color:var(--text);}
+  .set-rt.danger{color:#E5533A;}
+  .set-rs{font-size:12px;color:var(--text-soft);margin-top:1px;}
+  .set-rs.danger{color:#D9A99F;}
+  .set-chev{color:#D6C3CB;flex:none;display:flex;}
+  .set-chev svg{width:16px;height:16px;}
+  .seg{display:flex;gap:3px;padding:3px;background:rgba(43,42,38,.05);border-radius:11px;flex:none;}
+  .seg-btn{padding:6px 14px;border:none;border-radius:8px;background:transparent;font-family:var(--font);font-weight:600;font-size:13px;color:var(--text-soft);cursor:pointer;}
+  .seg-btn.active{background:var(--surface);color:var(--accent-strong);box-shadow:0 1px 3px rgba(0,0,0,.1);}
+  .set-themes{display:flex;justify-content:space-between;margin-top:2px;}
+  .set-sw{display:flex;flex-direction:column;align-items:center;gap:8px;border:none;background:none;padding:0;cursor:pointer;}
+  .set-sw .dot{width:46px;height:46px;border-radius:50%;}
+  .set-sw.sel .dot{box-shadow:0 0 0 3px var(--surface),0 0 0 5px var(--swr);}
+  .set-sw .lbl{font-family:var(--font);font-weight:600;font-size:12px;color:var(--text-soft);}
+  .set-sw.sel .lbl{color:var(--text);}
+  .set-editbtn{padding:8px 16px;border:none;border-radius:11px;background:var(--accent-bg);color:var(--accent-strong);font-family:var(--font);font-weight:600;font-size:13px;cursor:pointer;flex:none;}
+  .set-keyinput{width:100%;margin-top:10px;}
+  .set-badge{font-family:var(--font);font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--accent-strong);background:var(--accent-bg);padding:3px 8px;border-radius:999px;white-space:nowrap;}
+  .set-pill{display:inline-flex;align-items:center;gap:9px;padding:9px 12px 9px 15px;border:none;border-radius:12px;background:var(--accent-bg);color:var(--accent-strong);font-family:var(--font);font-weight:600;font-size:13.5px;cursor:pointer;flex:none;}
+  .set-pill svg{width:15px;height:15px;transition:transform .2s;}
+  .set-pill.open svg{transform:rotate(180deg);}
+  .set-menu{margin-top:12px;border:1.5px solid var(--divider);border-radius:16px;overflow:hidden;}
+  .set-mi{display:flex;align-items:center;gap:12px;width:100%;padding:13px 14px;border:none;border-bottom:1px solid var(--divider);background:var(--surface);text-align:left;cursor:pointer;}
+  .set-mi:last-child{border-bottom:none;}
+  .set-mi.sel{background:var(--accent-bg);}
+  .set-mi .mn{font-weight:600;font-size:14px;color:var(--text);}
+  .set-mi .md{font-size:12px;color:var(--text-soft);margin-top:1px;}
+  .set-mi .mck{flex:none;color:var(--accent-strong);display:flex;}
+  .set-tog{position:relative;width:46px;height:27px;border-radius:14px;border:none;background:var(--divider);cursor:pointer;padding:0;flex:none;transition:background .2s;}
+  .set-tog.on{background:var(--accent);}
+  .set-tog span{position:absolute;top:3px;left:3px;width:21px;height:21px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .2s;}
+  .set-tog.on span{left:22px;}
+  .set-signout{width:100%;margin-top:14px;padding:15px 0;border:none;border-radius:18px;background:var(--surface);box-shadow:0 3px 14px rgba(43,42,38,.05);font-family:var(--display);font-weight:700;font-size:16px;color:#E5533A;cursor:pointer;}
+  .set-foot{text-align:center;font-family:var(--font);font-size:12px;color:var(--text-soft);padding:18px 0 4px;}
+  .set-foot a{color:var(--text-soft);}
+
   #auth-screen{min-height:100vh;align-items:center;justify-content:center;padding:24px;}
   .auth-wrap{width:100%;max-width:380px;background:var(--surface);border-radius:26px;padding:30px 24px;box-shadow:0 12px 34px rgba(43,42,38,.12);}
   .auth-logo{font-family:var(--display);font-weight:800;font-size:32px;color:var(--accent-strong);text-align:center;}
@@ -464,6 +515,7 @@ let ONDB=null, ONBYEAN=null, _onPromise=null;
 function _idb(){return new Promise((res,rej)=>{const r=indexedDB.open('nomnom_food',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});}
 function _idbGet(k){return _idb().then(d=>new Promise((res,rej)=>{const t=d.transaction('kv').objectStore('kv').get(k);t.onsuccess=()=>res(t.result);t.onerror=()=>rej(t.error);}));}
 function _idbSet(k,v){return _idb().then(d=>new Promise((res,rej)=>{const tx=d.transaction('kv','readwrite');tx.objectStore('kv').put(v,k);tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error);}));}
+function _idbDel(k){return _idb().then(d=>new Promise((res,rej)=>{const tx=d.transaction('kv','readwrite');tx.objectStore('kv').delete(k);tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error);}));}
 function ensureONDB(){
   if(ONDB) return Promise.resolve(ONDB);
   if(_onPromise) return _onPromise;
@@ -1703,39 +1755,101 @@ function renderPlan(){
 /* ---------- SETTINGS ---------- */
 function openSettings(){
   const s=state.settings;
-  const presets=Object.keys(THEMES).map(id=>{
-    const t=THEMES[id];
-    return `<button class="preset${s.theme===id?' sel':''}" data-theme="${id}">
-      <span class="preset-sw" style="background:${t.sw}"></span>
-      <span><span class="pn">${t.name}</span><span class="pd">${t.desc}</span></span>
-    </button>`;
-  }).join('');
-  const overlay=el(`<div class="sheet-overlay"><div class="sheet" id="sheet">
+  const I=(p)=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+  const IC_SCALE=I('<path d="M7 8h10a2 2 0 012 2v9a2 2 0 01-2 2H7a2 2 0 01-2-2v-9a2 2 0 012-2z"/><path d="M12 4v4M9.5 13.5L12 8l2.5 5.5"/>');
+  const IC_RULER=I('<path d="M12 3v18M8 6l4-3 4 3M8 18l4 3 4-3"/>');
+  const IC_SPARK=I('<path d="M12 3l1.8 4.2L18 9l-4.2 1.8L12 15l-1.8-4.2L6 9l4.2-1.8z"/><path d="M18 14l.9 2.1L21 17l-2.1.9L18 20l-.9-2.1L15 17l2.1-.9z"/>');
+  const IC_DB=I('<ellipse cx="12" cy="5.5" rx="7" ry="2.5"/><path d="M5 5.5v6c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5v-6M5 11.5v6c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5v-6"/>');
+  const IC_EXPORT=I('<path d="M12 4v11M8 11l4 4 4-4"/><path d="M5 18v1a2 2 0 002 2h10a2 2 0 002-2v-1"/>');
+  const IC_CHEVR='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>';
+  const IC_CHEVD='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
+  const IC_CHECK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M20 6L9 17l-5-5"/></svg>';
+  const MODELS=[
+    {id:'gemini-3.5-flash',name:'Gemini 3.5 Flash',desc:'Newest · best accuracy'},
+    {id:'gemini-2.5-flash',name:'Gemini 2.5 Flash',desc:'Fast & dependable'},
+    {id:'gemini-2.5-flash-lite',name:'Gemini 2.5 Flash-Lite',desc:'Lighter on quota'},
+    {id:'gemini-2.0-flash',name:'Gemini 2.0 Flash',desc:'Lowest latency'}
+  ];
+  const meta=(user&&user.user_metadata)||{};
+  const email=(user&&user.email)||'';
+  const namePart=(email.split('@')[0]||'').replace(/[._-]+/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+  const displayName=meta.full_name||meta.name||namePart||'Your account';
+  const initials=((displayName.match(/\b\w/g)||[]).join('').slice(0,2)||email.slice(0,2)||'NN').toUpperCase();
+
+  const overlay=el(`<div class="sheet-overlay"><div class="sheet set-sheet" id="sheet">
     <div class="sheet-handle" id="sheet-handle"><div class="sheet-grip"></div></div>
     <h2>Settings</h2>
-    <div class="sub-h">Theme</div>
-    ${presets}
-    <div class="sub-h">AI &amp; data</div>
-    <div class="field"><label>Google Gemini API key</label>
-      <input type="password" id="s-key" value="${esc(s.apiKey)}" placeholder="AIza..."></div>
-    <div class="hint">Stored only on this device. Used for photo food recognition. Create one free in Google AI Studio.</div>
-    <div class="field"><label>Gemini model</label>
-      <input id="s-model" value="${esc(s.model)}" placeholder="gemini-2.5-flash"></div>
-    <div class="hint">e.g. gemini-2.5-flash or gemini-3.5-flash, depending on your key's access.</div>
-    <div class="field-row">
-      <div class="field"><label>Weight unit</label><select id="s-wu"><option value="kg">kg</option><option value="lb">lb</option></select></div>
-      <div class="field"><label>Height unit</label><select id="s-hu"><option value="cm">cm</option><option value="in">in</option></select></div>
+
+    ${(CLOUD&&user)?`<div class="set-card set-prof" style="margin-top:10px">
+      <div class="set-av">${esc(initials)}</div>
+      <div class="grow"><div class="set-name">${esc(displayName)}</div><div class="set-email">${esc(email)}</div></div>
+    </div>`:''}
+
+    <div class="set-sec">Units</div>
+    <div class="set-card">
+      <div class="set-row first">
+        <div class="set-ico">${IC_SCALE}</div>
+        <div class="grow"><div class="set-rt">Weight unit</div></div>
+        <div class="seg" id="seg-w">
+          <button class="seg-btn${s.weightUnit==='kg'?' active':''}" data-w="kg">kg</button>
+          <button class="seg-btn${s.weightUnit==='lb'?' active':''}" data-w="lb">lb</button>
+        </div>
+      </div>
+      <div class="set-row">
+        <div class="set-ico">${IC_RULER}</div>
+        <div class="grow"><div class="set-rt">Height unit</div><div class="set-rs">used only for profile estimates</div></div>
+        <div class="seg" id="seg-h">
+          <button class="seg-btn${s.heightUnit==='cm'?' active':''}" data-h="cm">cm</button>
+          <button class="seg-btn${s.heightUnit==='in'?' active':''}" data-h="in">in</button>
+        </div>
+      </div>
     </div>
-    <div class="field"><label>Daily calorie target</label><input type="number" inputmode="numeric" id="s-target" value="${s.dailyTarget||''}" placeholder="set here or in Plan"></div>
-    <div class="field"><button class="btn btn-primary btn-block" id="s-save">Save settings</button></div>
-    ${(CLOUD&&user)?`<div class="sub-h">Account</div><div class="hint">Signed in as ${esc(user.email||'your account')}. Your data syncs to the cloud.</div><div class="field"><button class="btn btn-block" id="s-signout">Sign out</button></div>`:''}
-    <div class="sub-h">Data</div>
-    <div class="btn-row"><button class="btn" id="s-export">Export JSON</button><button class="btn btn-danger" id="s-clear">Clear all data</button></div>
-    <div class="sub-h">Food database</div>
-    <div class="hint" id="s-dbinfo">The full OpenNutrition database (326,000+ foods, incl. barcodes) downloads once (~10 MB) and is cached on this device for offline search and barcode lookup.</div>
-    <div class="field"><button class="btn btn-block" id="s-dbget">Download for offline use</button></div>
-    <div class="sub-h">About &amp; credits</div>
-    <div class="hint">Food data from <a href="https://www.opennutrition.app" target="_blank" rel="noopener">OpenNutrition</a> (Open Database License) and <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a> contributors. Local Singapore dishes from a public calorie chart. AI estimates and photo analysis use Google Gemini. Calorie and macro values are approximate.</div>
+
+    <div class="set-sec">Appearance</div>
+    <div class="set-card pad">
+      <div class="set-rt" style="margin-bottom:4px">Theme</div>
+      <div class="set-rs" id="set-themelbl" style="margin-bottom:16px">${esc((THEMES[s.theme]||{}).desc||'')}</div>
+      <div class="set-themes" id="set-themes">
+        ${Object.keys(THEMES).map(id=>{const t=THEMES[id];return `<button class="set-sw${s.theme===id?' sel':''}" data-theme="${id}" style="--swr:${t.strong}"><span class="dot" style="background:${t.sw}"></span><span class="lbl">${t.name}</span></button>`;}).join('')}
+      </div>
+    </div>
+
+    <div class="set-sec">AI scanning</div>
+    <div class="set-card">
+      <div class="set-row first">
+        <div class="set-ico">${IC_SPARK}</div>
+        <div class="grow"><div class="set-rs" style="line-height:1.45">Powers photo &amp; barcode food recognition. Bring your own key — <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" style="color:var(--accent-strong);font-weight:600">free in Google AI Studio</a>.</div></div>
+      </div>
+      <div class="set-row" id="set-keyrow"></div>
+      <div class="set-row" style="display:block">
+        <div style="display:flex;align-items:center;gap:14px">
+          <div class="grow"><span class="set-rt">Model</span> <span class="set-badge">Free tier</span></div>
+          <button class="set-pill" id="set-modelpill"><span id="set-modelname">Choose</span>${IC_CHEVD}</button>
+        </div>
+        <div id="set-modelmenu"></div>
+      </div>
+    </div>
+
+    <div class="set-sec">Data &amp; storage</div>
+    <div class="set-card">
+      <div class="set-row first">
+        <div class="set-ico">${IC_DB}</div>
+        <div class="grow"><div class="set-rt">Offline food database</div><div class="set-rs" id="set-dbstatus">…</div></div>
+        <button class="set-tog" id="set-dbtog"><span></span></button>
+      </div>
+      <div class="set-row" id="set-export">
+        <div class="set-ico">${IC_EXPORT}</div>
+        <div class="grow"><div class="set-rt">Export my data</div><div class="set-rs">download everything as JSON</div></div>
+        <span class="set-chev">${IC_CHEVR}</span>
+      </div>
+      <div class="set-row" id="set-clear">
+        <div class="set-ico danger">${IC_TRASH}</div>
+        <div class="grow"><div class="set-rt danger">Clear all data</div><div class="set-rs danger">this can't be undone</div></div>
+      </div>
+    </div>
+
+    ${(CLOUD&&user)?`<button class="set-signout" id="set-signout">Sign out</button>`:''}
+    <div class="set-foot">NomNom · Food data from <a href="https://www.opennutrition.app" target="_blank" rel="noopener">OpenNutrition</a> &amp; <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a></div>
   </div></div>`);
   $('modal-root').appendChild(overlay);
   const sheet=overlay.querySelector('#sheet');
@@ -1769,36 +1883,78 @@ function openSettings(){
   handle.addEventListener('mousedown',e=>{e.preventDefault();ps(e.clientY);
     const mm=ev=>pm(ev.clientY),mu=()=>{pe();document.removeEventListener('mousemove',mm);document.removeEventListener('mouseup',mu);};
     document.addEventListener('mousemove',mm);document.addEventListener('mouseup',mu);});
-  overlay.querySelector('#s-wu').value=s.weightUnit;
-  overlay.querySelector('#s-hu').value=s.heightUnit;
-  (function(){
-    const info=overlay.querySelector('#s-dbinfo'), btn=overlay.querySelector('#s-dbget');
-    if(ONDB){info.textContent=`Cached on this device ✓ — ${ONDB.length.toLocaleString()} foods available offline.`;btn.style.display='none';}
-    btn.onclick=async()=>{
-      btn.disabled=true;btn.textContent='Downloading…';
-      try{await ensureONDB();info.textContent=`Cached on this device ✓ — ${ONDB.length.toLocaleString()} foods available offline.`;btn.style.display='none';}
-      catch(e){btn.disabled=false;btn.textContent='Download for offline use';info.textContent='Couldn\'t load opennutrition.json. It must be uploaded in the same folder as the app and served over https (it won\'t load in the in-chat preview or from a local file).';}
-    };
-  })();
-  // theme presets — apply live on tap
-  overlay.querySelectorAll('[data-theme]').forEach(b=>b.onclick=()=>{
-    s.theme=b.dataset.theme;save();applyTheme(s.theme);
-    overlay.querySelectorAll('.preset').forEach(p=>p.classList.toggle('sel',p===b));
+  // ---- units (segmented, live save) ----
+  overlay.querySelectorAll('#seg-w .seg-btn').forEach(b=>b.onclick=()=>{ s.weightUnit=b.dataset.w; save();
+    overlay.querySelectorAll('#seg-w .seg-btn').forEach(x=>x.classList.toggle('active',x===b)); });
+  overlay.querySelectorAll('#seg-h .seg-btn').forEach(b=>b.onclick=()=>{ s.heightUnit=b.dataset.h; save();
+    overlay.querySelectorAll('#seg-h .seg-btn').forEach(x=>x.classList.toggle('active',x===b)); });
+
+  // ---- theme (apply live on tap) ----
+  overlay.querySelectorAll('#set-themes .set-sw').forEach(b=>b.onclick=()=>{
+    s.theme=b.dataset.theme; save(); applyTheme(s.theme);
+    overlay.querySelectorAll('#set-themes .set-sw').forEach(p=>p.classList.toggle('sel',p===b));
+    const lbl=overlay.querySelector('#set-themelbl'); if(lbl)lbl.textContent=(THEMES[s.theme]||{}).desc||'';
   });
-  overlay.querySelector('#s-save').onclick=()=>{
-    s.apiKey=overlay.querySelector('#s-key').value.trim();
-    s.model=overlay.querySelector('#s-model').value.trim()||'gemini-2.5-flash';
-    s.weightUnit=overlay.querySelector('#s-wu').value;
-    s.heightUnit=overlay.querySelector('#s-hu').value;
-    s.dailyTarget=+overlay.querySelector('#s-target').value||null;
-    save();close();
+
+  // ---- API key (masked display + inline edit) ----
+  const keyrow=overlay.querySelector('#set-keyrow');
+  const maskKey=k=>k?('••••••••'+k.slice(-4)):'Not set';
+  function paintKey(){
+    keyrow.innerHTML=`<div class="grow"><div class="set-rt">Gemini API key</div><div class="set-rs">${esc(maskKey(s.apiKey))}</div></div><button class="set-editbtn">${s.apiKey?'Edit':'Add'}</button>`;
+    keyrow.querySelector('button').onclick=editKey;
+  }
+  function editKey(){
+    keyrow.innerHTML=`<div class="grow"><div class="set-rt">Gemini API key</div><input class="set-keyinput" type="password" placeholder="AIza…"></div><button class="set-editbtn">Done</button>`;
+    const inp=keyrow.querySelector('input'); inp.value=s.apiKey||''; setTimeout(()=>inp.focus(),0);
+    keyrow.querySelector('button').onclick=()=>{ s.apiKey=inp.value.trim(); save(); paintKey(); };
+    inp.onkeydown=e=>{ if(e.key==='Enter'){ s.apiKey=inp.value.trim(); save(); paintKey(); } };
+  }
+  paintKey();
+
+  // ---- model picker (dropdown, live save) ----
+  let modelOpen=false;
+  const pill=overlay.querySelector('#set-modelpill');
+  const nameEl=overlay.querySelector('#set-modelname');
+  const menuEl=overlay.querySelector('#set-modelmenu');
+  function paintModel(){
+    const cur=MODELS.find(m=>m.id===s.model);
+    nameEl.textContent=cur?cur.name:(s.model||'Choose');
+    pill.classList.toggle('open',modelOpen);
+    if(!modelOpen){ menuEl.innerHTML=''; return; }
+    menuEl.innerHTML=`<div class="set-menu">${MODELS.map(m=>`<button class="set-mi${s.model===m.id?' sel':''}" data-m="${m.id}"><div style="flex:1;min-width:0"><div class="mn">${m.name}</div><div class="md">${m.desc}</div></div>${s.model===m.id?`<span class="mck">${IC_CHECK}</span>`:''}</button>`).join('')}</div>`;
+    menuEl.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{ s.model=b.dataset.m; save(); modelOpen=false; paintModel(); });
+  }
+  pill.onclick=()=>{ modelOpen=!modelOpen; paintModel(); };
+  paintModel();
+
+  // ---- offline database (toggle: download / clear) ----
+  const dbtog=overlay.querySelector('#set-dbtog');
+  const dbstatus=overlay.querySelector('#set-dbstatus');
+  function paintDb(){
+    const on=!!ONDB;
+    dbtog.classList.toggle('on',on);
+    dbstatus.textContent=on?`${ONDB.length.toLocaleString()} foods · offline ready`:'Not downloaded';
+  }
+  paintDb();
+  dbtog.onclick=async()=>{
+    if(ONDB){
+      if(!confirm('Remove the offline food database from this device? You can download it again anytime.'))return;
+      try{await _idbDel('food');}catch(e){}
+      ONDB=null; ONBYEAN=null; _onPromise=null; paintDb();
+    }else{
+      dbtog.classList.add('on'); dbstatus.textContent='Downloading…';
+      try{ await ensureONDB(); paintDb(); }
+      catch(e){ dbtog.classList.remove('on'); dbstatus.textContent='Couldn’t download — needs the deployed https site.'; }
+    }
   };
-  overlay.querySelector('#s-export').onclick=()=>{
+
+  // ---- export / clear / sign out ----
+  overlay.querySelector('#set-export').onclick=()=>{
     const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
     const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='nomnom-data.json';a.click();
   };
-  const so=overlay.querySelector('#s-signout'); if(so)so.onclick=()=>{overlay.remove();signOut();};
-  overlay.querySelector('#s-clear').onclick=()=>{if(confirm('Erase all data? This cannot be undone.')){localStorage.removeItem(KEY);state=structuredClone(DEFAULT);if(CLOUD&&user){saveLocal();pushCloud();}close();}};
+  overlay.querySelector('#set-clear').onclick=()=>{if(confirm('Erase all data? This cannot be undone.')){localStorage.removeItem(KEY);state=structuredClone(DEFAULT);if(CLOUD&&user){saveLocal();pushCloud();}close();}};
+  const so=overlay.querySelector('#set-signout'); if(so)so.onclick=()=>{overlay.remove();signOut();};
 }
 
 /* ---------- cloud sync (Supabase) ---------- */
