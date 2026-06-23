@@ -98,7 +98,7 @@
   .fooditem .fi-cal{font-family:var(--display);font-weight:700;font-size:15px;color:var(--text);}
   .chev{color:#C9C2B6;flex:none;}
 
-  .act-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid #F0EAE0;}
+  .act-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid #F0EAE0;cursor:pointer;}
   .act-item.first{border-top:none;padding-top:2px;}
   .act-icon{width:38px;height:38px;border-radius:11px;background:var(--accent-bg);
     display:flex;align-items:center;justify-content:center;color:var(--accent-strong);flex:none;}
@@ -297,6 +297,12 @@
   .recent-main .rs{font-size:12.5px;color:var(--text-soft);}
   .recent-add{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:var(--accent);border:none;color:#fff;cursor:pointer;flex:none;}
   .recent-add svg{width:16px;height:16px;}
+  .swipe-wrap{position:relative;overflow:hidden;border-bottom:1px solid var(--divider);}
+  .swipe-del{position:absolute;top:0;right:0;bottom:0;width:88px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:none;background:#E5484D;color:#fff;cursor:pointer;padding:0;}
+  .swipe-del svg{width:19px;height:19px;}
+  .swipe-del span{font-family:var(--font);font-weight:600;font-size:11px;}
+  .swipe-row{position:relative;background:var(--surface);transform:translateX(0);touch-action:pan-y;will-change:transform;}
+  .swipe-wrap .recent-row{border-bottom:none;}
   .act-pick{display:flex;align-items:center;gap:13px;width:100%;background:var(--accent-bg);border:none;border-radius:18px;padding:14px 16px;cursor:pointer;text-align:left;margin-top:14px;}
   .act-ic{display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:13px;background:#fff;color:var(--accent-strong);flex:none;}
   .act-ic svg{width:23px;height:23px;}
@@ -654,10 +660,11 @@ function renderToday(){
 
   // activity card
   const actRows = ex.length ? ex.map((e,i)=>`
-    <div class="act-item${i===0?' first':''}" data-del-ex="${e.id}">
+    <div class="act-item${i===0?' first':''}" data-edit-ex="${e.id}">
       <div class="act-icon">${ACT_SVG}</div>
       <div style="flex:1;min-width:0"><div class="act-name">${esc(e.activity)}</div><div class="act-sub">${e.minutes} min · ${e.intensity}</div></div>
       <div class="act-cal">${r0(e.caloriesBurned)}</div>
+      <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-soft);flex:none;margin-left:6px"><path d="M9 18l6-6-6-6"/></svg>
     </div>`).join('') : `<div class="empty" style="margin-top:0">No exercise logged.</div>`;
   const actCard=`<div class="card">
     <div class="card-head"><div class="card-title">Activity</div><div class="card-sub">${r0(burned)} kcal</div></div>
@@ -668,9 +675,7 @@ function renderToday(){
   $('day-prev').onclick=()=>{viewDate=shiftDay(viewDate,-1);render();};
   $('day-next').onclick=()=>{if(!atToday){viewDate=shiftDay(viewDate,1);render();}};
   document.querySelectorAll('[data-edit-food]').forEach(n=>n.onclick=()=>editFood(n.dataset.editFood));
-  document.querySelectorAll('[data-del-ex]').forEach(n=>n.onclick=()=>{
-    if(confirm('Delete this exercise entry?')){state.exercise=state.exercise.filter(x=>x.id!==n.dataset.delEx);save();render();}
-  });
+  document.querySelectorAll('[data-edit-ex]').forEach(n=>n.onclick=()=>editExercise(n.dataset.editEx));
 }
 
 /* ---------- modal infra ---------- */
@@ -939,17 +944,51 @@ function openAdd(){
       <div id="lib-body" style="margin-top:6px"></div>`;
     body.querySelector('#lb-back').onclick=renderFood;
     const lb=body.querySelector('#lib-body');
-    const rowHtml=(name,sub,attr)=>`<div class="recent-row"><span class="recent-ic">${IC_FORK}</span><div class="recent-main"><div class="rn">${esc(name)}</div><div class="rs">${esc(sub)}</div></div><button class="recent-add" ${attr} aria-label="Add">${IC_PLUS}</button></div>`;
     const lib2=state.library;
     if(!lib2.length){lb.innerHTML=`<div class="empty" style="border:none">Your library is empty. Tick “Save to library” after logging an item to reuse it here.</div>`;return;}
-    lb.innerHTML=lib2.map(l=>{const sub=l.perServing?`${r0(l.perServing.calories)} kcal per ${esc(l.perServing.portion)}`:`${r0(l.per_100g.calories)} kcal/100g`;return rowHtml(l.name,sub,`data-lib="${l.id}"`);}).join('');
-    lb.querySelectorAll('[data-lib]').forEach(b=>b.onclick=()=>{
-      const l=state.library.find(x=>x.id===b.dataset.lib);
+    lb.innerHTML=lib2.map(l=>{
+      const sub=l.perServing?`${r0(l.perServing.calories)} kcal per ${esc(l.perServing.portion)}`:`${r0(l.per_100g.calories)} kcal/100g`;
+      return `<div class="swipe-wrap" data-id="${l.id}">
+        <button class="swipe-del" data-del="${l.id}" aria-label="Delete">${IC_TRASH}<span>Delete</span></button>
+        <div class="recent-row swipe-row">
+          <span class="recent-ic">${IC_FORK}</span>
+          <div class="recent-main"><div class="rn">${esc(l.name)}</div><div class="rs">${esc(sub)}</div></div>
+          <button class="recent-add" data-lib="${l.id}" aria-label="Add">${IC_PLUS}</button>
+        </div>
+      </div>`;
+    }).join('');
+    function addFromLib(id){
+      const l=state.library.find(x=>x.id===id); if(!l)return;
       body.innerHTML=`<div class="sub-head"><button class="circ-back" id="lb-b2">${IC_BACK}</button><h3>Add item</h3></div><div id="lb-stage"></div>`;
       body.querySelector('#lb-b2').onclick=renderLibrary;
       const stage=body.querySelector('#lb-stage');
       if(l.perServing)logServing(null,stage,l.name,l.perServing.calories,l.perServing.portion,'library',()=>sh.close());
       else weighAndLog(null,stage,l.name,l.per_100g,'library',l.lastGrams,()=>sh.close());
+    }
+    lb.querySelectorAll('.swipe-wrap').forEach(wrap=>{
+      const id=wrap.dataset.id, row=wrap.querySelector('.swipe-row');
+      const addBtn=wrap.querySelector('.recent-add'), delBtn=wrap.querySelector('.swipe-del');
+      let startX=0,base=0,off=0,down=false,dragging=false,open=false,suppress=false;
+      const apply=(x,anim)=>{row.style.transition=anim?'transform .2s ease':'';row.style.transform=`translateX(${x}px)`;};
+      const close=()=>{open=false;apply(0,true);};
+      const openIt=()=>{open=true;apply(-88,true);};
+      const guard=()=>{suppress=true;setTimeout(()=>{suppress=false;},80);};
+      const doDelete=()=>{ state.library=state.library.filter(x=>x.id!==id); save(); renderLibrary(); };
+      delBtn.onclick=(e)=>{e.stopPropagation();doDelete();};
+      addBtn.onclick=(e)=>{ if(open||suppress){e.stopPropagation();e.preventDefault();close();return;} addFromLib(id); };
+      row.addEventListener('pointerdown',e=>{ down=true;dragging=false;startX=e.clientX;base=open?-88:0;off=base; });
+      row.addEventListener('pointermove',e=>{
+        if(!down)return; const d=e.clientX-startX;
+        if(!dragging && Math.abs(d)>6){ dragging=true; try{row.setPointerCapture(e.pointerId);}catch(_){} }
+        if(dragging){ off=base+d; if(off>0)off=0; if(off<-120)off=-120; apply(off,false); e.preventDefault(); }
+      });
+      const endDrag=()=>{
+        if(!down)return; down=false;
+        if(dragging){ guard(); if(off<=-100){doDelete();return;} else if(off<=-44){openIt();} else {close();} }
+        else if(open){ guard(); close(); }
+      };
+      row.addEventListener('pointerup',endDrag);
+      row.addEventListener('pointercancel',endDrag);
     });
   }
 
@@ -1640,6 +1679,50 @@ function openExercise(){
 }
 
 /* ---------- WEIGHT ---------- */
+function editExercise(id){
+  const e=state.exercise.find(x=>x.id===id); if(!e)return;
+  const wkg=latestWeightKg();
+  const acts=[...QUICK,...Object.keys(MET).filter(a=>!QUICK.includes(a))];
+  let activity=e.activity, intensity=e.intensity;
+  const m=openModal('Edit exercise',`
+    <div class="field"><label>Activity</label>
+      <div class="chips" id="ex-acts">${acts.map(a=>`<button class="chip${a===activity?' sel':''}" data-act="${a}">${a}</button>`).join('')}</div>
+    </div>
+    <div class="field"><label>Intensity</label>
+      <div class="chips" id="ex-int">
+        <button class="chip${intensity==='light'?' sel':''}" data-int="light">Light</button>
+        <button class="chip${intensity==='moderate'?' sel':''}" data-int="moderate">Moderate</button>
+        <button class="chip${intensity==='vigorous'?' sel':''}" data-int="vigorous">Vigorous</button>
+      </div></div>
+    <div class="field-row">
+      <div class="field"><label>Minutes</label><input type="number" inputmode="numeric" id="ex-min" value="${e.minutes}"></div>
+      <div class="field"><label>Your weight (kg)</label><input type="number" inputmode="decimal" id="ex-wt" value="${wkg?r1(wkg):''}" placeholder="log weight first"></div>
+    </div>
+    <div class="field"><label>Calories burned (editable)</label><input type="number" inputmode="numeric" id="ex-cal" value="${r0(e.caloriesBurned)}"></div>
+    <div class="hint" id="ex-met"></div>
+    <div class="field"><button class="btn btn-primary btn-block" id="ex-save">Save changes</button></div>
+    <div class="field"><button class="btn btn-danger btn-block" id="ex-del">Delete entry</button></div>
+  `);
+  function recompute(setCal){
+    const met=(MET[activity]&&MET[activity][intensity])||0;
+    const wt=+m.querySelector('#ex-wt').value||0, min=+m.querySelector('#ex-min').value||0;
+    if(setCal) m.querySelector('#ex-cal').value=r0(met*wt*(min/60));
+    m.querySelector('#ex-met').textContent=`${activity}, ${intensity}: ${met} MET`;
+  }
+  m.querySelectorAll('#ex-acts .chip').forEach(c=>c.onclick=()=>{activity=c.dataset.act;m.querySelectorAll('#ex-acts .chip').forEach(x=>x.classList.toggle('sel',x===c));recompute(true);});
+  m.querySelectorAll('#ex-int .chip').forEach(c=>c.onclick=()=>{intensity=c.dataset.int;m.querySelectorAll('#ex-int .chip').forEach(x=>x.classList.toggle('sel',x===c));recompute(true);});
+  m.querySelector('#ex-min').oninput=()=>recompute(true);
+  m.querySelector('#ex-wt').oninput=()=>recompute(true);
+  recompute(false);
+  m.querySelector('#ex-save').onclick=()=>{
+    e.activity=activity; e.intensity=intensity;
+    e.minutes=+m.querySelector('#ex-min').value||0;
+    e.met=(MET[activity]&&MET[activity][intensity])||e.met;
+    e.caloriesBurned=+m.querySelector('#ex-cal').value||0;
+    save();closeModal(m);render();
+  };
+  m.querySelector('#ex-del').onclick=()=>{state.exercise=state.exercise.filter(x=>x.id!==id);save();closeModal(m);render();};
+}
 function renderWeight(){
   const unit=state.settings.weightUnit;
   const sorted=[...state.weights].sort((a,b)=>a.date<b.date?-1:1);
