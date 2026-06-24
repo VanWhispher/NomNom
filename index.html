@@ -331,6 +331,7 @@
   .ei-k{font-size:12.5px;color:var(--text-soft);min-width:58px;text-align:right;}
   .ei-rm{background:none;border:none;color:var(--text-soft);display:inline-flex;cursor:pointer;padding:2px;}
   .ei-rm svg{width:16px;height:16px;}
+  .add-ing-form{margin-top:14px;padding-top:14px;border-top:1px solid var(--divider);}
   .add-label{font-family:var(--body);font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-soft);margin:20px 2px 6px;}
   .recent-row{display:flex;align-items:center;gap:12px;padding:10px 2px;border-bottom:1px solid var(--divider);}
   .recent-ic{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:12px;background:var(--accent-bg);color:var(--accent-strong);flex:none;}
@@ -1344,6 +1345,7 @@ function openAdd(){
     camStop(); setTabs(false);
     const work=JSON.parse(JSON.stringify(rec));
     if(!Array.isArray(work.ingredients))work.ingredients=[];
+    let adding=false;
     const oCal=(work.total&&work.total.calories)||0, oP=(work.total&&work.total.protein_g)||0, oC=(work.total&&work.total.carbs_g)||0, oF=(work.total&&work.total.fat_g)||0;
     work.ingredients.forEach(ing=>{ const g=+ing.grams||0;
       ing._rk=g>0?(+ing.kcal||0)/g:0;
@@ -1387,6 +1389,15 @@ function openAdd(){
               </div>
             </div>`).join('')}</div>
           ${work.ingredients.length?'':`<div class="rc-empty">No ingredients left — cancel to keep the original.</div>`}
+          ${adding?`<div class="add-ing-form">
+            <div class="field"><label>Ingredient</label><input id="re-aname" placeholder="e.g. cooked rice" autocomplete="off"></div>
+            <div style="display:flex;gap:10px;margin-top:10px">
+              <div class="field" style="flex:1;margin:0"><label>Amount (g)</label><input id="re-ag" type="number" inputmode="decimal" min="0" placeholder="100"></div>
+              <div class="field" style="flex:1;margin:0"><label>kcal / 100g</label><input id="re-a100" type="number" inputmode="decimal" min="0" placeholder="auto"></div>
+            </div>
+            <div id="re-astat" class="hint" style="margin-top:8px"></div>
+            <div class="rc-acts" style="margin-top:10px"><button class="btn" id="re-addx">Cancel</button><button class="btn btn-primary" id="re-addgo">Add</button></div>
+          </div>`:`<button class="dashed-btn" id="re-add" style="margin-top:12px">${IC_PLUS} Add ingredient</button>`}
         </div>
         <div class="rc-card" id="re-prev">${preview()}</div>
         <div class="rc-acts"><button class="btn" id="re-cancel">Cancel</button><button class="btn btn-primary" id="re-save">Save changes</button></div>`;
@@ -1397,6 +1408,24 @@ function openAdd(){
       body.querySelector('#re-svdn').onclick=()=>{work.servings=Math.max(1,sv-1);body.querySelector('#re-sv').textContent=work.servings;refreshNums();};
       body.querySelectorAll('.ei-g').forEach(inp=>inp.oninput=(e)=>{ const i=+e.target.dataset.i; if(work.ingredients[i]){work.ingredients[i].grams=+e.target.value||0; refreshNums();} });
       body.querySelectorAll('[data-rm]').forEach(btn=>btn.onclick=()=>{ work.ingredients.splice(+btn.dataset.rm,1); draw(); });
+      if(adding){
+        const an=body.querySelector('#re-aname'); if(an)an.focus();
+        body.querySelector('#re-addx').onclick=()=>{adding=false;draw();};
+        body.querySelector('#re-addgo').onclick=async()=>{
+          const nameEl=body.querySelector('#re-aname'),gEl=body.querySelector('#re-ag'),mEl=body.querySelector('#re-a100'),stat=body.querySelector('#re-astat'),go=body.querySelector('#re-addgo');
+          const name=(nameEl.value||'').trim(),g=+gEl.value||0,man=+mEl.value||0;
+          if(!name){stat.textContent='Enter an ingredient name.';return;}
+          if(!g){stat.textContent='Enter an amount in grams.';return;}
+          let per100;
+          if(man>0){ per100={cal:man,prot:0,carb:0,fat:0}; }
+          else { stat.textContent='Estimating calories…'; go.disabled=true; per100=await lookupPer100(name); go.disabled=false;
+            if(!per100){ stat.textContent='Couldn’t estimate — enter a kcal/100g value above, or add a Gemini API key in Settings.'; return; } }
+          work.ingredients.push({name,grams:g,have:true,
+            kcal:Math.round((per100.cal||0)*g/100),protein_g:Math.round((per100.prot||0)*g/100),carbs_g:Math.round((per100.carb||0)*g/100),fat_g:Math.round((per100.fat||0)*g/100),
+            _rk:(per100.cal||0)/100,_rp:(per100.prot||0)/100,_rc:(per100.carb||0)/100,_rf:(per100.fat||0)/100});
+          adding=false; draw();
+        };
+      } else { const ab=body.querySelector('#re-add'); if(ab)ab.onclick=()=>{adding=true;draw();}; }
       body.querySelector('#re-save').onclick=()=>{
         recompute();
         const name=(work.name||'').trim()||rec.name, svv=Math.max(1,Math.round(+work.servings||1));
@@ -2200,6 +2229,13 @@ async function costRecipe(recipe){
   recipe._per={calories:Math.round(tk/sv),protein_g:Math.round(tp/sv),carbs_g:Math.round(tc/sv),fat_g:Math.round(tf/sv)};
   recipe._estimated=anyEst;
   return recipe;
+}
+async function lookupPer100(name){
+  try{ await ensureONDB(); }catch(_){}
+  const m=bestFoodMatch(name);
+  if(m) return {cal:m.per100.calories,prot:m.per100.protein_g,carb:m.per100.carbs_g,fat:m.per100.fat_g,src:'db'};
+  if(state.settings.apiKey){ try{ const ai=await aiNutrition(name); if(ai&&ai.per_100g&&+ai.per_100g.calories){ const n=ai.per_100g; return {cal:+n.calories||0,prot:+n.protein_g||0,carb:+n.carbs_g||0,fat:+n.fat_g||0,src:'ai'}; } }catch(_){} }
+  return null;
 }
 async function generateRecipes(ingredients, opts){
   opts=opts||{};
