@@ -340,6 +340,29 @@
   .picker-title{font-family:var(--display);font-weight:700;font-size:19px;color:var(--text);}
   .picker-sub{font-size:13px;color:var(--text-soft);margin-top:2px;}
   @keyframes sheetUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+  .edit-head{display:flex;align-items:center;justify-content:space-between;padding:2px 2px 6px;}
+  .edit-title{font-family:var(--display);font-weight:700;font-size:19px;color:var(--text);}
+  .edit-x{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;border:none;background:rgba(43,42,38,.06);color:var(--text-soft);cursor:pointer;flex:none;}
+  .edit-x svg{width:14px;height:14px;}
+  .efh{background:var(--accent);border-radius:20px;padding:16px 18px;box-shadow:0 8px 20px -10px rgba(216,85,122,.55);margin-top:6px;}
+  .efh-top{display:flex;align-items:center;gap:12px;}
+  .efh-ic{display:flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:14px;background:rgba(255,255,255,.22);color:#fff;flex:none;}
+  .efh-ic svg{width:24px;height:24px;}
+  .efh-main{flex:1;min-width:0;}
+  .efh-name{font-family:var(--display);font-weight:700;font-size:17px;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .efh-sub{font-size:12.5px;color:rgba(255,255,255,.85);margin-top:1px;}
+  .efh-cal{display:flex;align-items:baseline;gap:6px;margin-top:14px;}
+  .efh-cal span{font-family:var(--display);font-weight:800;font-size:42px;color:#fff;line-height:1;}
+  .efh-cal small{font-size:14px;color:rgba(255,255,255,.85);}
+  .qchips{display:flex;gap:7px;margin-top:13px;}
+  .qchips button{flex:1;padding:9px 0;border:none;border-radius:11px;background:var(--surface);font-family:var(--font);font-weight:600;font-size:13.5px;color:var(--text-soft);cursor:pointer;}
+  .qchips button.on{background:var(--accent);color:#fff;}
+  .lib-toggle{display:flex;align-items:center;gap:12px;width:100%;background:var(--accent-bg);border:none;border-radius:16px;padding:13px 15px;cursor:pointer;text-align:left;margin-top:14px;}
+  .lib-toggle .lt-ic{display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:11px;background:var(--surface);color:var(--accent-strong);flex:none;}
+  .lib-toggle .lt-ic svg{width:19px;height:19px;}
+  .lib-toggle .lt-label{flex:1;font-family:var(--font);font-weight:600;font-size:14px;color:var(--text);}
+  .btn-del-soft{display:flex;align-items:center;justify-content:center;gap:11px;width:100%;height:54px;border-radius:27px;border:none;background:#FCEBEC;color:#E5484D;cursor:pointer;margin-top:14px;font-family:var(--font);font-weight:700;font-size:16px;}
+  .btn-del-soft svg{width:20px;height:20px;}
   .act-pick{display:flex;align-items:center;gap:13px;width:100%;background:var(--accent-bg);border:none;border-radius:18px;padding:14px 16px;cursor:pointer;text-align:left;margin-top:14px;}
   .act-ic{display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:13px;background:#fff;color:var(--accent-strong);flex:none;}
   .act-ic svg{width:23px;height:23px;}
@@ -768,6 +791,8 @@ const IC_PLUS='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke
 const IC_CHEVR='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>';
 const IC_PENCIL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>';
 const IC_MINUS='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 12h14"/></svg>';
+const IC_X='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+const IC_BOOKMARK='<svg viewBox="0 0 24 24" fill="{F}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h12a1 1 0 011 1v15l-7-3.5L5 20V5a1 1 0 011-1z"/></svg>';
 const IC_RUN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="4.5" r="1.8"/><path d="M6 21l3.5-5.5 2.5-3-1.5-4.5 4.5 2.5 2.5 3.5M8.5 9.5L13 7.5"/></svg>';
 const IC_BIKE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="17" r="3"/><circle cx="18" cy="17" r="3"/><path d="M6 17l5-9 3 5h3M10 8h4"/></svg>';
 const IC_SWIM='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="17" cy="8" r="1.6"/><path d="M4 18c1.4 1 2.6 1 4 0s2.6-1 4 0 2.6 1 4 0 2.6-1 4 0M6 14l4-3 3 2M10 11l4-3"/></svg>';
@@ -1749,37 +1774,73 @@ function openManual(){
 function editFood(id){
   const e=state.entries.find(x=>x.id===id);if(!e)return;
   const perServing=(e.unitCal!=null);
-  const qtyNow=perServing&&e.unitCal?e.calories/e.unitCal:1;
-  const per100=e.grams?e.calories/e.grams*100:0;
-  const amountField=perServing
-    ? `<div class="field"><label>Quantity (number of ${esc(e.portion||'serving')})</label><input type="number" inputmode="decimal" id="ef-q" value="${r1(qtyNow)}"></div>
-       <div class="hint">${r0(e.unitCal)} kcal per ${esc(e.portion||'serving')}.</div>`
-    : `<div class="field"><label>Weight (g)</label><input type="number" inputmode="decimal" id="ef-g" value="${r1(e.grams)}"></div>
-       <div class="hint">Calories and macros scale with weight (currently ${r0(per100)} kcal/100g).</div>`;
-  const m=openModal('Edit item',`
-    <div class="field"><label>Name</label><input id="ef-name" value="${esc(e.name)}"></div>
-    ${amountField}
-    ${mealChips(e.meal||defaultMeal())}
-    <div class="toggle-row"><input type="checkbox" id="ef-lib" style="width:auto"><label for="ef-lib" style="margin:0">Save to library</label></div>
-    <div class="field"><button class="btn btn-primary btn-block" id="ef-save">Save changes</button></div>
-    <div class="field"><button class="btn btn-danger btn-block" id="ef-del">Delete entry</button></div>
-  `);
-  const getMeal=wireMealChips(m.querySelector('#m-body'));
-  m.querySelector('#ef-save').onclick=()=>{
-    e.name=m.querySelector('#ef-name').value.trim()||e.name;
-    e.meal=getMeal();
-    if(perServing){
-      const qty=+m.querySelector('#ef-q').value||0;
-      e.calories=qty*e.unitCal; e.servingLabel=`${qty} ${e.portion||'serving'}`;
-      if(m.querySelector('#ef-lib').checked)addToLibraryServing(e.name,e.unitCal,e.portion||'serving');
-    }else{
-      const g=+m.querySelector('#ef-g').value||0;const ratio=e.grams?g/e.grams:0;
-      e.calories*=ratio;e.protein_g*=ratio;e.carbs_g*=ratio;e.fat_g*=ratio;e.sugar_g=(e.sugar_g||0)*ratio;e.grams=g;e.servingLabel=r1(g)+' g';
-      if(m.querySelector('#ef-lib').checked && g) addToLibrary(e.name,{calories:e.calories/g*100,protein_g:e.protein_g/g*100,carbs_g:e.carbs_g/g*100,fat_g:e.fat_g/g*100,sugar_g:(e.sugar_g||0)/g*100},g);
-    }
-    save();closeModal(m);
+  const per100=(!perServing&&e.grams)?{calories:e.calories/e.grams*100,protein_g:(e.protein_g||0)/e.grams*100,carbs_g:(e.carbs_g||0)/e.grams*100,fat_g:(e.fat_g||0)/e.grams*100,sugar_g:(e.sugar_g||0)/e.grams*100}:null;
+  let size=perServing?0:Math.max(5,Math.round(e.grams||100));   // grams per serving
+  let servings=perServing?(e.unitCal?r1(e.calories/e.unitCal):1):1; if(!servings)servings=1;
+  let meal=e.meal||defaultMeal(), saveLib=false;
+  const fmtServ=(v)=>{const w=Math.floor(v);if(v-w===0.5)return w?`${w}½`:'½';return String(r1(v));};
+  const kcal=()=>perServing?(e.unitCal*servings):(per100?per100.calories*size*servings/100:0);
+  const sub=()=>perServing?`${fmtServ(servings)} × ${e.portion||'serving'}`:`${r0(size*servings)} g · ${fmtServ(servings)} serving${servings===1?'':'s'}`;
+  const sh=makeSheet(`<div class="edit-head"><span class="edit-title">Edit food</span><button class="edit-x" id="ef-x">${IC_X}</button></div>
+    <div class="efh">
+      <div class="efh-top"><span class="efh-ic">${IC_FORK}</span><div class="efh-main"><div class="efh-name">${esc(e.name)}</div><div class="efh-sub" id="ef-sub"></div></div></div>
+      <div class="efh-cal"><span id="ef-kcal">0</span><small>kcal</small></div>
+    </div>
+    ${perServing?'':`<div class="add-card">
+      <div class="dur-h"><span>Serving size</span><span class="dur-v"><b id="ef-szv">${size}</b> g</span></div>
+      <div class="dur-row"><button class="step" id="ef-szdec">${IC_MINUS}</button>
+        <div class="nn-slider" id="ef-slider"><div class="nn-track"></div><div class="nn-fill" id="ef-fill"></div><div class="nn-thumb" id="ef-thumb"></div></div>
+        <button class="step" id="ef-szinc">${IC_PLUS}</button></div></div>`}
+    <div class="add-card">
+      <div class="dur-h"><span>Servings</span>
+        <div class="stepper"><button id="ef-svdec">${IC_MINUS}</button><div class="sv" id="ef-svv">${fmtServ(servings)}</div><button id="ef-svinc">${IC_PLUS}</button></div></div>
+      <div class="qchips" id="ef-q"><button data-q="0.5">½</button><button data-q="1">1</button><button data-q="1.5">1½</button><button data-q="2">2×</button></div>
+    </div>
+    <div style="margin-top:14px"><div class="add-label">Meal</div><div class="seg" id="ef-meal">${MEALS.map(x=>`<button data-meal="${x}"${x===meal?' class="on"':''}>${x}</button>`).join('')}</div></div>
+    <button class="lib-toggle" id="ef-libtog"><span class="lt-ic" id="ef-bm">${IC_BOOKMARK.replace('{F}','none')}</span><span class="lt-label">Save to Library</span><span class="set-tog" id="ef-libsw"><span></span></span></button>
+    <button class="btn-del-soft" id="ef-del">${IC_TRASH}<span>Delete this entry</span></button>
+    <button class="btn btn-primary btn-block" id="ef-save" style="margin-top:14px">Save changes</button>`);
+  const root=sh.sheet;
+  let placeSize=()=>{};
+  const repaint=()=>{
+    root.querySelector('#ef-kcal').textContent=r0(kcal());
+    root.querySelector('#ef-sub').textContent=sub();
+    root.querySelector('#ef-svv').textContent=fmtServ(servings);
+    if(!perServing){const z=root.querySelector('#ef-szv');if(z)z.textContent=r0(size);placeSize();}
+    root.querySelectorAll('#ef-q button').forEach(b=>b.classList.toggle('on',+b.dataset.q===servings));
   };
-  m.querySelector('#ef-del').onclick=()=>{state.entries=state.entries.filter(x=>x.id!==id);save();closeModal(m);};
+  if(!perServing){
+    const MIN=20,MAX=600;
+    const sl=root.querySelector('#ef-slider'),fillEl=root.querySelector('#ef-fill'),thumbEl=root.querySelector('#ef-thumb');
+    placeSize=()=>{const f=Math.max(0,Math.min(1,(size-MIN)/(MAX-MIN)));fillEl.style.width=(f*100)+'%';thumbEl.style.left='calc('+f+' * (100% - 26px))';};
+    const setFromX=(x)=>{const r=sl.getBoundingClientRect();let f=(x-r.left-13)/(r.width-26);f=Math.max(0,Math.min(1,f));size=Math.round((MIN+f*(MAX-MIN))/5)*5;repaint();};
+    let drag=false;
+    sl.addEventListener('pointerdown',ev=>{drag=true;try{sl.setPointerCapture(ev.pointerId);}catch(_){}setFromX(ev.clientX);});
+    sl.addEventListener('pointermove',ev=>{if(drag)setFromX(ev.clientX);});
+    sl.addEventListener('pointerup',()=>{drag=false;});sl.addEventListener('pointercancel',()=>{drag=false;});
+    root.querySelector('#ef-szdec').onclick=()=>{size=Math.max(MIN,size-5);repaint();};
+    root.querySelector('#ef-szinc').onclick=()=>{size=Math.min(MAX,size+5);repaint();};
+  }
+  root.querySelector('#ef-svdec').onclick=()=>{servings=Math.max(0.5,r1(servings-0.5));repaint();};
+  root.querySelector('#ef-svinc').onclick=()=>{servings=Math.min(20,r1(servings+0.5));repaint();};
+  root.querySelectorAll('#ef-q button').forEach(b=>b.onclick=()=>{servings=+b.dataset.q;repaint();});
+  root.querySelectorAll('#ef-meal button').forEach(b=>b.onclick=()=>{meal=b.dataset.meal;root.querySelectorAll('#ef-meal button').forEach(x=>x.classList.toggle('on',x===b));});
+  root.querySelector('#ef-libtog').onclick=()=>{saveLib=!saveLib;root.querySelector('#ef-libsw').classList.toggle('on',saveLib);root.querySelector('#ef-bm').innerHTML=IC_BOOKMARK.replace('{F}',saveLib?'currentColor':'none');};
+  root.querySelector('#ef-x').onclick=()=>sh.close();
+  root.querySelector('#ef-del').onclick=()=>{state.entries=state.entries.filter(x=>x.id!==id);save();sh.close();};
+  root.querySelector('#ef-save').onclick=()=>{
+    e.meal=meal;
+    if(perServing){
+      e.calories=e.unitCal*servings; e.servingLabel=`${fmtServ(servings)} ${e.portion||'serving'}`;
+      if(saveLib)addToLibraryServing(e.name,e.unitCal,e.portion||'serving');
+    }else{
+      const g=size*servings;
+      e.grams=g; e.calories=per100.calories*g/100; e.protein_g=per100.protein_g*g/100; e.carbs_g=per100.carbs_g*g/100; e.fat_g=per100.fat_g*g/100; e.sugar_g=per100.sugar_g*g/100; e.servingLabel=`${r0(g)} g`;
+      if(saveLib&&g)addToLibrary(e.name,per100,Math.round(size));
+    }
+    save();sh.close();
+  };
+  repaint();
 }
 
 /* ---------- EXERCISE ---------- */
@@ -1831,45 +1892,60 @@ function editExercise(id){
   const e=state.exercise.find(x=>x.id===id); if(!e)return;
   const wkg=latestWeightKg();
   const acts=[...QUICK,...Object.keys(MET).filter(a=>!QUICK.includes(a))];
-  let activity=e.activity, intensity=e.intensity;
-  const m=openModal('Edit exercise',`
-    <div class="field"><label>Activity</label>
-      <div class="chips" id="ex-acts">${acts.map(a=>`<button class="chip${a===activity?' sel':''}" data-act="${a}">${a}</button>`).join('')}</div>
-    </div>
-    <div class="field"><label>Intensity</label>
-      <div class="chips" id="ex-int">
-        <button class="chip${intensity==='light'?' sel':''}" data-int="light">Light</button>
-        <button class="chip${intensity==='moderate'?' sel':''}" data-int="moderate">Moderate</button>
-        <button class="chip${intensity==='vigorous'?' sel':''}" data-int="vigorous">Vigorous</button>
-      </div></div>
-    <div class="field-row">
-      <div class="field"><label>Minutes</label><input type="number" inputmode="numeric" id="ex-min" value="${e.minutes}"></div>
-      <div class="field"><label>Your weight (kg)</label><input type="number" inputmode="decimal" id="ex-wt" value="${wkg?r1(wkg):''}" placeholder="log weight first"></div>
-    </div>
-    <div class="field"><label>Calories burned (editable)</label><input type="number" inputmode="numeric" id="ex-cal" value="${r0(e.caloriesBurned)}"></div>
-    <div class="hint" id="ex-met"></div>
-    <div class="field"><button class="btn btn-primary btn-block" id="ex-save">Save changes</button></div>
-    <div class="field"><button class="btn btn-danger btn-block" id="ex-del">Delete entry</button></div>
-  `);
-  function recompute(setCal){
-    const met=(MET[activity]&&MET[activity][intensity])||0;
-    const wt=+m.querySelector('#ex-wt').value||0, min=+m.querySelector('#ex-min').value||0;
-    if(setCal) m.querySelector('#ex-cal').value=r0(met*wt*(min/60));
-    m.querySelector('#ex-met').textContent=`${activity}, ${intensity}: ${met} MET`;
+  let activity=e.activity, intensity=e.intensity, minutes=e.minutes;
+  const calc=()=>Math.round(((MET[activity]&&MET[activity][intensity])||0)*(wkg||60)*(minutes/60));
+  const sh=makeSheet(`<div id="ee-root"></div>`);
+  const root=sh.sheet.querySelector('#ee-root');
+  function chooseActivity(){
+    root.innerHTML=`<div class="sub-head"><button class="circ-back" id="ee-caback">${IC_BACK}</button><h3>Choose activity</h3></div>
+      <div class="chooser">${acts.map(a=>`<button class="choose-row${a===activity?' on':''}" data-a="${esc(a)}">
+        <span class="choose-ic">${actMeta(a).ic}</span>
+        <span class="choose-main"><span class="cn">${esc(a)}</span><span class="cc">${actMeta(a).cat}</span></span>
+        ${a===activity?`<span class="choose-chk">${IC_CHECK}</span>`:''}</button>`).join('')}</div>`;
+    root.querySelector('#ee-caback').onclick=draw;
+    root.querySelectorAll('.choose-row').forEach(r=>r.onclick=()=>{activity=r.dataset.a;draw();});
   }
-  m.querySelectorAll('#ex-acts .chip').forEach(c=>c.onclick=()=>{activity=c.dataset.act;m.querySelectorAll('#ex-acts .chip').forEach(x=>x.classList.toggle('sel',x===c));recompute(true);});
-  m.querySelectorAll('#ex-int .chip').forEach(c=>c.onclick=()=>{intensity=c.dataset.int;m.querySelectorAll('#ex-int .chip').forEach(x=>x.classList.toggle('sel',x===c));recompute(true);});
-  m.querySelector('#ex-min').oninput=()=>recompute(true);
-  m.querySelector('#ex-wt').oninput=()=>recompute(true);
-  recompute(false);
-  m.querySelector('#ex-save').onclick=()=>{
-    e.activity=activity; e.intensity=intensity;
-    e.minutes=+m.querySelector('#ex-min').value||0;
-    e.met=(MET[activity]&&MET[activity][intensity])||e.met;
-    e.caloriesBurned=+m.querySelector('#ex-cal').value||0;
-    save();closeModal(m);render();
-  };
-  m.querySelector('#ex-del').onclick=()=>{state.exercise=state.exercise.filter(x=>x.id!==id);save();closeModal(m);render();};
+  function draw(){
+    root.innerHTML=`<div class="edit-head"><span class="edit-title">Edit exercise</span><button class="edit-x" id="ee-x">${IC_X}</button></div>
+      <button class="act-pick" id="ee-actbtn"><span class="act-ic">${actMeta(activity).ic}</span>
+        <div class="act-main"><div class="an">${esc(activity)}</div><div class="as">${actMeta(activity).cat}</div></div>${IC_CHEV}</button>
+      <div class="add-card"><div class="add-card-h">Intensity</div>
+        <div class="seg" id="ee-int">
+          <button data-i="light"${intensity==='light'?' class="on"':''}>Light</button>
+          <button data-i="moderate"${intensity==='moderate'?' class="on"':''}>Moderate</button>
+          <button data-i="vigorous"${intensity==='vigorous'?' class="on"':''}>Vigorous</button>
+        </div></div>
+      <div class="add-card"><div class="dur-h"><span>Duration</span><span class="dur-v"><b id="ee-minv">${minutes}</b> min</span></div>
+        <div class="dur-row"><button class="step" id="ee-dec">${IC_MINUS}</button>
+          <div class="nn-slider" id="ee-slider"><div class="nn-track"></div><div class="nn-fill" id="ee-fill"></div><div class="nn-thumb" id="ee-thumb"></div></div>
+          <button class="step" id="ee-inc">${IC_PLUS}</button></div></div>
+      <div class="burned"><div class="burned-l">Calories burned</div><div class="burned-n" id="ee-kcal">${calc()}</div>
+        <div class="burned-s">kcal · estimated from intensity, time${wkg?' &amp; weight':''}</div></div>
+      ${wkg?'':'<div class="hint" style="text-align:center;margin-top:8px">Using an estimated 60&nbsp;kg — log your weight for a more accurate burn.</div>'}
+      <button class="btn-del-soft" id="ee-del">${IC_TRASH}<span>Delete this entry</span></button>
+      <button class="btn btn-primary btn-block" id="ee-save" style="margin-top:14px">Save changes</button>`;
+    const MIN=5,MAX=120;
+    const sl=root.querySelector('#ee-slider'),fillEl=root.querySelector('#ee-fill'),thumbEl=root.querySelector('#ee-thumb');
+    const place=()=>{const f=(minutes-MIN)/(MAX-MIN);fillEl.style.width=(f*100)+'%';thumbEl.style.left='calc('+f+' * (100% - 26px))';};
+    const paint=()=>{root.querySelector('#ee-minv').textContent=minutes;root.querySelector('#ee-kcal').textContent=calc();place();};
+    const setFromX=(x)=>{const r=sl.getBoundingClientRect();let f=(x-r.left-13)/(r.width-26);f=Math.max(0,Math.min(1,f));minutes=Math.round(MIN+f*(MAX-MIN));paint();};
+    let drag=false;
+    sl.addEventListener('pointerdown',ev=>{drag=true;try{sl.setPointerCapture(ev.pointerId);}catch(_){}setFromX(ev.clientX);});
+    sl.addEventListener('pointermove',ev=>{if(drag)setFromX(ev.clientX);});
+    sl.addEventListener('pointerup',()=>{drag=false;});sl.addEventListener('pointercancel',()=>{drag=false;});
+    place();
+    root.querySelector('#ee-x').onclick=()=>sh.close();
+    root.querySelector('#ee-actbtn').onclick=chooseActivity;
+    root.querySelectorAll('#ee-int button').forEach(b=>b.onclick=()=>{intensity=b.dataset.i;root.querySelectorAll('#ee-int button').forEach(x=>x.classList.toggle('on',x===b));root.querySelector('#ee-kcal').textContent=calc();});
+    root.querySelector('#ee-dec').onclick=()=>{minutes=Math.max(MIN,minutes-1);paint();};
+    root.querySelector('#ee-inc').onclick=()=>{minutes=Math.min(MAX,minutes+1);paint();};
+    root.querySelector('#ee-del').onclick=()=>{state.exercise=state.exercise.filter(x=>x.id!==id);save();sh.close();};
+    root.querySelector('#ee-save').onclick=()=>{
+      e.activity=activity;e.intensity=intensity;e.minutes=minutes;e.met=(MET[activity]&&MET[activity][intensity])||e.met;e.caloriesBurned=calc();
+      save();sh.close();
+    };
+  }
+  draw();
 }
 function renderWeight(){
   const unit=state.settings.weightUnit;
