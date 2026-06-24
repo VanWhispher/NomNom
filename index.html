@@ -454,17 +454,17 @@
   .pace .u{font-size:10.5px;color:#B7AEB2;margin-top:1px;}
   .pace.on{background:var(--accent-bg);box-shadow:inset 0 0 0 2px var(--accent);}
   .pace.on .kg,.pace.on .u{color:var(--accent-strong);}
-  .proj{display:flex;gap:12px;align-items:center;background:linear-gradient(135deg,#FCE3EB,#FBD4E1);border-radius:16px;padding:13px 15px;margin-top:16px;}
-  .proj .ic{width:36px;height:36px;border-radius:11px;background:rgba(255,255,255,.6);color:var(--accent-strong);flex:none;display:flex;align-items:center;justify-content:center;}
+  .proj{display:flex;gap:12px;align-items:center;background:var(--accent-bg);background:color-mix(in srgb, var(--accent) 30%, var(--surface));border-radius:16px;padding:13px 15px;margin-top:16px;}
+  .proj .ic{width:36px;height:36px;border-radius:11px;background:var(--surface);color:var(--accent-strong);flex:none;display:flex;align-items:center;justify-content:center;}
   .proj .ic svg{width:19px;height:19px;}
-  .proj .tx{font-size:13px;line-height:1.45;color:#7A3A52;}
+  .proj .tx{font-size:13px;line-height:1.45;color:var(--accent-strong);}
   .numrow{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--divider);}
   .numrow .t{font-size:13.5px;font-weight:600;color:var(--text);}
   .numrow .s{font-size:11.5px;color:var(--text-soft);margin-top:1px;}
   .numrow .v{font-family:var(--display);font-weight:700;font-size:17px;color:var(--text);}
   .tgtbox{display:flex;align-items:center;justify-content:space-between;background:var(--accent-bg);border-radius:16px;padding:14px 16px;margin-top:6px;}
   .tgtbox .big{font-family:var(--display);font-weight:800;font-size:26px;color:var(--accent-strong);}
-  .cta{width:100%;height:54px;border-radius:18px;border:none;background:var(--accent);color:#fff;font-family:var(--display);font-weight:700;font-size:16px;cursor:pointer;box-shadow:0 8px 18px -8px rgba(216,85,122,.6);}
+  .cta{width:100%;height:54px;border-radius:18px;border:none;background:var(--accent);color:#fff;font-family:var(--display);font-weight:700;font-size:16px;cursor:pointer;box-shadow:0 8px 18px -10px var(--accent-strong);}
   .cta:disabled{opacity:.5;box-shadow:none;cursor:default;}
   .saved-note{text-align:center;font-size:12.5px;color:#18A974;font-weight:600;margin-top:10px;}
   .whero{display:flex;gap:18px;align-items:center;}
@@ -474,11 +474,11 @@
   .wring .ctr .u{font-size:12px;color:var(--text-soft);margin-top:1px;}
   .wpill{display:inline-flex;align-items:center;gap:5px;border-radius:20px;padding:4px 10px;margin-bottom:10px;font-size:12px;font-weight:700;}
   .wpill svg{width:12px;height:12px;}
-  .checkin{display:flex;gap:12px;align-items:flex-start;background:linear-gradient(135deg,#FCE3EB,#FBD4E1);border-radius:20px;padding:15px 16px;margin-bottom:14px;}
-  .checkin .ic{width:34px;height:34px;border-radius:11px;background:rgba(255,255,255,.6);color:var(--accent-strong);flex:none;display:flex;align-items:center;justify-content:center;}
+  .checkin{display:flex;gap:12px;align-items:flex-start;background:var(--accent-bg);background:color-mix(in srgb, var(--accent) 30%, var(--surface));border-radius:20px;padding:15px 16px;margin-bottom:14px;}
+  .checkin .ic{width:34px;height:34px;border-radius:11px;background:var(--surface);color:var(--accent-strong);flex:none;display:flex;align-items:center;justify-content:center;}
   .checkin .ic svg{width:18px;height:18px;}
-  .checkin .tx{font-size:13px;line-height:1.45;color:#7A3A52;}
-  .wlog-btn{width:100%;height:54px;border-radius:18px;border:none;background:var(--accent);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:14px;box-shadow:0 8px 18px -8px rgba(216,85,122,.6);font-family:var(--display);font-weight:700;font-size:16px;}
+  .checkin .tx{font-size:13px;line-height:1.45;color:var(--accent-strong);}
+  .wlog-btn{width:100%;height:54px;border-radius:18px;border:none;background:var(--accent);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:14px;box-shadow:0 8px 18px -10px var(--accent-strong);font-family:var(--display);font-weight:700;font-size:16px;}
   .wlog-btn svg{width:20px;height:20px;flex:none;}
   .wlog-btn .last{font-family:var(--font);font-size:12px;color:rgba(255,255,255,.8);font-weight:400;}
   .wstep{display:flex;align-items:center;justify-content:center;gap:14px;}
@@ -895,7 +895,7 @@ function openCalendar(){
   const metric=(k)=>target!=null?(target-netOf(k)):netOf(k);   // remaining (target − food + exercise) when a target is set
   const lerp=(a,b,t)=>[Math.round(a[0]+(b[0]-a[0])*t),Math.round(a[1]+(b[1]-a[1])*t),Math.round(a[2]+(b[2]-a[2])*t)];
   const lum=(c)=>(0.299*c[0]+0.587*c[1]+0.114*c[2])/255;
-  const GLO=[150,222,189],GHI=[8,94,62],RLO=[244,176,178],RHI=[150,28,33];
+  const GLO=[150,226,197],GHI=[16,150,101],RLO=[249,178,180],RHI=[222,54,60];
   const signed=(k)=>{ if(target==null)return r0(metric(k)); const v=metric(k); return (v>0?'+':'')+r0(v); };
   const heat=(k)=>{
     const st=statusOf(k);
@@ -2286,9 +2286,9 @@ function trendSVG(pts){
   const avg=pts.map(p=>{const win=pts.filter(q=>q.t<=p.t&&q.t>p.t-7*864e5);return [X(p.t),Y(win.reduce((s,q)=>s+q.v,0)/win.length)];});
   const last=pts[pts.length-1];
   return `<svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block;overflow:visible">
-    <polyline fill="none" stroke="#EBBFCF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" points="${daily}"/>
-    <polyline fill="none" stroke="#D8557A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" points="${avg.map(a=>a.join(',')).join(' ')}"/>
-    <circle cx="${X(last.t)}" cy="${Y(last.v)}" r="4.5" fill="#fff" stroke="#D8557A" stroke-width="3"/>
+    <polyline fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" points="${avg.map(a=>a.join(',')).join(' ')}"/>
+    <polyline fill="none" stroke="var(--accent-strong)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" points="${daily}"/>
+    <circle cx="${X(last.t)}" cy="${Y(last.v)}" r="4.5" fill="var(--surface)" stroke="var(--accent-strong)" stroke-width="3"/>
   </svg>`;
 }
 let wRange=30, wLogOpen=false, wLogVal=null;
@@ -2337,7 +2337,7 @@ function renderWeight(){
   $('main').innerHTML=`
     <div class="topbar"><div><h1>Weight</h1><div class="date">${wu}</div></div><button class="gear" id="open-settings-w">${GEAR_SVG}</button></div>
 
-    ${cur!=null?`<div class="scard whero">
+    ${cur!=null?`<div class="scard whero" style="margin-top:14px">
       <div class="wring">${ringSVG(progPct)}<div class="ctr"><span class="n">${r1(cur)}</span><span class="u">${wu} now</span></div></div>
       <div style="flex:1;min-width:0">
         ${goal!=null&&toGo!=null?`${weekCh!=null?`<div class="wpill" style="background:rgba(24,169,116,.12)">${(weekCh<-0.05?`<span style="color:#18A974">${ARR_DN}</span>`:weekCh>0.05?`<span style="color:#E5747A">${ARR_UP}</span>`:'')}<span style="color:${weekCh<-0.05?'#18A974':weekCh>0.05?'#E5747A':'#9A938A'}">${Math.abs(weekCh).toFixed(1)} ${wu} / wk</span></div>`:''}
@@ -2346,7 +2346,7 @@ function renderWeight(){
         <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--divider);font-size:12px;color:#7c766c">Started at <strong style="color:var(--text)">${r1(start0)} ${wu}</strong> · ${Math.round(progPct*100)}% there</div>`
         :`<div style="font-size:13px;color:var(--text-soft)">Set a goal weight in the <strong style="color:var(--text)">Plan</strong> tab to track your progress.</div>`}
       </div>
-    </div>`:`<div class="scard" style="text-align:center;padding:26px 18px"><div style="font-family:var(--display);font-weight:700;font-size:17px;color:var(--text)">No weigh-ins yet</div><div style="font-size:13px;color:var(--text-soft);margin-top:4px">Log your first morning below to start tracking.</div></div>`}
+    </div>`:`<div class="scard" style="text-align:center;padding:26px 18px;margin-top:14px"><div style="font-family:var(--display);font-weight:700;font-size:17px;color:var(--text)">No weigh-ins yet</div><div style="font-size:13px;color:var(--text-soft);margin-top:4px">Log your first morning below to start tracking.</div></div>`}
 
     <div class="checkin"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-5 4 3 6-7"/><path d="M16 8h4v4"/></svg></div><div class="tx">${cur!=null?'Weigh in at the same time each morning for the most consistent trend.':'Step on the scale first thing tomorrow and log it here.'}</div></div>
 
@@ -2356,7 +2356,7 @@ function renderWeight(){
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><span class="scard-h" style="margin:0">Trend</span>
         <div class="minitog" id="w-range">${ranges.map(([r,l])=>`<button data-r="${r}"${wRange===r?' class="on"':''}>${l}</button>`).join('')}</div></div>
       ${trendSVG(cpts)}
-      <div class="wlegend"><span class="lg"><span style="width:14px;height:3px;border-radius:2px;background:#D8557A"></span>7-day average</span><span class="lg"><span style="width:14px;height:2px;border-radius:2px;background:#EBBFCF"></span>Daily weigh-in</span></div>
+      <div class="wlegend"><span class="lg"><span style="width:14px;height:3px;border-radius:2px;background:var(--accent-strong)"></span>Daily weigh-in</span><span class="lg"><span style="width:14px;height:2px;border-radius:2px;background:var(--accent)"></span>7-day average</span></div>
     </div>
 
     <div class="wstrip">
@@ -2421,7 +2421,7 @@ function renderPlan(){
   $('main').innerHTML=`
     <div class="topbar"><div><h1>Plan</h1><div class="date">Set your targets</div></div><button class="gear" id="open-settings-p">${GEAR_SVG}</button></div>
 
-    <div class="scard">
+    <div class="scard" style="margin-top:14px">
       <div class="scard-h">About you</div>
       <div class="prow"><span class="lab">Sex</span>
         <div class="minitog" id="p-sex"><button data-s="female"${p.sex==='female'?' class="on"':''}>Female</button><button data-s="male"${p.sex==='male'?' class="on"':''}>Male</button></div></div>
