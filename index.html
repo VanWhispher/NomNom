@@ -2330,7 +2330,7 @@ function renderWeight(){
   // BMI
   let bmiHtml='';
   if(curKg&&p.height){ const hm=p.height/100; const bmi=curKg/(hm*hm); const cat=bmi<18.5?'Underweight':bmi<25?'Healthy':bmi<30?'Overweight':'Obese'; const ccol=bmi<18.5?'#7CB8E8':bmi<25?'#18A974':bmi<30?'#F2A93B':'#E5747A'; const pct=Math.max(0,Math.min(100,(bmi-15)/(35-15)*100));
-    bmiHtml=`<div class="scard" style="padding:16px 18px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><span style="font-weight:600;font-size:13px;color:var(--text-soft)">BMI</span><div style="display:flex;align-items:baseline;gap:5px"><span style="font-family:var(--display);font-weight:800;font-size:18px;color:${col}">${bmi.toFixed(1)}</span><span style="font-size:11.5px;color:var(--text-soft)">${cat}</span></div></div><div class="bmibar"><div class="knob" style="left:${pct}%"></div></div></div>`;
+    bmiHtml=`<div class="scard" style="padding:16px 18px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><span style="font-weight:600;font-size:13px;color:var(--text-soft)">BMI</span><div style="display:flex;align-items:baseline;gap:5px"><span style="font-family:var(--display);font-weight:800;font-size:18px;color:${ccol}">${bmi.toFixed(1)}</span><span style="font-size:11.5px;color:var(--text-soft)">${cat}</span></div></div><div class="bmibar"><div class="knob" style="left:${pct}%"></div></div></div>`;
   }
 
   const ranges=[[7,'1W'],[30,'1M'],[90,'3M'],[9999,'All']];
@@ -2450,7 +2450,7 @@ function renderPlan(){
           <div class="pstep"><button id="p-gwdn">${IC_MINUS}</button><span class="val" id="p-gwv"></span><button id="p-gwup">${IC_PLUS}</button></div></div>
         <div style="padding:14px 0 0;margin-top:14px;border-top:1px solid var(--divider)">
           <div style="font-size:14px;color:var(--text);margin-bottom:10px">Weekly pace</div>
-          <div class="paces" id="p-pace">${[0.25,0.5,0.75].map(r=>`<button class="pace${Math.abs(r-p.rate)<0.01?' on':''}" data-r="${r}"><div class="kg">${r}</div><div class="u">kg / week</div></button>`).join('')}</div>
+          <div class="paces" id="p-pace">${[0.25,0.5,0.75,1].map(r=>`<button class="pace${Math.abs(r-p.rate)<0.01?' on':''}" data-r="${r}"><div class="kg">${r}</div><div class="u">kg / week</div></button>`).join('')}</div>
         </div>
         <div id="p-proj"></div>
       </div>
@@ -2484,10 +2484,10 @@ function renderPlan(){
       document.querySelectorAll('#p-pace .pace').forEach(b=>b.classList.toggle('on',Math.abs(+b.dataset.r-p.rate)<0.01));
     }
     // numbers
-    const age=+p.age||0, ht=+p.height||0;
-    if(!wkg||!age||!ht){
+    const age=ageNow(), ht=+p.height||0;
+    if(!wkg||!ht){
       $('p-bmr').textContent='—';$('p-maint').textContent='—';$('p-tgt').textContent='—';
-      $('p-tsub').textContent=!wkg?'Log a weigh-in to calculate':'Fill in age & height';
+      $('p-tsub').textContent=!wkg?'Log a weigh-in to calculate':'Add your height above';
       $('p-set').disabled=true;
       $('p-proj').innerHTML='';
       return;
