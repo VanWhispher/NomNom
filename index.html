@@ -298,11 +298,47 @@
   .recent-add{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:var(--accent);border:none;color:#fff;cursor:pointer;flex:none;}
   .recent-add svg{width:16px;height:16px;}
   .swipe-wrap{position:relative;overflow:hidden;border-bottom:1px solid var(--divider);}
-  .swipe-del{position:absolute;top:0;right:0;bottom:0;width:88px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:none;background:#E5484D;color:#fff;cursor:pointer;padding:0;}
-  .swipe-del svg{width:19px;height:19px;}
-  .swipe-del span{font-family:var(--font);font-weight:600;font-size:11px;}
+  .swipe-actions{position:absolute;top:0;right:0;bottom:0;display:flex;}
+  .swipe-meal,.swipe-del{width:84px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:none;color:#fff;cursor:pointer;padding:0;}
+  .swipe-meal{background:#D8557A;}
+  .swipe-del{background:#E5484D;}
+  .swipe-meal svg,.swipe-del svg{width:19px;height:19px;}
+  .swipe-meal span,.swipe-del span{font-family:var(--font);font-weight:600;font-size:11px;}
   .swipe-row{position:relative;background:var(--surface);transform:translateX(0);touch-action:pan-y;will-change:transform;}
   .swipe-wrap .recent-row{border-bottom:none;}
+  .lib-sec{font-family:var(--font);font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-soft);padding:16px 2px 8px;}
+  .meal-folder{display:flex;align-items:center;gap:12px;width:100%;background:var(--accent-bg);border:none;border-radius:18px;padding:13px 14px;cursor:pointer;text-align:left;margin-bottom:9px;}
+  .meal-folder .mf-ic{display:flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:13px;background:var(--surface);color:var(--accent-strong);flex:none;}
+  .meal-folder .mf-ic svg{width:22px;height:22px;}
+  .meal-folder .mf-main{flex:1;min-width:0;}
+  .meal-folder .mf-name{display:block;font-family:var(--display);font-weight:700;font-size:15.5px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .meal-folder .mf-sum{display:block;font-size:12.5px;color:var(--text-soft);margin-top:1px;}
+  .meal-folder .mf-chev{color:#CFC6CB;flex:none;display:flex;}
+  .meal-folder .mf-chev svg{width:18px;height:18px;}
+  .meal-new{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;height:48px;border-radius:16px;border:1.5px dashed var(--accent);background:none;color:var(--accent-strong);font-family:var(--font);font-weight:600;font-size:14px;cursor:pointer;margin-top:2px;}
+  .meal-hero{background:var(--accent);border-radius:18px;padding:15px 18px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 8px 20px -10px rgba(216,85,122,.55);}
+  .meal-hero .mh-l{font-size:12.5px;color:rgba(255,255,255,.88);}
+  .meal-hero .mh-s{font-family:var(--display);font-weight:700;font-size:15px;color:#fff;margin-top:1px;}
+  .meal-hero .mh-tot{font-family:var(--display);font-weight:800;font-size:30px;color:#fff;line-height:1;}
+  .meal-hero .mh-u{font-size:13px;color:rgba(255,255,255,.85);}
+  .ming{display:flex;align-items:center;gap:10px;padding:12px 2px;border-bottom:1px solid var(--divider);}
+  .ming .mg-main{flex:1;min-width:0;}
+  .ming .mg-name{font-weight:600;font-size:14.5px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .ming .mg-kcal{font-size:12.5px;color:var(--text-soft);margin-top:1px;}
+  .ming .mg-rm{flex:none;width:26px;height:26px;border:none;background:none;color:var(--text-soft);display:flex;align-items:center;justify-content:center;cursor:pointer;}
+  .ming .mg-rm svg{width:16px;height:16px;}
+  .stepper{display:flex;align-items:center;gap:8px;background:rgba(43,42,38,.05);border-radius:13px;padding:5px;flex:none;}
+  .stepper button{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:9px;border:none;background:var(--surface);color:var(--accent-strong);cursor:pointer;flex:none;}
+  .stepper button svg{width:14px;height:14px;}
+  .stepper .sv{min-width:50px;text-align:center;font-family:var(--display);font-weight:700;font-size:15px;color:var(--text);}
+  .stepper .sv small{font-family:var(--font);font-weight:400;font-size:12px;color:var(--text-soft);}
+  .picker-ov{position:fixed;inset:0;z-index:120;display:flex;flex-direction:column;justify-content:flex-end;}
+  .picker-bd{position:absolute;inset:0;background:rgba(40,20,28,.45);}
+  .picker-card{position:relative;background:var(--surface);border-radius:28px 28px 0 0;padding:16px 18px calc(26px + env(safe-area-inset-bottom));box-shadow:0 -10px 40px rgba(0,0,0,.22);animation:sheetUp .22s ease;}
+  .picker-grip{width:40px;height:5px;border-radius:3px;background:#E7DDE2;margin:0 auto 14px;}
+  .picker-title{font-family:var(--display);font-weight:700;font-size:19px;color:var(--text);}
+  .picker-sub{font-size:13px;color:var(--text-soft);margin-top:2px;}
+  @keyframes sheetUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
   .act-pick{display:flex;align-items:center;gap:13px;width:100%;background:var(--accent-bg);border:none;border-radius:18px;padding:14px 16px;cursor:pointer;text-align:left;margin-top:14px;}
   .act-ic{display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:13px;background:#fff;color:var(--accent-strong);flex:none;}
   .act-ic svg{width:23px;height:23px;}
@@ -413,7 +449,7 @@ const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 let sb=null, user=null, CLOUD=false;
 const DEFAULT={
   settings:{apiKey:'',model:'gemini-2.5-flash',weightUnit:'kg',heightUnit:'cm',dailyTarget:null,theme:'pink'},
-  entries:[], exercise:[], library:[], weights:[],
+  entries:[], exercise:[], library:[], weights:[], meals:[],
   profile:{sex:'male',age:'',height:'',activity:1.2,goal:'maintain',lossRate:500}
 };
 let state=load();
@@ -728,6 +764,8 @@ const IC_PEN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-
 const IC_FORK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11h14a7 7 0 01-14 0z"/><path d="M9 7c0-1.5 1-2 1.5-3M13 7c0-1.5 1-2 1.5-3"/></svg>';
 const IC_DUMBBELL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 12h12M3.5 9v6M7 8v8M17 8v8M20.5 9v6"/></svg>';
 const IC_PLUS='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>';
+const IC_CHEVR='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>';
+const IC_PENCIL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>';
 const IC_MINUS='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 12h14"/></svg>';
 const IC_RUN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="4.5" r="1.8"/><path d="M6 21l3.5-5.5 2.5-3-1.5-4.5 4.5 2.5 2.5 3.5M8.5 9.5L13 7.5"/></svg>';
 const IC_BIKE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="17" r="3"/><circle cx="18" cy="17" r="3"/><path d="M6 17l5-9 3 5h3M10 8h4"/></svg>';
@@ -740,6 +778,15 @@ const IC_BOLT='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke
 const IC_HEART='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.5-7-10a4 4 0 017-2.5A4 4 0 0119 10c0 5.5-7 10-7 10z"/></svg>';
 const IC_BACK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>';
 const IC_TRASH='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg>';
+const IC_FOLDER='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 012-2h4l2 2.5h8a2 2 0 012 2V18a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M3 11h18"/></svg>';
+const IC_FOLDERADD='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 012-2h4l2 2.5h8a2 2 0 012 2V18a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M12 11.5v4M10 13.5h4"/></svg>';
+function mealItemKcal(it){ return it.kind==='serving' ? (it.unitCal||0)*(it.servings||0) : (it.per?.calories||0)*(it.grams||0)/100; }
+function mealTotal(meal){ return (meal.items||[]).reduce((s,it)=>s+mealItemKcal(it),0); }
+function mealSummary(meal){ const n=(meal.items||[]).length; return `${n} item${n===1?'':'s'} · ${r0(mealTotal(meal))} kcal`; }
+function libToMealItem(l){
+  if(l.perServing) return {id:uid(),name:l.name,kind:'serving',servings:1,unitCal:l.perServing.calories,portion:l.perServing.portion};
+  return {id:uid(),name:l.name,kind:'weight',grams:l.lastGrams||100,per:{calories:l.per_100g.calories||0,protein_g:l.per_100g.protein_g||0,carbs_g:l.per_100g.carbs_g||0,fat_g:l.per_100g.fat_g||0,sugar_g:l.per_100g.sugar_g||0}};
+}
 const IC_REFRESH='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36M21 4v5h-5"/></svg>';
 const IC_CHECK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>';
 const IC_UPLOAD='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></svg>';
@@ -938,58 +985,158 @@ function openAdd(){
     startScan();
   }
 
+  function addFromLib(id){
+    const l=state.library.find(x=>x.id===id); if(!l)return;
+    body.innerHTML=`<div class="sub-head"><button class="circ-back" id="lb-b2">${IC_BACK}</button><h3>Add item</h3></div><div id="lb-stage"></div>`;
+    body.querySelector('#lb-b2').onclick=renderLibrary;
+    const stage=body.querySelector('#lb-stage');
+    if(l.perServing)logServing(null,stage,l.name,l.perServing.calories,l.perServing.portion,'library',()=>sh.close());
+    else weighAndLog(null,stage,l.name,l.per_100g,'library',l.lastGrams,()=>sh.close());
+  }
   function renderLibrary(){
     camStop(); setTabs(false);
     body.innerHTML=`<div class="sub-head"><button class="circ-back" id="lb-back">${IC_BACK}</button><h3>Library</h3></div>
       <div id="lib-body" style="margin-top:6px"></div>`;
     body.querySelector('#lb-back').onclick=renderFood;
     const lb=body.querySelector('#lib-body');
-    const lib2=state.library;
-    if(!lib2.length){lb.innerHTML=`<div class="empty" style="border:none">Your library is empty. Tick “Save to library” after logging an item to reuse it here.</div>`;return;}
-    lb.innerHTML=lib2.map(l=>{
-      const sub=l.perServing?`${r0(l.perServing.calories)} kcal per ${esc(l.perServing.portion)}`:`${r0(l.per_100g.calories)} kcal/100g`;
-      return `<div class="swipe-wrap" data-id="${l.id}">
-        <button class="swipe-del" data-del="${l.id}" aria-label="Delete">${IC_TRASH}<span>Delete</span></button>
-        <div class="recent-row swipe-row">
-          <span class="recent-ic">${IC_FORK}</span>
-          <div class="recent-main"><div class="rn">${esc(l.name)}</div><div class="rs">${esc(sub)}</div></div>
-          <button class="recent-add" data-lib="${l.id}" aria-label="Add">${IC_PLUS}</button>
-        </div>
-      </div>`;
-    }).join('');
-    function addFromLib(id){
-      const l=state.library.find(x=>x.id===id); if(!l)return;
-      body.innerHTML=`<div class="sub-head"><button class="circ-back" id="lb-b2">${IC_BACK}</button><h3>Add item</h3></div><div id="lb-stage"></div>`;
-      body.querySelector('#lb-b2').onclick=renderLibrary;
-      const stage=body.querySelector('#lb-stage');
-      if(l.perServing)logServing(null,stage,l.name,l.perServing.calories,l.perServing.portion,'library',()=>sh.close());
-      else weighAndLog(null,stage,l.name,l.per_100g,'library',l.lastGrams,()=>sh.close());
+    const lib2=state.library, meals=state.meals||[];
+    if(!lib2.length && !meals.length){lb.innerHTML=`<div class="empty" style="border:none">Your library is empty. Tick “Save to library” after logging an item to reuse it here — then swipe a saved food left to drop it into a meal folder.</div>`;return;}
+    let html='';
+    if(meals.length){
+      html+=`<div class="lib-sec">My meals</div>`;
+      html+=meals.map(mm=>`<button class="meal-folder" data-meal="${mm.id}">
+        <span class="mf-ic">${IC_FOLDER}</span>
+        <span class="mf-main"><span class="mf-name">${esc(mm.name)}</span><span class="mf-sum">${mealSummary(mm)}</span></span>
+        <span class="mf-chev">${IC_CHEVR}</span>
+      </button>`).join('');
     }
+    if(lib2.length){
+      html+=`<div class="lib-sec">${meals.length?'Single foods':'Saved foods'}</div>`;
+      html+=lib2.map(l=>{
+        const sub=l.perServing?`${r0(l.perServing.calories)} kcal per ${esc(l.perServing.portion)}`:`${r0(l.per_100g.calories)} kcal/100g`;
+        return `<div class="swipe-wrap" data-id="${l.id}">
+          <div class="swipe-actions">
+            <button class="swipe-meal" data-meal-add="${l.id}" aria-label="Add to meal">${IC_FOLDERADD}<span>＋ Meal</span></button>
+            <button class="swipe-del" data-del="${l.id}" aria-label="Delete">${IC_TRASH}<span>Delete</span></button>
+          </div>
+          <div class="recent-row swipe-row">
+            <span class="recent-ic">${IC_FORK}</span>
+            <div class="recent-main"><div class="rn">${esc(l.name)}</div><div class="rs">${esc(sub)}</div></div>
+            <button class="recent-add" data-lib="${l.id}" aria-label="Add">${IC_PLUS}</button>
+          </div>
+        </div>`;
+      }).join('');
+    }
+    lb.innerHTML=html;
+    lb.querySelectorAll('[data-meal]').forEach(b=>b.onclick=()=>renderMeal(b.dataset.meal));
+    const OPENX=-168;
     lb.querySelectorAll('.swipe-wrap').forEach(wrap=>{
       const id=wrap.dataset.id, row=wrap.querySelector('.swipe-row');
-      const addBtn=wrap.querySelector('.recent-add'), delBtn=wrap.querySelector('.swipe-del');
+      const addBtn=wrap.querySelector('.recent-add'), delBtn=wrap.querySelector('.swipe-del'), mealBtn=wrap.querySelector('.swipe-meal');
       let startX=0,base=0,off=0,down=false,dragging=false,open=false,suppress=false;
       const apply=(x,anim)=>{row.style.transition=anim?'transform .2s ease':'';row.style.transform=`translateX(${x}px)`;};
       const close=()=>{open=false;apply(0,true);};
-      const openIt=()=>{open=true;apply(-88,true);};
+      const openIt=()=>{open=true;apply(OPENX,true);};
       const guard=()=>{suppress=true;setTimeout(()=>{suppress=false;},80);};
       const doDelete=()=>{ state.library=state.library.filter(x=>x.id!==id); save(); renderLibrary(); };
       delBtn.onclick=(e)=>{e.stopPropagation();doDelete();};
+      mealBtn.onclick=(e)=>{e.stopPropagation(); const l=state.library.find(x=>x.id===id); close(); if(l)openMealPicker(l);};
       addBtn.onclick=(e)=>{ if(open||suppress){e.stopPropagation();e.preventDefault();close();return;} addFromLib(id); };
-      row.addEventListener('pointerdown',e=>{ down=true;dragging=false;startX=e.clientX;base=open?-88:0;off=base; });
+      row.addEventListener('pointerdown',e=>{ down=true;dragging=false;startX=e.clientX;base=open?OPENX:0;off=base; });
       row.addEventListener('pointermove',e=>{
         if(!down)return; const d=e.clientX-startX;
         if(!dragging && Math.abs(d)>6){ dragging=true; try{row.setPointerCapture(e.pointerId);}catch(_){} }
-        if(dragging){ off=base+d; if(off>0)off=0; if(off<-120)off=-120; apply(off,false); e.preventDefault(); }
+        if(dragging){ off=base+d; if(off>0)off=0; if(off<OPENX-22)off=OPENX-22; apply(off,false); e.preventDefault(); }
       });
       const endDrag=()=>{
         if(!down)return; down=false;
-        if(dragging){ guard(); if(off<=-100){doDelete();return;} else if(off<=-44){openIt();} else {close();} }
+        if(dragging){ guard(); if(off<=-50){openIt();} else {close();} }
         else if(open){ guard(); close(); }
       };
       row.addEventListener('pointerup',endDrag);
       row.addEventListener('pointercancel',endDrag);
     });
+  }
+  function openMealPicker(l){
+    const meals=state.meals||[];
+    const ov=el(`<div class="picker-ov"><div class="picker-bd" id="pk-bd"></div>
+      <div class="picker-card">
+        <div class="picker-grip"></div>
+        <div class="picker-title">Add to a meal</div>
+        <div class="picker-sub">Put “${esc(l.name)}” into one of your meals.</div>
+        <div style="display:flex;flex-direction:column;gap:9px;margin-top:16px">
+          ${meals.map(mm=>`<button class="meal-folder" data-pick="${mm.id}" style="margin-bottom:0">
+            <span class="mf-ic">${IC_FOLDER}</span>
+            <span class="mf-main"><span class="mf-name" style="font-size:14.5px">${esc(mm.name)}</span><span class="mf-sum">${mealSummary(mm)}</span></span>
+            <span class="mf-chev" style="color:var(--accent)">${IC_PLUS}</span>
+          </button>`).join('')}
+          <button class="meal-new" id="pk-new">${IC_PLUS}<span>New meal</span></button>
+        </div>
+      </div></div>`);
+    $('modal-root').appendChild(ov);
+    const done=()=>ov.remove();
+    ov.querySelector('#pk-bd').onclick=done;
+    ov.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{
+      const mm=state.meals.find(x=>x.id===b.dataset.pick); if(mm){mm.items.push(libToMealItem(l));save();}
+      done(); renderLibrary();
+    });
+    ov.querySelector('#pk-new').onclick=()=>{
+      const name=(prompt('Name this meal','My meal')||'').trim(); if(!name){return;}
+      state.meals.push({id:uid(),name,items:[libToMealItem(l)]}); save();
+      done(); renderLibrary();
+    };
+  }
+  function renderMeal(mealId){
+    camStop(); setTabs(false);
+    const meal=()=>state.meals.find(x=>x.id===mealId);
+    if(!meal()){renderLibrary();return;}
+    let chosenMeal=defaultMeal();
+    body.innerHTML=`<div class="sub-head"><button class="circ-back" id="ml-back">${IC_BACK}</button><h3 id="ml-title" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(meal().name)}</h3><button class="circ-back" id="ml-rename" aria-label="Rename" style="margin-left:auto">${IC_PENCIL}</button></div>
+      <div id="ml-hero"></div>
+      <div id="ml-items" style="margin-top:6px"></div>
+      ${mealChips(chosenMeal)}
+      <button class="btn btn-primary btn-block" id="ml-add" style="margin-top:14px"></button>
+      <button class="btn btn-danger btn-block" id="ml-del" style="margin-top:10px">Delete this meal</button>`;
+    body.querySelector('#ml-back').onclick=renderLibrary;
+    const getMeal=wireMealChips(body);
+    body.querySelector('#ml-rename').onclick=()=>{const m=meal();const nn=(prompt('Rename meal',m.name)||'').trim();if(nn){m.name=nn;save();renderMeal(mealId);}};
+    body.querySelector('#ml-del').onclick=()=>{ if(confirm('Delete this meal folder? Saved single foods are not affected.')){state.meals=state.meals.filter(x=>x.id!==mealId);save();renderLibrary();} };
+    function paint(){
+      const m=meal(); if(!m){renderLibrary();return;}
+      const tot=mealTotal(m);
+      body.querySelector('#ml-hero').innerHTML=`<div class="meal-hero"><div><div class="mh-l">${m.items.length} ingredient${m.items.length===1?'':'s'}</div><div class="mh-s">Adjust portions below</div></div><div style="display:flex;align-items:baseline;gap:5px"><span class="mh-tot">${r0(tot)}</span><span class="mh-u">kcal</span></div></div>`;
+      const box=body.querySelector('#ml-items');
+      if(!m.items.length){ box.innerHTML=`<div class="empty" style="border:none">No items yet. Swipe a saved food left in the Library and tap ＋ Meal to add it here.</div>`; }
+      else box.innerHTML=m.items.map((it,i)=>{
+        const kcal=r0(mealItemKcal(it));
+        const val=it.kind==='serving'?`${r1(it.servings)}<small> × ${esc(it.portion||'serving')}</small>`:`${r0(it.grams)}<small> g</small>`;
+        return `<div class="ming">
+          <button class="mg-rm" data-rm="${i}" aria-label="Remove">${IC_TRASH}</button>
+          <div class="mg-main"><div class="mg-name">${esc(it.name)}</div><div class="mg-kcal">${kcal} kcal</div></div>
+          <div class="stepper"><button data-dec="${i}">${IC_MINUS}</button><div class="sv">${val}</div><button data-inc="${i}">${IC_PLUS}</button></div>
+        </div>`;
+      }).join('');
+      const step=(it,dir)=>{ if(it.kind==='serving'){it.servings=Math.max(0.5,r1((it.servings||1)+dir*0.5));} else {it.grams=Math.max(0,Math.round((it.grams||0)+dir*10));} };
+      box.querySelectorAll('[data-inc]').forEach(b=>b.onclick=()=>{step(m.items[+b.dataset.inc],1);save();paint();});
+      box.querySelectorAll('[data-dec]').forEach(b=>b.onclick=()=>{step(m.items[+b.dataset.dec],-1);save();paint();});
+      box.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{m.items.splice(+b.dataset.rm,1);save();paint();});
+      const addBtn=body.querySelector('#ml-add');
+      addBtn.disabled=!m.items.length;
+      addBtn.textContent=`Add ${m.items.length} item${m.items.length===1?'':'s'} · ${r0(tot)} kcal`;
+    }
+    body.querySelector('#ml-add').onclick=()=>{
+      const m=meal(); if(!m||!m.items.length)return; const meal2=getMeal();
+      m.items.forEach(it=>{
+        if(it.kind==='serving'){
+          state.entries.push({id:uid(),date:viewDate,meal:meal2,name:it.name,grams:0,portion:it.portion,unitCal:it.unitCal,servingLabel:`${r1(it.servings)} ${it.portion||'serving'}`,calories:it.unitCal*it.servings,protein_g:0,carbs_g:0,fat_g:0,sugar_g:0,source:'meal'});
+        }else{
+          const g=it.grams||0;
+          state.entries.push({id:uid(),date:viewDate,meal:meal2,name:it.name,grams:g,servingLabel:r1(g)+' g',calories:it.per.calories*g/100,protein_g:it.per.protein_g*g/100,carbs_g:it.per.carbs_g*g/100,fat_g:it.per.fat_g*g/100,sugar_g:(it.per.sugar_g||0)*g/100,source:'meal'});
+        }
+      });
+      save(); sh.close(); render();
+    };
+    paint();
   }
 
   function renderManual(){
