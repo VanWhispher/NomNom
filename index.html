@@ -1345,36 +1345,67 @@ function openAdd(){
   }
 
   /* ---------- EAT OUT: scan a menu (A) + find food near me (B) ---------- */
+  const EO_FRAC={Breakfast:0.25,Lunch:0.35,Dinner:0.30,Snack:0.10};
+  const EO_FALLBACK={Breakfast:400,Lunch:600,Dinner:600,Snack:200};
+  const eoOpts={meal:null, target:null};
   function eoRemaining(){ return state.settings.dailyTarget ? Math.round(state.settings.dailyTarget - sum(todayFood(),'calories') + sum(todayEx(),'caloriesBurned')) : null; }
+  function eoMealTarget(meal){
+    const dt=state.settings.dailyTarget;
+    let t;
+    if(dt){ t=Math.round(dt*(EO_FRAC[meal]||0.3)); const rem=eoRemaining(); if(rem!=null) t=Math.min(t,rem); }
+    else { t=EO_FALLBACK[meal]||500; }
+    return Math.max(150,t);
+  }
   function eoFit(kcal,budget){ if(budget==null) return 'var(--accent-strong)'; if(kcal<=budget) return '#3FB27F'; if(kcal<=budget*1.1) return '#E5A23D'; return '#E5484D'; }
+  // build a dish object straight from Gemini's estimate (no OpenNutrition anchor for Eat out)
+  function eoDish(d){
+    const grams=Math.max(1,Math.round(+d.grams||300));
+    let per;
+    if(d.per100 && +d.per100.calories){ per={calories:+d.per100.calories||0,protein_g:+d.per100.protein_g||0,carbs_g:+d.per100.carbs_g||0,fat_g:+d.per100.fat_g||0,sugar_g:+d.per100.sugar_g||0}; }
+    else { const c=(+d.kcal>0&&grams>0)?(+d.kcal*100/grams):0; per={calories:c,protein_g:0,carbs_g:0,fat_g:0,sugar_g:0}; }
+    let kcal=Math.round(per.calories*grams/100); if(!kcal && +d.kcal>0) kcal=Math.round(+d.kcal);
+    return {name:d.name, grams, per, kcal};
+  }
 
   function eatOutView(){
     camStop(); setTabs(false);
+    if(!eoOpts.meal){ eoOpts.meal=defaultMeal(); eoOpts.target=eoMealTarget(eoOpts.meal); }
+    const MEALS_EO=['Breakfast','Lunch','Dinner','Snack'];
     body.innerHTML=`
       <div class="sub-head"><button class="circ-back" id="eo-back">${IC_BACK}</button><h3>Eat out</h3></div>
       <div class="scard">
         <div class="scard-h">What can I eat around me?</div>
+        <div class="field"><label>Meal</label><div class="chips" id="eo-meal">${MEALS_EO.map(m=>`<button class="chip${m===eoOpts.meal?' sel':''}" data-m="${m}">${m}</button>`).join('')}</div></div>
+        <div class="field"><label>Calories for this meal</label><input type="number" inputmode="numeric" id="eo-budget" value="${eoOpts.target!=null?eoOpts.target:''}" placeholder="optional"></div>
         <button class="dashed-btn" id="eo-menu">${IC_CAMERA} Scan a menu or food court</button>
         <button class="dashed-btn" id="eo-near" style="margin-top:10px">${IC_PIN} Find food places near me</button>
-        <div class="hint">Calories are estimates, anchored to the OpenNutrition database where a match is found.</div>
+        <div class="hint">Calorie figures are AI estimates.</div>
       </div>`;
     body.querySelector('#eo-back').onclick=renderFood;
+    const budEl=body.querySelector('#eo-budget');
+    body.querySelectorAll('#eo-meal .chip').forEach(c=>c.onclick=()=>{
+      eoOpts.meal=c.dataset.m;
+      body.querySelectorAll('#eo-meal .chip').forEach(x=>x.classList.toggle('sel',x===c));
+      eoOpts.target=eoMealTarget(eoOpts.meal);
+      budEl.value=eoOpts.target!=null?eoOpts.target:'';
+    });
+    budEl.oninput=(e)=>{ eoOpts.target=+e.target.value||null; };
     body.querySelector('#eo-menu').onclick=menuScanView;
     body.querySelector('#eo-near').onclick=nearbyView;
   }
 
-  // hand a single chosen dish to the standard confirm/log step
+  // hand a single chosen dish to the standard confirm/log step (pre-selecting the chosen meal)
   function openDish(dish, backFn){
     setTabs(false);
     body.innerHTML=`<div class="sub-head"><button class="circ-back" id="eo-b3">${IC_BACK}</button><h3>Review &amp; add</h3></div><div id="eo-stage"></div>`;
     body.querySelector('#eo-b3').onclick=backFn;
     const result={assumptions:'Estimated portion — adjust the weight to match what you’re eating.',
       items:[{name:dish.name, per_100g:dish.per, estimated_grams:dish.grams}]};
-    showConfirm(null, body.querySelector('#eo-stage'), result, ()=>sh.close());
+    showConfirm(null, body.querySelector('#eo-stage'), result, ()=>sh.close(), eoOpts.meal);
   }
   const eoDishRow=(d,budget,attr)=>`<div class="recent-row eo-dish" ${attr} style="cursor:pointer">
       <span class="recent-ic">${IC_FORK}</span>
-      <div class="recent-main"><div class="rn">${esc(d.name)}</div><div class="rs">~${d.grams} g · ${d.src==='db'?'OpenNutrition':'estimate'}</div></div>
+      <div class="recent-main"><div class="rn">${esc(d.name)}</div><div class="rs">~${d.grams} g · est</div></div>
       <span style="font-weight:700;color:${eoFit(d.kcal,budget)}">${d.kcal}<small style="font-weight:500;color:var(--text-soft)"> kcal</small></span>
     </div>`;
 
@@ -1406,10 +1437,9 @@ function openAdd(){
       body.querySelector('#ms-b2').onclick=menuScanView;
       const stage=body.querySelector('#ms-stage');
       try{
-        const raw=await detectMenuDishes(b64);
+        const raw=await detectMenuDishes(b64,{meal:eoOpts.meal,target:eoOpts.target});
         if(!raw.length){ stage.innerHTML=`<div class="err">No dishes spotted. Try a clearer photo of the menu or the food.</div><button class="btn btn-block" id="ms-rt" style="margin-top:10px">Try again</button>`; stage.querySelector('#ms-rt').onclick=menuScanView; return; }
-        try{ await ensureONDB(); }catch(_){}
-        const dishes=[]; for(const d of raw){ dishes.push(await anchorDish(d)); }
+        const dishes=raw.map(eoDish);
         renderMenuList(dishes);
       }catch(e){ stage.innerHTML=`<div class="err">${esc(e.message||'Request failed.')}</div><button class="btn btn-block" id="ms-rt" style="margin-top:10px">Try again</button>`; stage.querySelector('#ms-rt').onclick=menuScanView; }
     }
@@ -1420,10 +1450,10 @@ function openAdd(){
 
     function renderMenuList(dishes){
       setTabs(false);
-      const budget=eoRemaining();
+      const budget=eoOpts.target;
       const sorted=dishes.slice().sort((a,b)=>{ const af=budget==null?0:(a.kcal<=budget?0:1), bf=budget==null?0:(b.kcal<=budget?0:1); return af-bf || a.kcal-b.kcal; });
       body.innerHTML=`<div class="sub-head"><button class="circ-back" id="ms-b3">${IC_BACK}</button><h3>What you can eat</h3></div>
-        ${budget!=null?`<div class="hint" style="margin-top:0">About ${budget} kcal left today — green fits, amber is close.</div>`:''}
+        ${budget!=null?`<div class="hint" style="margin-top:0">${eoOpts.meal} target ~${budget} kcal — green fits, amber is close.</div>`:''}
         <div>${sorted.map((d,i)=>eoDishRow(d,budget,`data-i="${i}"`)).join('')}</div>`;
       body.querySelector('#ms-b3').onclick=menuScanView;
       body.querySelectorAll('.eo-dish').forEach(b=>b.onclick=()=>openDish(sorted[+b.dataset.i], renderMenuList.bind(null,dishes)));
@@ -1454,12 +1484,11 @@ function openAdd(){
       if(!places.length){ return fail('No food places found within 600 m. Try the menu scanner instead.'); }
       places.forEach(p=>{ p._dist=haversine(loc.lat,loc.lng,+p.lat,+p.lng); });
       places.sort((a,b)=>a._dist-b._dist); places=places.slice(0,8);
-      stage.innerHTML=`<div class="spinner">Finding dishes that fit your day…</div>`;
-      const budget=eoRemaining();
+      stage.innerHTML=`<div class="spinner">Finding ${eoOpts.meal.toLowerCase()} picks near you…</div>`;
+      const budget=eoOpts.target;
       let withDishes;
-      try{ withDishes=await suggestDishesForPlaces(places,{budget}); }catch(e){ return fail(e.message); }
-      try{ await ensureONDB(); }catch(_){}
-      for(const p of withDishes){ const out=[]; for(const d of (p.dishes||[])){ out.push(await anchorDish(d)); } p._dishes=out; }
+      try{ withDishes=await suggestDishesForPlaces(places,{meal:eoOpts.meal,target:eoOpts.target}); }catch(e){ return fail(e.message); }
+      for(const p of withDishes){ p._dishes=(p.dishes||[]).map(eoDish); }
       renderPlaceList(withDishes,budget);
     })();
 
@@ -1468,7 +1497,7 @@ function openAdd(){
       const fmtDist=(m)=>m<1000?`${m} m`:`${(m/1000).toFixed(1)} km`;
       const price=(n)=> (n>0?'$'.repeat(Math.min(4,n)):'');
       body.innerHTML=`<div class="sub-head"><button class="circ-back" id="nb-b2">${IC_BACK}</button><h3>Places near you</h3></div>
-        ${budget!=null?`<div class="hint" style="margin-top:0">About ${budget} kcal left today — green fits, amber is close.</div>`:''}
+        ${budget!=null?`<div class="hint" style="margin-top:0">${eoOpts.meal} target ~${budget} kcal — green fits, amber is close.</div>`:''}
         <div>${places.map((p,pi)=>`
           <div class="scard" style="padding:14px">
             <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
@@ -2379,21 +2408,14 @@ async function lookupPer100(name){
   return null;
 }
 
-/* ---------- EAT OUT helpers (menu vision, geo, Places proxy, dish suggest, anchoring) ---------- */
-async function detectMenuDishes(b64){
-  const prompt=`This photo shows a menu, a hawker/food-court signboard, or food on display at an eatery. List the distinct orderable dishes you can see (max 12). Use the common Singapore name for each. For EACH dish give a realistic typical single-serving weight in grams ("grams"), nutrition per 100 g, and the estimated calories for that serving ("kcal"). Ignore prices, drinks (unless they are the only items), and non-food text. Respond with ONLY JSON, no markdown: {"dishes":[{"name":"","grams":0,"kcal":0,"per_100g":{"calories":0,"protein_g":0,"carbs_g":0,"fat_g":0,"sugar_g":0}}]}. Return an empty array if no food or menu is visible.`;
+/* ---------- EAT OUT helpers (menu vision, geo, Places proxy, dish suggest) ---------- */
+async function detectMenuDishes(b64, opts){
+  opts=opts||{};
+  const mealLine = opts.meal ? `The user is picking a ${opts.meal} option. ` : '';
+  const budgetLine = opts.target!=null ? `They are aiming for about ${opts.target} kcal for this meal. ` : '';
+  const prompt=`This photo shows a menu, a hawker/food-court signboard, or food on display at an eatery. ${mealLine}List the distinct orderable dishes you can see (max 12). Use the common Singapore name for each. ${budgetLine}For EACH dish give a realistic typical single-serving weight in grams ("grams"), nutrition per 100 g, and the estimated calories for that serving ("kcal"). Ignore prices, drinks (unless they are the only items), and non-food text. Respond with ONLY JSON, no markdown: {"dishes":[{"name":"","grams":0,"kcal":0,"per_100g":{"calories":0,"protein_g":0,"carbs_g":0,"fat_g":0,"sugar_g":0}}]}. Return an empty array if no food or menu is visible.`;
   const out=await geminiJSON([{inline_data:{mime_type:'image/jpeg',data:b64}},{text:prompt}],4096);
   return Array.isArray(out.dishes)?out.dishes.filter(d=>d&&d.name).map(d=>({name:String(d.name).trim(),grams:+d.grams||0,kcal:+d.kcal||0,per100:d.per_100g||null})):[];
-}
-// override Gemini's per-100g with an OpenNutrition match when one exists (same pattern as costRecipe)
-async function anchorDish(d){
-  const grams=Math.max(1,Math.round(+d.grams||300));
-  let per, src='ai';
-  const m=bestFoodMatch(d.name);
-  if(m){ per={calories:+m.per100.calories||0,protein_g:+m.per100.protein_g||0,carbs_g:+m.per100.carbs_g||0,fat_g:+m.per100.fat_g||0,sugar_g:+m.per100.sugar_g||0}; src='db'; }
-  else if(d.per100 && +d.per100.calories){ per={calories:+d.per100.calories||0,protein_g:+d.per100.protein_g||0,carbs_g:+d.per100.carbs_g||0,fat_g:+d.per100.fat_g||0,sugar_g:+d.per100.sugar_g||0}; }
-  else { const c=(+d.kcal>0&&grams>0)?(+d.kcal*100/grams):0; per={calories:c,protein_g:0,carbs_g:0,fat_g:0,sugar_g:0}; }
-  return {name:d.name, grams, per, kcal:Math.round(per.calories*grams/100), src};
 }
 function haversine(la1,lo1,la2,lo2){
   const R=6371000, t=Math.PI/180, dLa=(la2-la1)*t, dLo=(lo2-lo1)*t;
@@ -2425,12 +2447,13 @@ async function nearbyPlaces(lat,lng){
 }
 async function suggestDishesForPlaces(places, opts){
   opts=opts||{};
-  const budgetLine = opts.budget!=null ? `The user has about ${opts.budget} kcal left for the day — prefer dishes at or under that, though one slightly-higher option per place is fine.` : `Keep dishes to sensible single-serving portions.`;
+  const mealLine = opts.meal ? `The user wants a ${opts.meal} option. ` : '';
+  const budgetLine = opts.target!=null ? `Aim for dishes at or under about ${opts.target} kcal; one slightly-higher option per place is fine.` : `Keep dishes to sensible single-serving portions.`;
   const list = places.map((p,i)=>`${i}. ${p.name}${p.type?` (${String(p.type).replace(/_/g,' ')})`:''}`).join('\n');
   const prompt=`These are real food places near the user in Singapore, listed by index:
 ${list}
 
-For EACH place, suggest 1-3 popular dishes a person could realistically order there. ${budgetLine} Use common Singapore dish names. For each dish give a realistic single-serving weight in grams ("grams"), nutrition per 100 g, and estimated calories ("kcal"). Respond with ONLY JSON, no markdown:
+For EACH place, base your suggestions on that specific establishment's ACTUAL popular menu: if you recognise the named place (a chain, franchise, or well-known eatery), use its real signature/best-selling dishes; otherwise infer the most likely menu for that type and name of place. ${mealLine}Suggest 1-3 dishes a person could realistically order there for this meal. ${budgetLine} Use the dish's real menu name where you know it, otherwise the common Singapore name. For each dish give a realistic single-serving weight in grams ("grams"), nutrition per 100 g, and estimated calories ("kcal"). Respond with ONLY JSON, no markdown:
 {"places":[{"i":0,"dishes":[{"name":"","grams":0,"kcal":0,"per_100g":{"calories":0,"protein_g":0,"carbs_g":0,"fat_g":0,"sugar_g":0}}]}]}`;
   const out=await geminiJSON([{text:prompt}],4096);
   const byI={}; (out&&out.places||[]).forEach(pp=>{ if(pp&&pp.i!=null) byI[pp.i]=Array.isArray(pp.dishes)?pp.dishes.map(d=>({name:String(d.name||'').trim(),grams:+d.grams||0,kcal:+d.kcal||0,per100:d.per_100g||null})).filter(d=>d.name):[]; });
@@ -2460,7 +2483,7 @@ Respond with ONLY JSON, no markdown:
   const out=await geminiJSON([{text:prompt}],8192);
   return Array.isArray(out.recipes)?out.recipes:[];
 }
-function showConfirm(m,stage,result,onDone){
+function showConfirm(m,stage,result,onDone,presetMeal){
   const items=result.items.map(it=>({
     name:it.name||'Item',
     per:{calories:+(it.per_100g?.calories||0),protein_g:+(it.per_100g?.protein_g||0),carbs_g:+(it.per_100g?.carbs_g||0),fat_g:+(it.per_100g?.fat_g||0),sugar_g:+(it.per_100g?.sugar_g||0)},
@@ -2495,7 +2518,7 @@ function showConfirm(m,stage,result,onDone){
       ${result.assumptions?`<div class="note">${esc(result.assumptions)}</div>`:''}
       ${items.length?items.map(rowHtml).join(''):'<div class="empty" style="border:none">No items left. Add one below or go back to rescan.</div>'}
       <button class="add-missing" id="add-missing">+ Add an item the AI missed</button>
-      ${mealChips(defaultMeal())}
+      ${mealChips(presetMeal||defaultMeal())}
       <div class="toggle-row"><input type="checkbox" id="savelib" style="width:auto"><label for="savelib" style="margin:0">Save these to library</label></div>
       <div class="field"><button class="btn btn-primary btn-block" id="confirm-save"${named.length?'':' disabled'}>Log ${named.length} item${named.length===1?'':'s'}</button></div>`;
     const getMeal=wireMealChips(stage);
