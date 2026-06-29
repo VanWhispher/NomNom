@@ -1,0 +1,6 @@
+# Only declares where serverless functions live, so the places proxy deploys.
+# Does not set `publish` — your existing site/publish settings in the Netlify
+# dashboard are left untouched.
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
