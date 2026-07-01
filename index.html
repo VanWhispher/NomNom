@@ -658,7 +658,7 @@ const SUPABASE_URL='https://jjupcfisuqnvjeokafnj.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqdXBjZmlzdXFudmplb2thZm5qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNDIyNzUsImV4cCI6MjA5NzYxODI3NX0.aGnnEayj0yB6_x6U5bycwiFqtzqt2WaVHk1frGroZ5s';
 let sb=null, user=null, CLOUD=false;
 const DEFAULT={
-  settings:{apiKey:'',model:'gemini-2.5-flash',weightUnit:'kg',heightUnit:'cm',dailyTarget:null,theme:'pink'},
+  settings:{apiKey:'',model:'gemini-2.5-flash',weightUnit:'kg',heightUnit:'cm',dailyTarget:null,theme:'pink',meals:{Breakfast:true,Lunch:true,Dinner:true,Snack:true}},
   entries:[], exercise:[], library:[], weights:[], meals:[], recipes:[],
   profile:{sex:'male',age:'',height:'',activity:1.2,goal:'maintain',lossRate:500,rate:0.5,goalWeight:null}
 };
@@ -676,7 +676,8 @@ const THEMES={
   pink:{name:'Baby Pink',desc:'Warm & playful',header:'#EF9CB4',strong:'#E37D9A',itemBg:'#FBEFF4',gradTop:'#FDEFF3',gradBot:'#FBE7EE',sw:'linear-gradient(160deg,#E8839B,#D86A86)'},
   mint:{name:'Mint',desc:'Fresh & calm',header:'#3FC2A4',strong:'#2EB89F',itemBg:'#EBF8F3',gradTop:'#ECFAF5',gradBot:'#E2F5EE',sw:'linear-gradient(160deg,#5DCCAE,#2EB89F)'},
   lavender:{name:'Lavender',desc:'Soft & dreamy',header:'#A285CF',strong:'#9274C7',itemBg:'#F3EDFA',gradTop:'#F4EFFB',gradBot:'#EDE5F8',sw:'linear-gradient(160deg,#B599D9,#9274C7)'},
-  coral:{name:'Coral',desc:'Vibrant & fun',header:'#FF7A57',strong:'#FF6B4A',itemBg:'#FDF0EB',gradTop:'#FEF0EB',gradBot:'#FCE6DE',sw:'linear-gradient(160deg,#FF8B6B,#FF6B4A)'}
+  coral:{name:'Coral',desc:'Vibrant & fun',header:'#FF7A57',strong:'#FF6B4A',itemBg:'#FDF0EB',gradTop:'#FEF0EB',gradBot:'#FCE6DE',sw:'linear-gradient(160deg,#FF8B6B,#FF6B4A)'},
+  mocha:{name:'Mocha',desc:'Rich & cozy',header:'#B08968',strong:'#9A7050',itemBg:'#F3EBE3',gradTop:'#F7F0E9',gradBot:'#F0E5DA',sw:'linear-gradient(160deg,#BE9873,#9A7050)'}
 };
 function applyTheme(id){
   const t=THEMES[id]||THEMES.pink;
@@ -693,7 +694,31 @@ const LOGO_SVG='<img class="brandimg" alt="NomNom" src="data:image/png;base64,iV
 let tab='today';
 let viewDate=todayKey();
 const MEALS=['Breakfast','Lunch','Dinner','Snack'];
-function defaultMeal(){const h=new Date().getHours();return h<11?'Breakfast':h<15?'Lunch':h<21?'Dinner':'Snack';}
+const MEAL_FRAC={Breakfast:0.25,Lunch:0.35,Dinner:0.30,Snack:0.10};
+// which meals the user usually eats (Plan tab). Missing/all-off ⇒ treat all four as on.
+function mealsEnabledMap(){
+  const d={Breakfast:true,Lunch:true,Dinner:true,Snack:true};
+  const m=state.settings.meals;
+  if(!m||typeof m!=='object') return d;
+  const merged=Object.assign({},d,m);
+  return MEALS.some(k=>merged[k])?merged:d;
+}
+function enabledMeals(){ const m=mealsEnabledMap(); return MEALS.filter(k=>m[k]); }
+// a meal's share of the daily target, renormalised across only the meals you eat
+function mealFraction(meal){
+  const en=enabledMeals();
+  const denom=en.reduce((a,k)=>a+(MEAL_FRAC[k]||0),0)||1;
+  return en.includes(meal) ? (MEAL_FRAC[meal]||0)/denom : (MEAL_FRAC[meal]||0.3);
+}
+function defaultMeal(){
+  const h=new Date().getHours();
+  const clock=h<11?'Breakfast':h<15?'Lunch':h<21?'Dinner':'Snack';
+  const en=enabledMeals();
+  if(en.includes(clock)) return clock;
+  const idx=MEALS.indexOf(clock); let best=en[0]||clock, bd=99;
+  en.forEach(k=>{const dd=Math.abs(MEALS.indexOf(k)-idx); if(dd<bd){bd=dd;best=k;}});
+  return best;
+}
 function shiftDay(key,delta){const a=key.split('-').map(Number);const d=new Date(a[0],a[1]-1,a[2]);d.setDate(d.getDate()+delta);return dateKey(d);}
 function dayLabel(key){if(key===todayKey())return 'Today';if(key===shiftDay(todayKey(),-1))return 'Yesterday';return new Date(key+'T00:00:00').toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'long'});}
 function mealChips(sel){return `<div class="field"><label>Meal</label><div class="chips mealchips">${MEALS.map(x=>`<button class="chip${x===sel?' sel':''}" data-meal="${x}">${x}</button>`).join('')}</div></div>`;}
@@ -1133,10 +1158,10 @@ function makeSheet(innerHtml){
   };
   overlay.onclick=(e)=>{if(e.target===overlay)close();};
   let startY=0,dY=0,drag=false;
-  sheet.addEventListener('touchstart',e=>{startY=e.touches[0].clientY;dY=0;drag=false;sheet.style.transition='none';},{passive:true});
-  sheet.addEventListener('touchmove',e=>{const dy=e.touches[0].clientY-startY;if(sheet.scrollTop<=0&&dy>0){drag=true;dY=dy;sheet.style.transform=`translateY(${dy}px)`;e.preventDefault();}},{passive:false});
-  sheet.addEventListener('touchend',()=>{if(!drag){sheet.style.transition='';return;}drag=false;sheet.style.transition='transform .25s ease';if(dY>90){close();}else{sheet.style.transform='translateY(0)';}});
   const handle=overlay.querySelector('#sheet-handle');
+  handle.addEventListener('touchstart',e=>{startY=e.touches[0].clientY;dY=0;drag=false;sheet.style.transition='none';},{passive:true});
+  handle.addEventListener('touchmove',e=>{const dy=e.touches[0].clientY-startY;if(dy>0){drag=true;dY=dy;sheet.style.transform=`translateY(${dy}px)`;e.preventDefault();}},{passive:false});
+  handle.addEventListener('touchend',()=>{if(!drag){sheet.style.transition='';return;}drag=false;sheet.style.transition='transform .25s ease';if(dY>90){close();}else{sheet.style.transform='translateY(0)';}});
   const ps=(y)=>{startY=y;dY=0;drag=true;sheet.style.transition='none';};
   const pm=(y)=>{if(!drag)return;dY=Math.max(0,y-startY);sheet.style.transform=`translateY(${dY}px)`;};
   const pe=()=>{if(!drag)return;drag=false;sheet.style.transition='transform .25s ease';if(dY>90){close();}else{sheet.style.transform='translateY(0)';}};
@@ -1273,11 +1298,14 @@ function openAdd(){
       if(!isBC && low.length>=1) html+=`<div class="add-label">Not what you want?</div><button class="btn btn-block" id="af-ai" style="margin-top:2px">Estimate “${esc(term)}” with AI</button>`;
       if(!html) html=`<div class="empty" style="border:none">Type a food name to search or estimate with AI.</div>`;
       main.innerHTML=html;
-      const aiBtn=main.querySelector('#af-ai'); if(aiBtn) aiBtn.onclick=()=>addItemView(async st=>{
-        if(!state.settings.apiKey){ st.innerHTML=`<div class="err">Add your Google Gemini API key in Settings to estimate foods with AI.</div><button class="btn btn-block" id="af-aiset" style="margin-top:10px">Open Settings</button>`; const b=st.querySelector('#af-aiset'); if(b)b.onclick=()=>{sh.close();setTimeout(openSettings,200);}; return; }
-        st.innerHTML=`<div class="spinner">Estimating “${esc(term)}” with AI…</div>`;
-        try{ const ai=await aiNutrition(term); if(!ai||!ai.per_100g||!(+ai.per_100g.calories)){ st.innerHTML=`<div class="err">AI couldn’t estimate that. Try a different name, or enter it manually.</div>`; return; } weighAndLog(null,st,ai.name||term,ai.per_100g,'ai',null,()=>sh.close()); }
-        catch(e){ st.innerHTML=`<div class="err">${esc(e.message||'AI lookup failed.')}</div>`; }
+      const aiBtn=main.querySelector('#af-ai'); if(aiBtn) aiBtn.onclick=()=>addItemView(st=>{
+        const runAiEst=async()=>{
+          if(!state.settings.apiKey){ st.innerHTML=`<div class="err">Add your Google Gemini API key in Settings to estimate foods with AI.</div><button class="btn btn-block" id="af-aiset" style="margin-top:10px">Open Settings</button>`; const b=st.querySelector('#af-aiset'); if(b)b.onclick=()=>{sh.close();setTimeout(openSettings,200);}; return; }
+          st.innerHTML=`<div class="spinner">Estimating “${esc(term)}” with AI…</div>`;
+          try{ const ai=await aiNutrition(term); if(!ai||!ai.per_100g||!(+ai.per_100g.calories)){ st.innerHTML=`<div class="err">AI couldn’t estimate that. Try a different name, or enter it manually.</div>`; return; } weighAndLog(null,st,ai.name||term,ai.per_100g,'ai',null,()=>sh.close()); }
+          catch(e){ st.innerHTML=`<div class="err">${esc(e.message||'AI lookup failed.')}</div><button class="btn btn-block" id="af-airt" style="margin-top:10px">Try again</button>`; const rb=st.querySelector('#af-airt'); if(rb)rb.onclick=runAiEst; }
+        };
+        runAiEst();
       });
       const bc=main.querySelector('[data-bc]'); if(bc)bc.onclick=()=>addItemView(async st=>{ st.innerHTML=`<div class="spinner">Looking up…</div>`; const r=await barcodeLookup(term); if(!r){st.innerHTML=`<div class="err">No product found for barcode ${esc(term)}.</div>`;return;} weighAndLog(null,st,r.name,r.per,r.source,r.g,()=>sh.close()); });
       main.querySelectorAll('[data-lib]').forEach(n=>n.onclick=()=>{const l=state.library.find(x=>x.id===n.dataset.lib);addItemView(st=>{ if(l.perServing)logServing(null,st,l.name,l.perServing.calories,l.perServing.portion,'library',()=>sh.close()); else weighAndLog(null,st,l.name,l.per_100g,'library',l.lastGrams,()=>sh.close()); });});
@@ -1336,7 +1364,7 @@ function openAdd(){
         const result=await analyzePhoto(b64);
         if(!result.items||!result.items.length){ stage.innerHTML=`<div class="err">No food detected. ${esc(result.assumptions||'')}</div><button class="btn btn-block" id="sc-rt" style="margin-top:10px">Try again</button>`; stage.querySelector('#sc-rt').onclick=renderScan; return; }
         showConfirm(null,stage,result,()=>sh.close());
-      }catch(e){ stage.innerHTML=`<div class="err">${esc(e.message||'Request failed.')}</div><button class="btn btn-block" id="sc-rt" style="margin-top:10px">Try again</button>`; stage.querySelector('#sc-rt').onclick=renderScan; }
+      }catch(e){ stage.innerHTML=`<div class="err">${esc(e.message||'Request failed.')}</div><button class="btn btn-block" id="sc-rt" style="margin-top:10px">Try again</button>`; stage.querySelector('#sc-rt').onclick=()=>analyze(b64); }
     }
     const nativeShot=()=>{ file.setAttribute('capture','environment'); file.click(); };
     body.querySelector('#sc-shot').onclick=()=>{ if(live&&_camStream){ analyze(camCapture(video)); } else { nativeShot(); } };
@@ -1345,15 +1373,12 @@ function openAdd(){
   }
 
   /* ---------- EAT OUT: scan a menu (A) + find food near me (B) ---------- */
-  const EO_FRAC={Breakfast:0.25,Lunch:0.35,Dinner:0.30,Snack:0.10};
   const EO_FALLBACK={Breakfast:400,Lunch:600,Dinner:600,Snack:200};
   const eoOpts={meal:null, target:null};
   function eoRemaining(){ return state.settings.dailyTarget ? Math.round(state.settings.dailyTarget - sum(todayFood(),'calories') + sum(todayEx(),'caloriesBurned')) : null; }
   function eoMealTarget(meal){
     const dt=state.settings.dailyTarget;
-    let t;
-    if(dt){ t=Math.round(dt*(EO_FRAC[meal]||0.3)); const rem=eoRemaining(); if(rem!=null) t=Math.min(t,rem); }
-    else { t=EO_FALLBACK[meal]||500; }
+    const t = dt ? Math.round(dt*mealFraction(meal)) : (EO_FALLBACK[meal]||500);
     return Math.max(150,t);
   }
   function eoFit(kcal,budget){ if(budget==null) return 'var(--accent-strong)'; if(kcal<=budget) return '#3FB27F'; if(kcal<=budget*1.1) return '#E5A23D'; return '#E5484D'; }
@@ -1376,20 +1401,29 @@ function openAdd(){
       <div class="scard">
         <div class="scard-h">What can I eat around me?</div>
         <div class="field"><label>Meal</label><div class="chips" id="eo-meal">${MEALS_EO.map(m=>`<button class="chip${m===eoOpts.meal?' sel':''}" data-m="${m}">${m}</button>`).join('')}</div></div>
-        <div class="field"><label>Calories for this meal</label><input type="number" inputmode="numeric" id="eo-budget" value="${eoOpts.target!=null?eoOpts.target:''}" placeholder="optional"></div>
+        <div class="field"><label>Calories for this meal</label><input type="number" inputmode="numeric" id="eo-budget" value="${eoOpts.target!=null?eoOpts.target:''}" placeholder="optional"><div class="hint" id="eo-remwarn" style="display:none;margin-top:6px;color:var(--text-soft)"></div></div>
         <button class="dashed-btn" id="eo-menu">${IC_CAMERA} Scan a menu or food court</button>
         <button class="dashed-btn" id="eo-near" style="margin-top:10px">${IC_PIN} Find food places near me</button>
         <div class="hint">Calorie figures are AI estimates.</div>
       </div>`;
     body.querySelector('#eo-back').onclick=renderFood;
     const budEl=body.querySelector('#eo-budget');
+    const remWarn=body.querySelector('#eo-remwarn');
+    function syncRemWarn(){
+      const rem=eoRemaining();
+      if(rem!=null && eoOpts.target!=null && eoOpts.target>rem){
+        remWarn.style.display=''; remWarn.textContent=`Above your ~${Math.max(0,rem)} kcal left today.`;
+      } else { remWarn.style.display='none'; }
+    }
     body.querySelectorAll('#eo-meal .chip').forEach(c=>c.onclick=()=>{
       eoOpts.meal=c.dataset.m;
       body.querySelectorAll('#eo-meal .chip').forEach(x=>x.classList.toggle('sel',x===c));
       eoOpts.target=eoMealTarget(eoOpts.meal);
       budEl.value=eoOpts.target!=null?eoOpts.target:'';
+      syncRemWarn();
     });
-    budEl.oninput=(e)=>{ eoOpts.target=+e.target.value||null; };
+    budEl.oninput=(e)=>{ eoOpts.target=+e.target.value||null; syncRemWarn(); };
+    syncRemWarn();
     body.querySelector('#eo-menu').onclick=menuScanView;
     body.querySelector('#eo-near').onclick=nearbyView;
   }
@@ -1441,7 +1475,7 @@ function openAdd(){
         if(!raw.length){ stage.innerHTML=`<div class="err">No dishes spotted. Try a clearer photo of the menu or the food.</div><button class="btn btn-block" id="ms-rt" style="margin-top:10px">Try again</button>`; stage.querySelector('#ms-rt').onclick=menuScanView; return; }
         const dishes=raw.map(eoDish);
         renderMenuList(dishes);
-      }catch(e){ stage.innerHTML=`<div class="err">${esc(e.message||'Request failed.')}</div><button class="btn btn-block" id="ms-rt" style="margin-top:10px">Try again</button>`; stage.querySelector('#ms-rt').onclick=menuScanView; }
+      }catch(e){ stage.innerHTML=`<div class="err">${esc(e.message||'Request failed.')}</div><button class="btn btn-block" id="ms-rt" style="margin-top:10px">Try again</button>`; stage.querySelector('#ms-rt').onclick=()=>analyze(b64); }
     }
     const nativeShot=()=>{ file.setAttribute('capture','environment'); file.click(); };
     body.querySelector('#ms-shot').onclick=()=>{ if(live&&_camStream){ analyze(camCapture(video)); } else { nativeShot(); } };
@@ -1741,7 +1775,7 @@ function openAdd(){
         if(!recipes.length){ out.innerHTML=`<div class="err">No recipes came back. Try adding an ingredient or loosening the extras.</div><button class="btn btn-block" id="rc-rt" style="margin-top:10px">Back</button>`; out.querySelector('#rc-rt').onclick=inputView; return; }
         for(const r of recipes){ try{ await costRecipe(r); }catch(_){ } }
         renderResults(recipes);
-      }catch(e){ out.innerHTML=`<div class="err">${esc(e.message||'Request failed.')}</div><button class="btn btn-block" id="rc-rt" style="margin-top:10px">Try again</button>`; out.querySelector('#rc-rt').onclick=inputView; }
+      }catch(e){ out.innerHTML=`<div class="err">${esc(e.message||'Request failed.')}</div><button class="btn btn-block" id="rc-rt" style="margin-top:10px">Try again</button>`; out.querySelector('#rc-rt').onclick=()=>generate(); }
     }
 
     const fitColor=(per)=>{ if(rc.budget==null) return 'var(--accent)'; if(per<=rc.budget) return '#3FB27F'; if(per<=rc.budget*1.1) return '#E5A23D'; return '#E5484D'; };
@@ -2207,7 +2241,7 @@ function openSearch(){
       const node=el(`<div class="row tappable"><div><div class="name">${esc(ai.name||term)}</div><div class="sub">${r0(ai.per_100g.calories)} kcal/100g · AI estimate</div></div></div>`);
       node.onclick=()=>pickPer(ai.name||term,ai.per_100g,'ai');
       res.appendChild(node);
-    }catch(e){res.innerHTML=`<div class="err">${esc(e.message||'AI lookup failed.')}</div>`;}
+    }catch(e){res.innerHTML=`<div class="err">${esc(e.message||'AI lookup failed.')}</div><button class="btn btn-block" id="sf-airt" style="margin-top:10px">Try again</button>`;const rb=res.querySelector('#sf-airt');if(rb)rb.onclick=()=>runAI(term);}
   }
   async function doSearch(){
     const term=q.value.trim(); if(!term)return;
@@ -2278,26 +2312,31 @@ function openPhoto(){
     <input type="file" accept="image/*" id="photo-gal" style="display:none">
     <div id="photo-stage"></div>
   `);
-  const handle=async(ev)=>{
-    const file=ev.target.files[0]; if(!file)return;
-    const stage=m.querySelector('#photo-stage');
-    stage.innerHTML=`<div class="spinner">Analyzing photo…</div>`;
+  const stage=()=>m.querySelector('#photo-stage');
+  async function runPhoto(b64){
+    stage().innerHTML=`<div class="spinner">Analyzing photo…</div>`;
     try{
-      const b64=await toJpegBase64(file);
       const result=await analyzePhoto(b64);
       if(!result.items || !result.items.length){
-        stage.innerHTML=`<div class="err">No food detected. ${esc(result.assumptions||'')}</div>
+        stage().innerHTML=`<div class="err">No food detected. ${esc(result.assumptions||'')}</div>
           <div class="btn-row"><button class="btn" id="retry">Try another photo</button></div>`;
-        stage.querySelector('#retry').onclick=()=>{m.remove();openPhoto();};
+        stage().querySelector('#retry').onclick=()=>{m.remove();openPhoto();};
         return;
       }
-      showConfirm(m,stage,result);
+      showConfirm(m,stage(),result);
     }catch(e){
-      stage.innerHTML=`<div class="err">${esc(e.message||'Request failed.')}</div>
+      stage().innerHTML=`<div class="err">${esc(e.message||'Request failed.')}</div>
         <div class="btn-row"><button class="btn" id="retry">Try again</button><button class="btn" id="man">Enter manually</button></div>`;
-      stage.querySelector('#retry').onclick=()=>{m.remove();openPhoto();};
-      stage.querySelector('#man').onclick=()=>{m.remove();openManual();};
+      stage().querySelector('#retry').onclick=()=>runPhoto(b64);
+      stage().querySelector('#man').onclick=()=>{m.remove();openManual();};
     }
+  }
+  const handle=async(ev)=>{
+    const file=ev.target.files[0]; if(!file)return;
+    let b64;
+    try{ b64=await toJpegBase64(file); }
+    catch(_){ stage().innerHTML=`<div class="err">Could not read that image.</div>`; return; }
+    runPhoto(b64);
   };
   m.querySelector('#ph-cam').onclick=()=>m.querySelector('#photo-cam').click();
   m.querySelector('#ph-gal-btn').onclick=()=>m.querySelector('#photo-gal').click();
@@ -3089,6 +3128,12 @@ function renderPlan(){
     </div>
 
     <div class="scard">
+      <div class="scard-h">Meals I usually eat</div>
+      <div class="adesc" style="margin:-2px 0 10px">Splits your daily target across these meals when you're eating out.</div>
+      <div class="achips" id="p-meals">${MEALS.map(m=>`<button class="achip${mealsEnabledMap()[m]?' on':''}" data-meal="${m}">${m}</button>`).join('')}</div>
+    </div>
+
+    <div class="scard">
       <div class="scard-h">Your numbers</div>
       <div class="numrow"><div><div class="t">BMR</div><div class="s">At complete rest</div></div><span class="v" id="p-bmr">—</span></div>
       <div class="numrow" style="border-bottom:none"><div><div class="t">Maintenance</div><div class="s">To stay the same weight</div></div><span class="v" id="p-maint">—</span></div>
@@ -3161,6 +3206,13 @@ function renderPlan(){
   const gwStep=(d)=>{const base=p.goalWeight!=null?p.goalWeight:(wkg||70);const disp=kgToUnit(base,wu)+d;p.goalWeight=r1(unitToKg(disp,wu));save2();};
   $('p-gwup').onclick=()=>gwStep(0.1); $('p-gwdn').onclick=()=>gwStep(-0.1);
   document.querySelectorAll('#p-pace .pace').forEach(b=>b.onclick=()=>{p.rate=+b.dataset.r;save2();});
+  document.querySelectorAll('#p-meals .achip').forEach(b=>b.onclick=()=>{
+    const cur=Object.assign({Breakfast:true,Lunch:true,Dinner:true,Snack:true}, state.settings.meals||{});
+    cur[b.dataset.meal]=!cur[b.dataset.meal];
+    if(!MEALS.some(k=>cur[k])) cur[b.dataset.meal]=true; // keep at least one on
+    state.settings.meals=cur; save();
+    document.querySelectorAll('#p-meals .achip').forEach(x=>x.classList.toggle('on',cur[x.dataset.meal]));
+  });
   $('p-set').onclick=()=>{ if(p._target){state.settings.dailyTarget=p._target;save();$('p-saved').innerHTML=`<div class="saved-note">${fmtN(p._target)} kcal set as your daily target ✓</div>`;} };
   paint();
 }
@@ -3275,21 +3327,20 @@ function openSettings(){
     setTimeout(()=>{overlay.remove();render();},240);
   };
   overlay.onclick=(e)=>{if(e.target===overlay)close();};
-  // swipe-down to dismiss
+  // swipe-down to dismiss — only when the top grip handle is dragged
   let startY=0,dY=0,drag=false;
-  // touch: drag down from anywhere when the sheet is scrolled to the top (native bottom-sheet feel)
-  sheet.addEventListener('touchstart',e=>{startY=e.touches[0].clientY;dY=0;drag=false;sheet.style.transition='none';},{passive:true});
-  sheet.addEventListener('touchmove',e=>{
+  const handle=overlay.querySelector('#sheet-handle');
+  handle.addEventListener('touchstart',e=>{startY=e.touches[0].clientY;dY=0;drag=false;sheet.style.transition='none';},{passive:true});
+  handle.addEventListener('touchmove',e=>{
     const dy=e.touches[0].clientY-startY;
-    if(sheet.scrollTop<=0 && dy>0){drag=true;dY=dy;sheet.style.transform=`translateY(${dy}px)`;e.preventDefault();}
+    if(dy>0){drag=true;dY=dy;sheet.style.transform=`translateY(${dy}px)`;e.preventDefault();}
   },{passive:false});
-  sheet.addEventListener('touchend',()=>{
+  handle.addEventListener('touchend',()=>{
     if(!drag){sheet.style.transition='';return;}
     drag=false;sheet.style.transition='transform .25s ease';
     if(dY>90){close();}else{sheet.style.transform='translateY(0)';}
   });
   // mouse: drag the grip handle (desktop)
-  const handle=overlay.querySelector('#sheet-handle');
   const ps=(y)=>{startY=y;dY=0;drag=true;sheet.style.transition='none';};
   const pm=(y)=>{if(!drag)return;dY=Math.max(0,y-startY);sheet.style.transform=`translateY(${dY}px)`;};
   const pe=()=>{if(!drag)return;drag=false;sheet.style.transition='transform .25s ease';if(dY>90){close();}else{sheet.style.transform='translateY(0)';}};
