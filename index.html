@@ -1011,8 +1011,7 @@ function openCalendar(){
       <div class="cal-stats" id="cal-stats"></div>
     </div></div>`);
   $('modal-root').appendChild(ov);
-  const _navEntry=navOpen(()=>ov.remove());
-  const close=()=>{ navClose(_navEntry); ov.remove(); };
+  const close=()=>ov.remove();
   ov.querySelector('#cal-x').onclick=close;
   const jump=(k)=>{ viewDate=k; tab='today'; close(); render(); };
 
@@ -1102,8 +1101,7 @@ function openDayDetail(key){
     <div class="cal-body" id="dd-body"></div></div>`);
   $('modal-root').appendChild(ov);
   let cur=key;
-  const _navEntry=navOpen(()=>ov.remove());
-  ov.querySelector('#dd-x').onclick=()=>{ navClose(_navEntry); ov.remove(); };
+  ov.querySelector('#dd-x').onclick=()=>ov.remove();
   ov.querySelector('#dd-prev').onclick=()=>{cur=shiftDay(cur,-1);paint();};
   ov.querySelector('#dd-next').onclick=()=>{cur=shiftDay(cur,1);paint();};
   function paint(){
@@ -1132,39 +1130,14 @@ function openDayDetail(key){
   }
   paint();
 }
-/* ---------- hardware / Android back-button navigation ---------- */
-const _navStack=[];        // LIFO of open dismissible layers, each {close}
-let _navSuppress=0;        // count of history entries we're unwinding ourselves
-function navOpen(closeFn){  // call when a layer opens; returns an entry handle
-  const entry={close:closeFn};
-  _navStack.push(entry);
-  try{history.pushState({nom:_navStack.length},'');}catch(_){}
-  return entry;
-}
-function navClose(entry){    // call from a UI close (X / swipe / backdrop)
-  if(!entry)return;
-  const i=_navStack.indexOf(entry);
-  if(i===-1)return;         // already unwound by a back press
-  _navStack.splice(i,1);
-  _navSuppress++;
-  try{history.back();}catch(_){_navSuppress=Math.max(0,_navSuppress-1);}   // consume our pushed entry
-}
-window.addEventListener('popstate',()=>{
-  if(_navSuppress>0){_navSuppress--;return;}
-  const entry=_navStack.pop();       // back pressed:
-  if(entry)entry.close();            // close top layer WITHOUT calling history.back
-  // stack empty -> default back proceeds (app exits) which is what we want
-});
-
 function openModal(title,bodyHtml){
   const m=el(`<div class="overlay"><div class="overlay-inner"><div class="mhead"><h2>${esc(title)}</h2><button class="linkbtn" id="m-close">Close</button></div><div id="m-body">${bodyHtml}</div></div></div>`);
   $('modal-root').appendChild(m);
-  m._nav=navOpen(()=>{ if(m.parentNode)m.remove(); render(); });
   m.querySelector('#m-close').onclick=()=>closeModal(m);
   return m;
 }
-function closeModal(m){ if(m){navClose(m._nav); if(m.parentNode)m.remove();} render(); }
-function closeAllModals(){ while(_navStack.length)navClose(_navStack[_navStack.length-1]); $('modal-root').innerHTML=''; render(); }
+function closeModal(m){ if(m&&m.parentNode)m.remove(); render(); }
+function closeAllModals(){ $('modal-root').innerHTML=''; render(); }
 
 /* ---------- bottom-sheet helper (slide up + swipe down, like Settings) ---------- */
 function makeSheet(innerHtml){
@@ -1177,15 +1150,13 @@ function makeSheet(innerHtml){
   sheet.style.transform='translateY(100%)';
   requestAnimationFrame(()=>{sheet.style.transition='transform .28s cubic-bezier(.22,.61,.36,1)';sheet.style.transform='translateY(0)';});
   let closed=false;
-  const rawClose=()=>{
+  const close=()=>{
     if(closed)return; closed=true;
     camStop();
     sheet.style.transition='transform .25s ease-in';sheet.style.transform='translateY(100%)';
     overlay.style.transition='background .25s';overlay.style.background='rgba(0,0,0,0)';
     setTimeout(()=>{overlay.remove();render();},240);
   };
-  const _navEntry=navOpen(rawClose);
-  const close=()=>{ if(closed)return; navClose(_navEntry); rawClose(); };
   overlay.onclick=(e)=>{if(e.target===overlay)close();};
   let startY=0,dY=0,drag=false;
   const handle=overlay.querySelector('#sheet-handle');
@@ -1348,7 +1319,7 @@ function openAdd(){
         };
         runAiEst();
       });
-      const bc=main.querySelector('[data-bc]'); if(bc)bc.onclick=()=>addItemView(async st=>{ st.innerHTML=`<div class="spinner">Looking up…</div>`; const r=await barcodeLookup(term); if(!r){st.innerHTML=`<div class="err">No product found for barcode ${esc(term)}.</div>`;return;} weighAndLog(null,st,r.name,r.per,r.source,r.g,()=>sh.close()); });
+      const bc=main.querySelector('[data-bc]'); if(bc)bc.onclick=()=>addItemView(async st=>{ st.innerHTML=`<div class="spinner">Looking up…</div>`; const r=await barcodeLookup(term); if(!r){st.innerHTML=`<div class="err">No product found for barcode ${esc(term)}.</div>`;return;} logPackaged(null,st,r,()=>sh.close()); });
       main.querySelectorAll('[data-lib]').forEach(n=>n.onclick=()=>{const l=state.library.find(x=>x.id===n.dataset.lib);addItemView(st=>{ if(l.perServing)logServing(null,st,l.name,l.perServing.calories,l.perServing.portion,'library',()=>sh.close()); else weighAndLog(null,st,l.name,l.per_100g,'library',l.lastGrams,()=>sh.close()); });});
       main.querySelectorAll('[data-db]').forEach(n=>n.onclick=()=>{const f=dbM[+n.dataset.db];addItemView(st=>logServing(null,st,f.name,f.calories,f.portion,'local',()=>sh.close()));});
       main.querySelectorAll('[data-on]').forEach(n=>n.onclick=()=>{const f=onM[+n.dataset.on];addItemView(st=>weighAndLog(null,st,f[0],{calories:f[1],protein_g:f[2],carbs_g:f[3],fat_g:f[4],sugar_g:f[5]},'opennutrition',f[6],()=>sh.close()));});
@@ -1893,7 +1864,7 @@ function openAdd(){
       if(!r){ stage.innerHTML=`<div class="err">No product found for that barcode. Scan again, or enter it manually.</div><button class="btn btn-block" id="bc-man" style="margin-top:10px">Enter manually</button><button class="btn btn-block" id="bc-again" style="margin-top:8px">Scan again</button>`; stage.querySelector('#bc-man').onclick=renderManual; stage.querySelector('#bc-again').onclick=renderBarcode; return; }
       body.innerHTML=`<div class="sub-head"><button class="circ-back" id="bc-b2">${IC_BACK}</button><h3>Add item</h3></div><div id="bc-stage2"></div>`;
       body.querySelector('#bc-b2').onclick=renderBarcode;
-      weighAndLog(null,body.querySelector('#bc-stage2'),r.name,r.per,r.source,r.g,()=>sh.close());
+      logPackaged(null,body.querySelector('#bc-stage2'),r,()=>sh.close());
     }
     startScan();
   }
@@ -1996,8 +1967,7 @@ function openAdd(){
         </div>
       </div></div>`);
     $('modal-root').appendChild(ov);
-    const _navEntry=navOpen(()=>ov.remove());
-    const done=()=>{ navClose(_navEntry); ov.remove(); };
+    const done=()=>ov.remove();
     ov.querySelector('#pk-bd').onclick=done;
     ov.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{
       const mm=state.meals.find(x=>x.id===b.dataset.pick); if(mm){mm.items.push(libToMealItem(l));save();}
@@ -2181,11 +2151,21 @@ function openAdd(){
 /* ---------- SEARCH BY NAME ---------- */
 async function barcodeLookup(code){
   code=String(code);
-  try{ await ensureONDB(); const hit=ONBYEAN&&ONBYEAN.get(code); if(hit) return {name:hit[0],per:{calories:hit[1],protein_g:hit[2],carbs_g:hit[3],fat_g:hit[4],sugar_g:hit[5]},source:'opennutrition',g:hit[6]}; }catch(e){}
+  try{ await ensureONDB(); const hit=ONBYEAN&&ONBYEAN.get(code); if(hit){ const sg=(+hit[6]>0)?+hit[6]:null; return {name:hit[0],per:{calories:hit[1],protein_g:hit[2],carbs_g:hit[3],fat_g:hit[4],sugar_g:hit[5]},source:'opennutrition',servingGrams:sg,servingLabel:sg?`${r1(sg)} g`:null,packageGrams:null}; } }catch(e){}
   try{
-    const res=await fetch(`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(code)}.json?fields=product_name,nutriments`);
+    const res=await fetch(`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(code)}.json?fields=product_name,nutriments,serving_size,serving_quantity,product_quantity`);
     const data=await res.json();
-    if(data.product){ const n=data.product.nutriments||{}; return {name:data.product.product_name||('Item '+code),per:{calories:+(n['energy-kcal_100g']||0),protein_g:+(n['proteins_100g']||0),carbs_g:+(n['carbohydrates_100g']||0),fat_g:+(n['fat_100g']||0),sugar_g:+(n['sugars_100g']||0)},source:'barcode'}; }
+    if(data.product){
+      const p=data.product, n=p.nutriments||{};
+      const per={calories:+(n['energy-kcal_100g']||0),protein_g:+(n['proteins_100g']||0),carbs_g:+(n['carbohydrates_100g']||0),fat_g:+(n['fat_100g']||0),sugar_g:+(n['sugars_100g']||0)};
+      // serving weight in grams: prefer numeric serving_quantity, else parse it out of the serving_size label
+      let sg=null; const sq=parseFloat(p.serving_quantity);
+      if(isFinite(sq)&&sq>0&&sq<=5000) sg=sq;
+      if(sg==null && p.serving_size){ const mm=String(p.serving_size).match(/([\d.]+)\s*(g|ml)\b/i); if(mm){ const v=parseFloat(mm[1]); if(isFinite(v)&&v>0&&v<=5000) sg=v; } }
+      const sLabel=(p.serving_size&&String(p.serving_size).trim())||(sg?`${r1(sg)} g`:null);
+      const pq=parseFloat(p.product_quantity); const pkg=(isFinite(pq)&&pq>0&&pq<=10000)?pq:null;   // net package weight (g/ml)
+      return {name:p.product_name||('Item '+code),per,source:'barcode',servingGrams:sg,servingLabel:sLabel,packageGrams:pkg};
+    }
   }catch(e){}
   return null;
 }
@@ -2234,7 +2214,7 @@ function openSearch(){
     stage.innerHTML=`<div class="spinner">${ONDB?'Looking up product…':'Loading food database (first time only, ~10 MB)…'}</div>`;
     const r=await barcodeLookup(code);
     if(!r){ stage.innerHTML=`<div class="err">No product found for barcode ${esc(code)} in OpenNutrition or Open Food Facts.</div><div class="field"><button class="btn btn-block" id="bc-back2">Back to search</button></div>`; stage.querySelector('#bc-back2').onclick=()=>{m.remove();openSearch();}; return; }
-    weighAndLog(m,stage,r.name,r.per,r.source,r.g);
+    logPackaged(m,stage,r);
   }
   function renderLocal(){
     const term=q.value.trim().toLowerCase();
@@ -2736,7 +2716,7 @@ function openBarcode(){
     stage.innerHTML=`<div class="spinner">${ONDB?'Looking up product…':'Loading food database (first time only, ~10 MB)…'}</div>`;
     const r=await barcodeLookup(code);
     if(!r){stage.innerHTML=`<div class="err">Product not found in OpenNutrition or Open Food Facts. Try entering it manually.</div><div class="btn-row"><button class="btn" id="man">Enter manually</button></div>`;stage.querySelector('#man').onclick=()=>{m.remove();openManual();};return;}
-    weighAndLog(m,stage,r.name,r.per,r.source,r.g);
+    logPackaged(m,stage,r);
   }
   startScan();
 }
@@ -2757,6 +2737,56 @@ function weighAndLog(m,stage,name,per,source,defGrams,onDone){
     state.entries.push({id:uid(),date:viewDate,meal:getMeal(),name,grams:g,servingLabel:sv.desc(),
       calories:per.calories*g/100,protein_g:per.protein_g*g/100,carbs_g:per.carbs_g*g/100,fat_g:per.fat_g*g/100,sugar_g:per.sugar_g*g/100,source});
     if(stage.querySelector('#wl-lib').checked)addToLibrary(name,per,g);
+    save(); onDone?onDone():closeModal(m);
+  };
+}
+
+/* Log a packaged / barcode item, serving-first.
+   r = {name, per (per-100g), source, servingGrams, servingLabel, packageGrams}
+   Defaults to 1 serving; offers whole-package and custom-amount. Falls back to the
+   plain per-100g grams widget when the product has no serving weight at all. */
+function logPackaged(m,stage,r,onDone){
+  const per={calories:+r.per.calories||0,protein_g:+r.per.protein_g||0,carbs_g:+r.per.carbs_g||0,fat_g:+r.per.fat_g||0,sugar_g:+r.per.sugar_g||0};
+  const sg=(+r.servingGrams>0)?+r.servingGrams:null;
+  const pkg=(+r.packageGrams>0)?+r.packageGrams:null;
+  if(!sg){ return weighAndLog(m,stage,r.name,per,r.source,pkg||undefined,onDone); }   // no serving info -> old behaviour
+  const sLabel=r.servingLabel||`${r1(sg)} g`;
+  const kcalFor=g=>r0(per.calories*g/100);
+  let basis='serving', count=1;                     // count = number of servings
+  const bases=[['serving','1 serving']];
+  if(pkg) bases.push(['package','Whole package']);
+  bases.push(['custom','Custom amount']);
+  stage.innerHTML=`
+    <div class="item-edit"><div class="nm">${esc(r.name)}</div>
+      <div style="color:var(--text-soft);font-size:12.5px;margin-top:3px">Serving ${esc(sLabel)} · ${kcalFor(sg)} kcal${pkg?` &nbsp;·&nbsp; Package ${r1(pkg)} g · ${kcalFor(pkg)} kcal`:''}</div></div>
+    <div class="field"><label>How much did you have?</label>
+      <div class="chips" id="pk-basis">${bases.map(([b,l])=>`<button class="chip${b===basis?' sel':''}" data-b="${b}">${l}</button>`).join('')}</div></div>
+    <div class="field" id="pk-serv"><label>Number of servings</label>
+      <div class="pstep"><button id="pk-dn">${IC_MINUS}</button><span class="val" id="pk-ct">1</span><button id="pk-up">${IC_PLUS}</button></div></div>
+    <div id="pk-custom" style="display:none">${servingWidget()}</div>
+    <div class="hint" id="pk-total"></div>
+    ${mealChips(defaultMeal())}
+    <div class="toggle-row"><input type="checkbox" id="pk-lib" style="width:auto"><label for="pk-lib" style="margin:0">Save to library</label></div>
+    <div class="field"><button class="btn btn-primary btn-block" id="pk-save">Log item</button></div>`;
+  const getMeal=wireMealChips(stage);
+  const svWrap=stage.querySelector('#pk-serv'), customWrap=stage.querySelector('#pk-custom'),
+        total=stage.querySelector('#pk-total'), ctEl=stage.querySelector('#pk-ct');
+  const sv=wireServing(customWrap,per,sg);          // custom grams widget, pre-filled to one serving
+  const curGrams=()=> basis==='serving' ? sg*count : basis==='package' ? pkg : sv.grams();
+  const curDesc=()=> basis==='serving' ? `${r1(count)} serving${count===1?'':'s'} (${r1(sg*count)} g)`
+                    : basis==='package' ? `whole package (${r1(pkg)} g)` : sv.desc();
+  const recompute=()=>{ const g=curGrams(); total.textContent=`= ${r0(per.calories*g/100)} kcal · ${r1(g)} g`; };
+  const syncBasis=()=>{ svWrap.style.display=basis==='serving'?'':'none'; customWrap.style.display=basis==='custom'?'':'none'; recompute(); };
+  stage.querySelectorAll('#pk-basis .chip').forEach(c=>c.onclick=()=>{ basis=c.dataset.b; stage.querySelectorAll('#pk-basis .chip').forEach(x=>x.classList.toggle('sel',x===c)); syncBasis(); });
+  stage.querySelector('#pk-up').onclick=()=>{ count=r1(Math.min(50,count+0.5)); ctEl.textContent=r1(count); recompute(); };
+  stage.querySelector('#pk-dn').onclick=()=>{ count=r1(Math.max(0.5,count-0.5)); ctEl.textContent=r1(count); recompute(); };
+  customWrap.addEventListener('input',recompute);
+  syncBasis();
+  stage.querySelector('#pk-save').onclick=()=>{
+    const g=curGrams();
+    state.entries.push({id:uid(),date:viewDate,meal:getMeal(),name:r.name,grams:g,servingLabel:curDesc(),
+      calories:per.calories*g/100,protein_g:per.protein_g*g/100,carbs_g:per.carbs_g*g/100,fat_g:per.fat_g*g/100,sugar_g:per.sugar_g*g/100,source:r.source});
+    if(stage.querySelector('#pk-lib').checked)addToLibrary(r.name,per,sg);
     save(); onDone?onDone():closeModal(m);
   };
 }
@@ -3385,15 +3415,11 @@ function openSettings(){
   // slide-up entry
   sheet.style.transform='translateY(100%)';
   requestAnimationFrame(()=>{sheet.style.transition='transform .28s cubic-bezier(.22,.61,.36,1)';sheet.style.transform='translateY(0)';});
-  let closed=false;
-  const rawClose=()=>{
-    if(closed)return; closed=true;
+  const close=()=>{
     sheet.style.transition='transform .25s ease-in';sheet.style.transform='translateY(100%)';
     overlay.style.transition='background .25s';overlay.style.background='rgba(0,0,0,0)';
     setTimeout(()=>{overlay.remove();render();},240);
   };
-  const _navEntry=navOpen(rawClose);
-  const close=()=>{ if(closed)return; navClose(_navEntry); rawClose(); };
   overlay.onclick=(e)=>{if(e.target===overlay)close();};
   // swipe-down to dismiss — only when the top grip handle is dragged
   let startY=0,dY=0,drag=false;
