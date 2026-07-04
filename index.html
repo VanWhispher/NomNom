@@ -1011,7 +1011,8 @@ function openCalendar(){
       <div class="cal-stats" id="cal-stats"></div>
     </div></div>`);
   $('modal-root').appendChild(ov);
-  const close=()=>ov.remove();
+  const _navEntry=navOpen(()=>ov.remove());
+  const close=()=>{ navClose(_navEntry); ov.remove(); };
   ov.querySelector('#cal-x').onclick=close;
   const jump=(k)=>{ viewDate=k; tab='today'; close(); render(); };
 
@@ -1101,7 +1102,8 @@ function openDayDetail(key){
     <div class="cal-body" id="dd-body"></div></div>`);
   $('modal-root').appendChild(ov);
   let cur=key;
-  ov.querySelector('#dd-x').onclick=()=>ov.remove();
+  const _navEntry=navOpen(()=>ov.remove());
+  ov.querySelector('#dd-x').onclick=()=>{ navClose(_navEntry); ov.remove(); };
   ov.querySelector('#dd-prev').onclick=()=>{cur=shiftDay(cur,-1);paint();};
   ov.querySelector('#dd-next').onclick=()=>{cur=shiftDay(cur,1);paint();};
   function paint(){
@@ -1130,14 +1132,39 @@ function openDayDetail(key){
   }
   paint();
 }
+/* ---------- hardware / Android back-button navigation ---------- */
+const _navStack=[];        // LIFO of open dismissible layers, each {close}
+let _navSuppress=0;        // count of history entries we're unwinding ourselves
+function navOpen(closeFn){  // call when a layer opens; returns an entry handle
+  const entry={close:closeFn};
+  _navStack.push(entry);
+  try{history.pushState({nom:_navStack.length},'');}catch(_){}
+  return entry;
+}
+function navClose(entry){    // call from a UI close (X / swipe / backdrop)
+  if(!entry)return;
+  const i=_navStack.indexOf(entry);
+  if(i===-1)return;         // already unwound by a back press
+  _navStack.splice(i,1);
+  _navSuppress++;
+  try{history.back();}catch(_){_navSuppress=Math.max(0,_navSuppress-1);}   // consume our pushed entry
+}
+window.addEventListener('popstate',()=>{
+  if(_navSuppress>0){_navSuppress--;return;}
+  const entry=_navStack.pop();       // back pressed:
+  if(entry)entry.close();            // close top layer WITHOUT calling history.back
+  // stack empty -> default back proceeds (app exits) which is what we want
+});
+
 function openModal(title,bodyHtml){
   const m=el(`<div class="overlay"><div class="overlay-inner"><div class="mhead"><h2>${esc(title)}</h2><button class="linkbtn" id="m-close">Close</button></div><div id="m-body">${bodyHtml}</div></div></div>`);
   $('modal-root').appendChild(m);
+  m._nav=navOpen(()=>{ if(m.parentNode)m.remove(); render(); });
   m.querySelector('#m-close').onclick=()=>closeModal(m);
   return m;
 }
-function closeModal(m){ if(m&&m.parentNode)m.remove(); render(); }
-function closeAllModals(){ $('modal-root').innerHTML=''; render(); }
+function closeModal(m){ if(m){navClose(m._nav); if(m.parentNode)m.remove();} render(); }
+function closeAllModals(){ while(_navStack.length)navClose(_navStack[_navStack.length-1]); $('modal-root').innerHTML=''; render(); }
 
 /* ---------- bottom-sheet helper (slide up + swipe down, like Settings) ---------- */
 function makeSheet(innerHtml){
@@ -1150,13 +1177,15 @@ function makeSheet(innerHtml){
   sheet.style.transform='translateY(100%)';
   requestAnimationFrame(()=>{sheet.style.transition='transform .28s cubic-bezier(.22,.61,.36,1)';sheet.style.transform='translateY(0)';});
   let closed=false;
-  const close=()=>{
+  const rawClose=()=>{
     if(closed)return; closed=true;
     camStop();
     sheet.style.transition='transform .25s ease-in';sheet.style.transform='translateY(100%)';
     overlay.style.transition='background .25s';overlay.style.background='rgba(0,0,0,0)';
     setTimeout(()=>{overlay.remove();render();},240);
   };
+  const _navEntry=navOpen(rawClose);
+  const close=()=>{ if(closed)return; navClose(_navEntry); rawClose(); };
   overlay.onclick=(e)=>{if(e.target===overlay)close();};
   let startY=0,dY=0,drag=false;
   const handle=overlay.querySelector('#sheet-handle');
@@ -1967,7 +1996,8 @@ function openAdd(){
         </div>
       </div></div>`);
     $('modal-root').appendChild(ov);
-    const done=()=>ov.remove();
+    const _navEntry=navOpen(()=>ov.remove());
+    const done=()=>{ navClose(_navEntry); ov.remove(); };
     ov.querySelector('#pk-bd').onclick=done;
     ov.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{
       const mm=state.meals.find(x=>x.id===b.dataset.pick); if(mm){mm.items.push(libToMealItem(l));save();}
@@ -3355,11 +3385,15 @@ function openSettings(){
   // slide-up entry
   sheet.style.transform='translateY(100%)';
   requestAnimationFrame(()=>{sheet.style.transition='transform .28s cubic-bezier(.22,.61,.36,1)';sheet.style.transform='translateY(0)';});
-  const close=()=>{
+  let closed=false;
+  const rawClose=()=>{
+    if(closed)return; closed=true;
     sheet.style.transition='transform .25s ease-in';sheet.style.transform='translateY(100%)';
     overlay.style.transition='background .25s';overlay.style.background='rgba(0,0,0,0)';
     setTimeout(()=>{overlay.remove();render();},240);
   };
+  const _navEntry=navOpen(rawClose);
+  const close=()=>{ if(closed)return; navClose(_navEntry); rawClose(); };
   overlay.onclick=(e)=>{if(e.target===overlay)close();};
   // swipe-down to dismiss — only when the top grip handle is dragged
   let startY=0,dY=0,drag=false;
