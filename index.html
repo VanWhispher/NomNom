@@ -635,6 +635,76 @@
   .mcal input{width:96px;text-align:right;border:none;background:none;font-family:var(--display);font-weight:800;font-size:26px;color:#fff;outline:none;padding:0;}
   .mcal input::placeholder{color:rgba(255,255,255,.7);}
   .calu{color:rgba(255,255,255,.85);font-size:13px;}
+
+  /* ---------- Rivals tab ---------- */
+  .rv-head{display:flex;align-items:center;justify-content:space-between;padding:18px 2px 12px;position:relative;}
+  .rv-title{font-family:var(--display);font-weight:800;font-size:24px;color:var(--text);line-height:1;}
+  .rv-sub{font-size:12.5px;color:var(--text-soft);margin-top:4px;}
+  .rv-iconbtn{display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;
+    background:var(--surface);border:none;color:#5f5a51;box-shadow:0 1px 4px rgba(43,42,38,.08);cursor:pointer;}
+  .rv-pop{position:absolute;right:0;top:52px;z-index:30;background:var(--surface);border-radius:14px;
+    box-shadow:0 10px 30px rgba(43,42,38,.18);padding:6px;min-width:180px;}
+  .rv-pop button{display:block;width:100%;text-align:left;background:none;border:none;padding:11px 14px;
+    border-radius:10px;font-size:14px;font-weight:600;color:var(--text);cursor:pointer;}
+  .rv-pop button:hover{background:var(--accent-bg);}
+  .rv-pop button.danger{color:#E5533A;}
+  .rv-toggle{display:flex;background:#EAE3D8;border-radius:12px;padding:3px;margin:0 0 14px;}
+  .rv-toggle button{flex:1;text-align:center;padding:8px 0;border:none;background:none;border-radius:9px;
+    font-family:var(--display);font-weight:600;font-size:13px;color:var(--text-soft);cursor:pointer;}
+  .rv-toggle button.on{background:#fff;color:var(--text);font-weight:700;box-shadow:0 1px 3px rgba(43,42,38,.08);}
+  .rv-hero{background:linear-gradient(165deg,#4A9FD4,#2C6E9E);border-radius:26px;padding:20px 18px 18px;
+    box-shadow:0 8px 22px -8px rgba(62,146,204,.5);margin-bottom:14px;}
+  .rv-hero-row{display:flex;align-items:flex-end;justify-content:space-between;}
+  .rv-hero-p{text-align:center;width:108px;}
+  .rv-av{width:58px;height:58px;margin:0 auto;border-radius:50%;border:3px solid #fff;display:flex;
+    align-items:center;justify-content:center;font-family:var(--display);font-weight:800;font-size:22px;}
+  .rv-hero-name{font-family:var(--display);font-weight:700;font-size:14px;color:#fff;margin-top:8px;}
+  .rv-hero-pts{font-family:var(--display);font-weight:800;font-size:34px;color:#fff;line-height:1;margin-top:2px;}
+  .rv-hero-lbl{font-size:11px;color:rgba(255,255,255,.75);}
+  .rv-hero-vs{width:38px;height:38px;margin-bottom:26px;border-radius:50%;background:rgba(255,255,255,.16);
+    border:1.5px solid rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;
+    font-family:var(--display);font-weight:800;font-size:14px;color:#fff;}
+  .rv-hero-split{height:9px;border-radius:6px;overflow:hidden;margin-top:16px;background:rgba(255,255,255,.25);}
+  .rv-hero-split>div{height:100%;border-radius:6px;background:#fff;transition:width .4s;}
+  .rv-hero-foot{text-align:center;margin-top:11px;font-family:var(--display);font-weight:700;font-size:13px;color:#fff;}
+  .rv-card{background:var(--surface);border-radius:24px;padding:18px;box-shadow:0 3px 14px rgba(43,42,38,.05);margin-bottom:14px;}
+  .rv-card-h{font-family:var(--display);font-weight:700;font-size:16px;color:var(--text);margin-bottom:15px;}
+  .rv-legend{display:flex;align-items:center;justify-content:space-between;}
+  .rv-leg{display:flex;align-items:center;gap:11px;font-size:11px;color:var(--text-soft);font-family:var(--font);font-weight:500;}
+  .rv-leg i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:3px;vertical-align:middle;}
+  .rv-brow{margin-bottom:15px;}
+  .rv-brow:last-child{margin-bottom:0;}
+  .rv-brow-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;}
+  .rv-brow-h>span:first-child{font-weight:600;font-size:13.5px;color:var(--text);}
+  .rv-brow-v{font-size:12px;color:var(--text-soft);}
+  .rv-dual{display:flex;gap:5px;height:8px;}
+  .rv-dbar{border-radius:6px;min-width:3px;}
+  .rv-daywrap{display:flex;justify-content:space-between;align-items:flex-end;}
+  .rv-daycol{display:flex;flex-direction:column;align-items:center;gap:6px;width:38px;}
+  .rv-daybars{display:flex;gap:3px;align-items:flex-end;height:70px;}
+  .rv-daybars>div{width:8px;border-radius:4px;}
+  .rv-daycol>span{font-size:11px;color:var(--text-soft);}
+  .rv-winrow{display:flex;gap:7px;}
+  .rv-wincell{flex:1;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;}
+  .rv-wincell span{font-size:11px;font-weight:700;color:rgba(255,255,255,.9);font-family:var(--display);}
+  .rv-split{display:flex;height:9px;border-radius:6px;overflow:hidden;}
+  .rv-empty{text-align:center;padding:26px 0 18px;}
+  .rv-emoji{font-size:42px;line-height:1;}
+  .rv-empty h3{font-family:var(--display);font-size:20px;margin:12px 0 4px;color:var(--text);}
+  .rv-empty p{color:var(--text-soft);font-size:14px;margin:0 auto;line-height:1.5;max-width:300px;}
+  .rv-code{font-family:var(--display);font-weight:800;font-size:30px;letter-spacing:3px;color:var(--accent-strong);
+    text-align:center;background:var(--accent-bg);border-radius:18px;padding:18px 0;margin:14px 0;}
+  .rv-codebox{display:flex;align-items:center;gap:0;background:var(--surface);border:1.5px solid var(--divider);
+    border-radius:16px;padding:4px 14px;box-shadow:0 3px 14px rgba(43,42,38,.05);}
+  .rv-codepre{font-family:var(--display);font-weight:800;font-size:24px;letter-spacing:2px;color:var(--text-soft);}
+  .rv-codeinp{flex:1;border:none;background:none;outline:none;font-family:var(--display);font-weight:800;
+    font-size:24px;letter-spacing:4px;color:var(--text);padding:12px 6px;text-transform:uppercase;}
+  .rv-note{color:var(--text-soft);font-size:13px;line-height:1.5;text-align:center;margin-top:14px;}
+  .rv-leave{width:100%;margin-top:16px;padding:14px 0;border:none;border-radius:16px;background:var(--surface);
+    box-shadow:0 3px 14px rgba(43,42,38,.05);font-family:var(--display);font-weight:700;color:#E5533A;cursor:pointer;}
+  .rv-spin{width:26px;height:26px;border:3px solid var(--accent-bg);border-top-color:var(--accent-strong);
+    border-radius:50%;margin:30px auto;animation:rvspin .8s linear infinite;}
+  @keyframes rvspin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -646,6 +716,7 @@
   <div class="tab" data-tab="today"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 001 1h12a1 1 0 001-1V9.5"/><path d="M9.5 21v-6h5v6"/></svg><span class="tlabel">Today</span></div>
   <div class="tab" data-tab="weight"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 12l4-4.5"/><path d="M9 4.5h6"/></svg><span class="tlabel">Weight</span></div>
   <div class="tab" data-tab="plan"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2.5"/><path d="M9 3h6v3H9z"/><path d="M9 11h6M9 15h4"/></svg><span class="tlabel">Plan</span></div>
+  <div class="tab" data-tab="rivals"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg><span class="tlabel">Rivals</span></div>
 </div>
 <div id="modal-root"></div>
 <div id="auth-screen" style="display:none"></div>
@@ -858,6 +929,7 @@ function render(){
   $('fab').style.display = tab==='today' ? 'block' : 'none';
   if(tab==='today')renderToday();
   else if(tab==='weight')renderWeight();
+  else if(tab==='rivals')renderRivals();
   else renderPlan();
   layout();
 }
@@ -3560,15 +3632,18 @@ function openSettings(){
   overlay.querySelector('#set-clear').onclick=()=>{if(confirm('Erase all data? This cannot be undone.')){localStorage.removeItem(KEY);state=structuredClone(DEFAULT);if(CLOUD&&user){saveLocal();pushCloud();}close();}};
   const so=overlay.querySelector('#set-signout'); if(so)so.onclick=()=>{overlay.remove();signOut();};
   const compBtn=overlay.querySelector('#set-compete');
-  if(compBtn)compBtn.onclick=()=>{ close(); setTimeout(openLeaderboard,200); };
+  if(compBtn)compBtn.onclick=()=>{ close(); setTimeout(()=>{ tab='rivals'; _rivalsStale=true; render(); layout(); },220); };
 }
 
 /* ================================================================
-   LEADERBOARD — head-to-head competition with one friend
+   RIVALS — head-to-head competition with one friend
    Fairness: each person races their own Plan-tab target, so different
    genders / weights / goals compete on adherence, not raw kg.
    Only DERIVED scores (points + %-progress) ever leave the device.
    ================================================================ */
+
+/* colours (You = blue, Rival = orange), matching the Rivals design */
+const RV_YOU='#3E92CC', RV_YOU_LT='#C3DEF0', RV_THEM='#FF6B4A', RV_THEM_LT='#F3CFC4';
 
 /* ----- scoring (pure functions of local state) ----- */
 function compCalorieScore(C,T){                 // 0..80
@@ -3583,19 +3658,6 @@ function compDailyScore(d){                      // 0..100
   if(!T || !compDayLogged(d)) return 0;          // no log = 0 (showing up is the point)
   return 20 + compCalorieScore(compDayCalories(d), T);
 }
-function compWeekDays(){                          // Mon..Sun of the current week
-  const now=new Date(); const off=(now.getDay()+6)%7; // 0=Mon
-  const mon=new Date(now); mon.setDate(now.getDate()-off); mon.setHours(0,0,0,0);
-  const out=[]; for(let i=0;i<7;i++){const x=new Date(mon);x.setDate(mon.getDate()+i);out.push(dateKey(x));}
-  return out;
-}
-function compWeekTotalLocal(){
-  const days=compWeekDays(), tk=todayKey();
-  let pts=0, elapsed=0, loggedCount=0;
-  for(const d of days){ if(d>tk)continue; elapsed++; pts+=compDailyScore(d); if(compDayLogged(d))loggedCount++; }
-  const fullLog = days.every(d=> d<=tk && compDayLogged(d));   // only reachable at week's end
-  return { points: Math.round(pts + (fullLog?25:0)), elapsed, loggedCount, fullLog };
-}
 function compSeasonPct(){
   const c=state.competition; if(!c)return null;
   const start=c.startWeightKg, goal=state.profile.goalWeight, cur=latestWeightKg();
@@ -3604,13 +3666,43 @@ function compSeasonPct(){
   if(!isFinite(p))return null;
   return Math.max(0,Math.min(100,p));
 }
-function compMilestones(pct){ return [25,50,75,100].filter(m=>pct!=null&&pct>=m); }
+
+/* ----- week / range helpers ----- */
+function compWeekMonday(offset){                 // offset weeks back; 0 = this week
+  const now=new Date(); const o=(now.getDay()+6)%7; // 0=Mon
+  const mon=new Date(now); mon.setDate(now.getDate()-o-7*(offset||0)); mon.setHours(0,0,0,0);
+  return mon;
+}
+function compWeekDaysFor(offset){
+  const mon=compWeekMonday(offset), out=[];
+  for(let i=0;i<7;i++){const d=new Date(mon);d.setDate(mon.getDate()+i);out.push(dateKey(d));}
+  return out;
+}
+function compWeekDays(){ return compWeekDaysFor(0); }
+function comp28Days(){
+  const start=compWeekMonday(3), out=[];
+  for(let i=0;i<28;i++){const d=new Date(start);d.setDate(start.getDate()+i);out.push(dateKey(d));}
+  return out;                                    // 4 ISO weeks ending this Sunday
+}
+function compDaysLeftWeek(){ const idx=(new Date().getDay()+6)%7; return 6-idx; }
+function compDaysLeftMonth(){
+  const now=new Date(); const end=new Date(now.getFullYear(),now.getMonth()+1,0);
+  return Math.max(0, Math.round((end-now)/86400000));
+}
 
 /* ----- who am I (display name, matches Settings) ----- */
 function compMyName(){
   const meta=(user&&user.user_metadata)||{}, email=(user&&user.email)||'';
   const namePart=(email.split('@')[0]||'').replace(/[._-]+/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
   return meta.full_name||meta.name||namePart||'You';
+}
+function rvInitial(n){ return ((n||'?').trim()[0]||'?').toUpperCase(); }
+
+/* ----- code normalisation (fixes join: prefix is fixed, we only need 4 chars) ----- */
+function compNormalizeCode(raw){
+  let s=String(raw||'').toUpperCase().replace(/\s+/g,'');
+  s=s.replace(/^NOM[-\s]?/,'').replace(/[^A-Z0-9]/g,'');
+  return 'NOM-'+s;
 }
 
 /* ----- Supabase wrappers ----- */
@@ -3624,7 +3716,7 @@ async function compCreate(){
 }
 async function compJoin(code){
   const name=compMyName();
-  const {data,error}=await sb.rpc('join_competition',{p_code:String(code||'').trim().toUpperCase(),p_display_name:name});
+  const {data,error}=await sb.rpc('join_competition',{p_code:compNormalizeCode(code),p_display_name:name});
   if(error)throw error;
   state.competition={id:data.id,code:data.code,role:'guest',startWeightKg:latestWeightKg(),name};
   save();
@@ -3632,7 +3724,7 @@ async function compJoin(code){
 }
 async function compPushMine(){
   const c=state.competition; if(!c||!CLOUD||!user)return;
-  const days=compWeekDays(), tk=todayKey(), pct=compSeasonPct(), now=new Date().toISOString();
+  const days=comp28Days(), tk=todayKey(), pct=compSeasonPct(), now=new Date().toISOString();
   const rows=days.filter(d=>d<=tk).map(d=>({
     competition_id:c.id, user_id:user.id, date:d,
     daily_points:Math.round(compDailyScore(d)), logged:compDayLogged(d),
@@ -3642,30 +3734,26 @@ async function compPushMine(){
 }
 async function compFetchAll(){
   const c=state.competition; if(!c)return null;
-  const days=compWeekDays();
+  const days=comp28Days();
   const [memR,scR,cmpR]=await Promise.all([
     sb.from('competition_members').select('user_id,display_name').eq('competition_id',c.id),
     sb.from('competition_scores').select('user_id,date,daily_points,logged,progress_pct').eq('competition_id',c.id).in('date',days),
     sb.from('competitions').select('status,invite_code').eq('id',c.id).maybeSingle()
   ]);
   if(memR.error)throw memR.error;
-  const members=memR.data||[], scores=scR.data||[], status=(cmpR.data&&cmpR.data.status)||'pending';
-  const byUser={};
-  members.forEach(m=>{ byUser[m.user_id]={id:m.user_id,name:m.display_name||'Player',week:0,pct:null,logged:0}; });
+  const members=memR.data||[], scores=scR.data||[];
+  const status=(cmpR.data&&cmpR.data.status)||'pending';
+  const mk=(id,name)=>({id,name,byDate:{},pct:null});
+  const users={};
+  members.forEach(m=>users[m.user_id]=mk(m.user_id,m.display_name||'Player'));
   scores.forEach(r=>{
-    const u=byUser[r.user_id]; if(!u)return;
-    u.week+=(r.daily_points||0);
-    if(r.logged)u.logged++;
-    if(r.progress_pct!=null)u.pct=r.progress_pct;   // same value across rows; keep it
+    const u=users[r.user_id]; if(!u)return;
+    u.byDate[r.date]={points:r.daily_points||0,logged:!!r.logged};
+    if(r.progress_pct!=null)u.pct=r.progress_pct;
   });
-  // full-log bonus per user (all 7 days present + logged)
-  Object.values(byUser).forEach(u=>{
-    const set=new Set(scores.filter(r=>r.user_id===u.id&&r.logged).map(r=>r.date));
-    if(days.every(d=>set.has(d)))u.week+=25;
-  });
-  const me=byUser[user.id]||{id:user.id,name:c.name,week:0,pct:null,logged:0};
-  const them=Object.values(byUser).find(u=>u.id!==user.id)||null;
-  return { status, me, them, invite:(cmpR.data&&cmpR.data.invite_code)||c.code };
+  const me=users[user.id]||mk(user.id,c.name);
+  const them=Object.values(users).find(u=>u.id!==user.id)||null;
+  return {status,me,them,invite:(cmpR.data&&cmpR.data.invite_code)||c.code};
 }
 async function compLeave(){
   const c=state.competition; if(!c)return;
@@ -3673,204 +3761,307 @@ async function compLeave(){
   state.competition=null; save();
 }
 
-/* ----- one-time styles ----- */
-function compEnsureStyle(){
-  if($('comp-style'))return;
-  const st=document.createElement('style'); st.id='comp-style';
-  st.textContent=`
-   .lb-hero{text-align:center;padding:8px 0 18px}
-   .lb-hero .lb-emoji{font-size:40px;line-height:1}
-   .lb-hero h3{font-family:var(--display);font-size:20px;margin:10px 0 4px}
-   .lb-hero p{color:var(--text-soft);font-size:14px;margin:0;line-height:1.5}
-   .lb-code{font-family:var(--display);font-weight:800;font-size:30px;letter-spacing:3px;color:var(--accent-strong);
-     text-align:center;background:var(--accent-bg);border-radius:18px;padding:18px 0;margin:14px 0}
-   .lb-vs{display:flex;align-items:stretch;gap:10px;margin:6px 0 4px}
-   .lb-vs .col{flex:1;background:var(--surface);border-radius:20px;padding:16px 14px;box-shadow:0 3px 14px rgba(43,42,38,.05);text-align:center}
-   .lb-vs .col.lead{outline:2px solid var(--accent)}
-   .lb-vs .who{font-family:var(--display);font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-   .lb-vs .pts{font-family:var(--display);font-weight:800;font-size:34px;color:var(--accent-strong);line-height:1.1;margin-top:4px}
-   .lb-vs .plab{font-size:11px;color:var(--text-soft);text-transform:uppercase;letter-spacing:.5px}
-   .lb-vs .mid{display:flex;align-items:center;font-family:var(--display);font-weight:800;color:var(--text-soft);font-size:13px}
-   .lb-season{background:var(--surface);border-radius:20px;padding:16px;box-shadow:0 3px 14px rgba(43,42,38,.05);margin-top:12px}
-   .lb-season .sr{margin:12px 0}
-   .lb-season .sr:first-child{margin-top:6px}
-   .lb-season .srh{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px}
-   .lb-season .srh b{font-family:var(--display)}
-   .lb-bar{height:12px;border-radius:999px;background:var(--accent-bg);overflow:hidden}
-   .lb-bar>span{display:block;height:100%;border-radius:999px;background:var(--accent-strong);transition:width .4s}
-   .lb-badges{margin-top:6px;font-size:12px;color:var(--text-soft)}
-   .lb-note{color:var(--text-soft);font-size:13px;line-height:1.5;text-align:center;margin-top:14px}
-   .lb-wait{display:flex;align-items:center;gap:8px;justify-content:center;color:var(--text-soft);font-size:14px;margin-top:8px}
-   .lb-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:lbp 1s infinite}
-   @keyframes lbp{0%,100%{opacity:.3}50%{opacity:1}}
-   .lb-sec{font-size:13px;font-weight:700;color:var(--text-soft);margin:20px 4px 8px}
-   .lb-leave{width:100%;margin-top:16px;padding:14px 0;border:none;border-radius:16px;background:var(--surface);
-     box-shadow:0 3px 14px rgba(43,42,38,.05);font-family:var(--display);font-weight:700;color:#E5533A;cursor:pointer}
+/* ----- per-user aggregation over a set of dates ----- */
+function rvAgg(u,dates){
+  let p=0,l=0; if(u) dates.forEach(d=>{const e=u.byDate[d]; if(e){p+=e.points; if(e.logged)l++;}});
+  return {points:p, logged:l, logging:20*l, calorie:Math.max(0,p-20*l)};
+}
+
+/* ================================================================
+   RENDER — the Rivals tab (into #main)
+   ================================================================ */
+let rivalsMode='week';      // 'week' | 'month'
+let rivalsView='intro';     // 'intro' | 'join' (only when no competition)
+let rivalsData=null;
+let _rivalsStale=true, _rivalsLoading=false;
+
+function renderRivals(){
+  const main=$('main');
+  if(!(CLOUD&&user)){
+    main.innerHTML=`<div class="rv-empty"><div class="rv-emoji">🔒</div><h3>Sign in to compete</h3><p>Rivals needs an account so you and your friend can share a scoreboard.</p></div>`;
+    return;
+  }
+  if(!state.competition){
+    rivalsView==='join' ? rvRenderJoin() : rvRenderIntro();
+    return;
+  }
+  if(_rivalsStale && !_rivalsLoading) rivalsLoad();
+  if(rivalsData && rivalsData.error){ rvRenderError(rivalsData.error); return; }
+  if(!rivalsData){ main.innerHTML=rvHeader('Rivals','Loading…')+`<div class="rv-empty"><div class="rv-spin"></div></div>`; return; }
+  if(!rivalsData.them){ rvRenderPending(); return; }
+  rvRenderBoard();
+}
+
+async function rivalsLoad(){
+  _rivalsLoading=true; _rivalsStale=false;
+  try{ await compPushMine(); rivalsData=await compFetchAll(); }
+  catch(e){ rivalsData={error:(e&&e.message)||'Could not load the scoreboard.'}; }
+  _rivalsLoading=false;
+  if(tab==='rivals') renderRivals();
+}
+function rivalsRefresh(){ _rivalsStale=true; renderRivals(); }
+
+/* ---- shared bits ---- */
+const RV_PEOPLE='<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/><path d="M16 6.5a3 3 0 0 1 0 6M17 20a5.5 5.5 0 0 0-2.5-4.6"/></svg>';
+function rvHeader(title,sub,menu){
+  return `<div class="rv-head">
+    <div><div class="rv-title">${esc(title)}</div>${sub?`<div class="rv-sub">${esc(sub)}</div>`:''}</div>
+    ${menu?`<button class="rv-iconbtn" id="rv-menu">${RV_PEOPLE}</button>`:''}
+  </div>`;
+}
+function rvAvatar(letter,color,bg,ring){
+  return `<div class="rv-av" style="background:${bg};color:${color};border-color:${ring||'#fff'}">${esc(letter)}</div>`;
+}
+
+/* ---- intro (no competition) ---- */
+function rvRenderIntro(){
+  const noTarget=!state.settings.dailyTarget;
+  $('main').innerHTML=rvHeader('Rivals','')+`
+    <div class="rv-empty">
+      <div class="rv-emoji">🏁</div>
+      <h3>Race a friend</h3>
+      <p>Compete on sticking to your plan — not on the scale. You each race your own daily target, so different bodies and goals stay fair.</p>
+    </div>
+    <button class="btn btn-primary btn-block" id="rv-create">Start a competition</button>
+    <button class="btn btn-block" id="rv-joinbtn" style="margin-top:10px">Join with a code</button>
+    ${noTarget?`<div class="rv-note">Set a daily calorie target in the Plan tab first — it's what makes the scoring fair.</div>`:''}
   `;
-  document.head.appendChild(st);
+  const cr=$('rv-create');
+  cr.onclick=async()=>{
+    if(noTarget){ toastComp('Set a daily target in Plan first.'); return; }
+    cr.disabled=true; cr.textContent='Creating…';
+    try{ await compCreate(); rivalsData=null; _rivalsStale=true; renderRivals(); }
+    catch(e){ cr.disabled=false; cr.textContent='Start a competition'; toastComp((e&&e.message)||'Could not create.'); }
+  };
+  $('rv-joinbtn').onclick=()=>{ rivalsView='join'; renderRivals(); };
 }
 
-/* ----- the sheet ----- */
-function openLeaderboard(){
-  compEnsureStyle();
-  const sh=makeSheet(`<div class="set-sheet" style="padding-bottom:8px"><h2 style="margin:4px 0 2px">Compete</h2><div id="lb-body"></div></div>`);
-  const body=sh.overlay.querySelector('#lb-body');
-  const set=(html)=>{ body.innerHTML=html; };
-
-  function viewStart(){
-    set(`
-      <div class="lb-hero">
-        <div class="lb-emoji">🏁</div>
-        <h3>Race a friend</h3>
-        <p>Compete on sticking to your plan — not on the scale. You each race your own daily target, so different bodies and goals stay fair.</p>
-      </div>
-      <button class="btn btn-primary btn-block" id="lb-create">Start a competition</button>
-      <button class="btn btn-block" id="lb-joinbtn" style="margin-top:10px">Join with a code</button>
-      ${!state.settings.dailyTarget?`<div class="lb-note">Set a daily calorie target in the Plan tab first — it's what makes the scoring fair.</div>`:''}
-    `);
-    body.querySelector('#lb-create').onclick=async()=>{
-      if(!state.settings.dailyTarget){ toastComp('Set a daily target in Plan first.'); return; }
-      const btn=body.querySelector('#lb-create'); btn.disabled=true; btn.textContent='Creating…';
-      try{ await compCreate(); viewInvite(); }
-      catch(e){ btn.disabled=false; btn.textContent='Start a competition'; toastComp(e.message||'Could not create.'); }
-    };
-    body.querySelector('#lb-joinbtn').onclick=viewJoin;
-  }
-
-  function viewInvite(){
-    const c=state.competition;
-    set(`
-      <div class="lb-hero">
-        <div class="lb-emoji">📨</div>
-        <h3>Share your code</h3>
-        <p>Send this to your friend. When they join with it, the race begins.</p>
-      </div>
-      <div class="lb-code">${esc(c.code)}</div>
-      <button class="btn btn-primary btn-block" id="lb-share">Share code</button>
-      <div class="lb-wait"><span class="lb-dot"></span> Waiting for your friend to join…</div>
-      <button class="btn btn-block" id="lb-refresh" style="margin-top:14px">I've shared it — check now</button>
-      <button class="lb-leave" id="lb-cancel">Cancel competition</button>
-    `);
-    body.querySelector('#lb-share').onclick=async()=>{
-      const txt=`Join my NomNom competition — code ${c.code}`;
-      if(navigator.share){ try{ await navigator.share({text:txt}); }catch(e){} }
-      else{ try{ await navigator.clipboard.writeText(c.code); toastComp('Code copied'); }catch(e){ toastComp(c.code); } }
-    };
-    body.querySelector('#lb-refresh').onclick=()=>viewBoard();
-    body.querySelector('#lb-cancel').onclick=async()=>{ await compLeave(); viewStart(); };
-  }
-
-  function viewJoin(){
-    set(`
-      <div class="lb-hero">
-        <div class="lb-emoji">🔑</div>
-        <h3>Join a competition</h3>
-        <p>Enter the code your friend shared with you.</p>
-      </div>
-      <input id="lb-code" placeholder="NOM-XXXX" autocapitalize="characters" autocomplete="off"
-        style="width:100%;text-align:center;font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:2px;box-sizing:border-box">
-      <button class="btn btn-primary btn-block" id="lb-do" style="margin-top:14px">Join</button>
-      <button class="btn btn-block" id="lb-back" style="margin-top:10px">Back</button>
-      <div id="lb-jmsg"></div>
-    `);
-    const inp=body.querySelector('#lb-code'); inp.focus();
-    body.querySelector('#lb-do').onclick=async()=>{
-      const code=inp.value.trim(); if(!code){ inp.focus(); return; }
-      if(!state.settings.dailyTarget){ toastComp('Set a daily target in Plan first.'); return; }
-      const btn=body.querySelector('#lb-do'); btn.disabled=true; btn.textContent='Joining…';
-      try{ await compJoin(code); viewBoard(); }
-      catch(e){
-        btn.disabled=false; btn.textContent='Join';
-        body.querySelector('#lb-jmsg').innerHTML=`<div class="lb-note" style="color:#E5533A">${esc(e.message||'Could not join.')}</div>`;
-      }
-    };
-    body.querySelector('#lb-back').onclick=viewStart;
-  }
-
-  async function viewBoard(){
-    set(`<div class="lb-wait" style="margin-top:40px"><span class="lb-dot"></span> Loading the scoreboard…</div>`);
-    let data;
-    try{ await compPushMine(); data=await compFetchAll(); }
-    catch(e){ set(`<div class="lb-note" style="color:#E5533A;margin-top:30px">${esc(e.message||'Could not load.')}</div>
-      <button class="btn btn-block" id="lb-retry" style="margin-top:14px">Try again</button>`);
-      body.querySelector('#lb-retry').onclick=viewBoard; return; }
-
-    if(!data){ viewStart(); return; }
-
-    // opponent hasn't joined yet
-    if(!data.them){
-      const c=state.competition;
-      set(`
-        <div class="lb-hero"><div class="lb-emoji">📨</div><h3>Waiting for your friend</h3>
-          <p>Share your code — the race starts the moment they join.</p></div>
-        <div class="lb-code">${esc(data.invite||c.code)}</div>
-        <button class="btn btn-primary btn-block" id="lb-share">Share code</button>
-        <button class="btn btn-block" id="lb-refresh" style="margin-top:12px">Check again</button>
-        <button class="lb-leave" id="lb-cancel">Cancel competition</button>
-      `);
-      body.querySelector('#lb-share').onclick=async()=>{
-        const txt=`Join my NomNom competition — code ${data.invite||c.code}`;
-        if(navigator.share){ try{ await navigator.share({text:txt}); }catch(e){} }
-        else{ try{ await navigator.clipboard.writeText(data.invite||c.code); toastComp('Code copied'); }catch(e){} }
-      };
-      body.querySelector('#lb-refresh').onclick=viewBoard;
-      body.querySelector('#lb-cancel').onclick=async()=>{ await compLeave(); viewStart(); };
-      return;
+/* ---- join form (fixed NOM- prefix, only 4 chars typed) ---- */
+function rvRenderJoin(){
+  $('main').innerHTML=rvHeader('Join a rival','')+`
+    <div class="rv-empty" style="padding-bottom:8px">
+      <div class="rv-emoji">🔑</div>
+      <h3>Enter the code</h3>
+      <p>Type the 4 characters your friend shared. The <b>NOM-</b> part is already filled in.</p>
+    </div>
+    <div class="rv-codebox">
+      <span class="rv-codepre">NOM-</span>
+      <input id="rv-code" class="rv-codeinp" maxlength="6" placeholder="XXXX" autocapitalize="characters" autocomplete="off" spellcheck="false" inputmode="text">
+    </div>
+    <button class="btn btn-primary btn-block" id="rv-do" style="margin-top:16px">Join</button>
+    <button class="btn btn-block" id="rv-back" style="margin-top:10px">Back</button>
+    <div id="rv-jmsg"></div>
+  `;
+  const inp=$('rv-code'); inp.focus();
+  inp.oninput=()=>{ inp.value=inp.value.toUpperCase().replace(/[^A-Z0-9]/g,''); };
+  const go=async()=>{
+    const raw=inp.value.trim(); if(!raw){ inp.focus(); return; }
+    if(!state.settings.dailyTarget){ toastComp('Set a daily target in Plan first.'); return; }
+    const btn=$('rv-do'); btn.disabled=true; btn.textContent='Joining…';
+    try{ await compJoin(raw); rivalsView='intro'; rivalsData=null; _rivalsStale=true; renderRivals(); }
+    catch(e){
+      btn.disabled=false; btn.textContent='Join';
+      $('rv-jmsg').innerHTML=`<div class="rv-note" style="color:#E5533A">${esc((e&&e.message)||'Could not join.')}</div>`;
     }
-
-    const me=data.me, them=data.them;
-    const meLead=me.week>them.week, themLead=them.week>me.week;
-    const wk=compWeekTotalLocal();
-    const seasonRow=(u)=>{
-      const pct=u.pct;
-      const badges=compMilestones(pct);
-      return `<div class="sr">
-        <div class="srh"><span>${esc(u.name)}</span><b>${pct!=null?Math.round(pct)+'%':'—'}</b></div>
-        <div class="lb-bar"><span style="width:${pct!=null?Math.max(2,Math.min(100,pct)):0}%"></span></div>
-        ${badges.length?`<div class="lb-badges">🏅 ${badges.map(b=>b+'%').join(' · ')} reached</div>`:''}
-      </div>`;
-    };
-
-    set(`
-      <div class="lb-sec">This week · resets Monday</div>
-      <div class="lb-vs">
-        <div class="col ${meLead?'lead':''}">
-          <div class="who">${esc(me.name)}</div>
-          <div class="pts">${me.week}</div>
-          <div class="plab">points</div>
-        </div>
-        <div class="mid">vs</div>
-        <div class="col ${themLead?'lead':''}">
-          <div class="who">${esc(them.name)}</div>
-          <div class="pts">${them.week}</div>
-          <div class="plab">points</div>
-        </div>
-      </div>
-      <div class="lb-note" style="margin-top:2px">
-        ${meLead?`You're ahead by ${me.week-them.week}.`:themLead?`${esc(them.name)} leads by ${them.week-me.week}.`:`Dead even — ${me.week} apiece.`}
-        You've logged ${wk.loggedCount}/${wk.elapsed} day${wk.elapsed===1?'':'s'} so far.
-      </div>
-
-      <div class="lb-sec">Season · progress to goal</div>
-      <div class="lb-season">
-        ${seasonRow(me)}
-        ${seasonRow(them)}
-      </div>
-
-      <button class="btn btn-block" id="lb-refresh" style="margin-top:16px">Refresh</button>
-      <button class="lb-leave" id="lb-leave">Leave competition</button>
-    `);
-    body.querySelector('#lb-refresh').onclick=viewBoard;
-    body.querySelector('#lb-leave').onclick=async()=>{
-      if(confirm('Leave this competition? Your scores will stop syncing.')){ await compLeave(); viewStart(); }
-    };
-  }
-
-  // route to the right view
-  if(!state.competition) viewStart();
-  else viewBoard();
+  };
+  $('rv-do').onclick=go;
+  inp.onkeydown=(e)=>{ if(e.key==='Enter')go(); };
+  $('rv-back').onclick=()=>{ rivalsView='intro'; renderRivals(); };
 }
 
+/* ---- pending (waiting for the friend to join) ---- */
+function rvRenderPending(){
+  const c=state.competition, code=(rivalsData&&rivalsData.invite)||c.code;
+  $('main').innerHTML=rvHeader('Rivals','Waiting for your friend',true)+`
+    <div class="rv-empty" style="padding-bottom:6px">
+      <div class="rv-emoji">📨</div>
+      <h3>Share your code</h3>
+      <p>Send this to your friend. The race begins the moment they join with it.</p>
+    </div>
+    <div class="rv-code">${esc(code)}</div>
+    <button class="btn btn-primary btn-block" id="rv-share">Share code</button>
+    <button class="btn btn-block" id="rv-check" style="margin-top:10px">I've shared it — check now</button>
+    <button class="rv-leave" id="rv-cancel">Cancel competition</button>
+  `;
+  rvWireMenu();
+  $('rv-share').onclick=()=>rvShare(code);
+  $('rv-check').onclick=rivalsRefresh;
+  $('rv-cancel').onclick=async()=>{ await compLeave(); rivalsData=null; renderRivals(); };
+}
+
+function rvRenderError(msg){
+  $('main').innerHTML=rvHeader('Rivals','',true)+`
+    <div class="rv-note" style="color:#E5533A;margin-top:26px">${esc(msg)}</div>
+    <button class="btn btn-block" id="rv-retry" style="margin-top:14px">Try again</button>`;
+  rvWireMenu();
+  $('rv-retry').onclick=rivalsRefresh;
+}
+
+async function rvShare(code){
+  const txt=`Join my NomNom competition — code ${code}`;
+  if(navigator.share){ try{ await navigator.share({text:txt}); }catch(e){} }
+  else{ try{ await navigator.clipboard.writeText(code); toastComp('Code copied'); }catch(e){ toastComp(code); } }
+}
+
+/* ---- menu (top-right people icon → refresh / leave) ---- */
+function rvWireMenu(){
+  const b=$('rv-menu'); if(!b)return;
+  b.onclick=()=>{
+    const existing=document.getElementById('rv-menu-pop'); if(existing){existing.remove();return;}
+    const pop=el(`<div id="rv-menu-pop" class="rv-pop">
+      <button data-act="refresh">Refresh</button>
+      <button data-act="leave" class="danger">Leave competition</button>
+    </div>`);
+    b.parentElement.appendChild(pop);
+    pop.querySelector('[data-act="refresh"]').onclick=()=>{ pop.remove(); rivalsRefresh(); };
+    pop.querySelector('[data-act="leave"]').onclick=async()=>{
+      pop.remove();
+      if(confirm('Leave this competition? Your scores will stop syncing.')){ await compLeave(); rivalsData=null; renderRivals(); }
+    };
+    setTimeout(()=>{ document.addEventListener('click',function h(ev){ if(!pop.contains(ev.target)&&ev.target!==b){pop.remove();document.removeEventListener('click',h);} }); },0);
+  };
+}
+
+/* ---- the scoreboard ---- */
+function rvBar(myVal,theirVal){
+  const a=Math.max(0,myVal), b=Math.max(0,theirVal), tot=a+b;
+  if(tot<=0) return `<div class="rv-split"><div style="flex:1;background:#EFE9DF"></div></div>`;
+  return `<div class="rv-split">
+    <div style="flex:${a||0.001};background:${RV_YOU}"></div>
+    <div style="flex:${b||0.001};background:${RV_THEM_LT}"></div>
+  </div>`;
+}
+function rvBreakRow(label,my,their,suffix,myLead){
+  const you=`<b style="color:${RV_YOU}">${my}${suffix||''}</b>`;
+  const them=`<b style="color:${RV_THEM}">${their}${suffix||''}</b>`;
+  return `<div class="rv-brow">
+    <div class="rv-brow-h"><span>${esc(label)}</span>
+      <span class="rv-brow-v">${myLead?you:my+(suffix||'')} vs ${myLead?their+(suffix||''):them}</span></div>
+    <div class="rv-dual">
+      <div class="rv-dbar" style="flex:${Math.max(my,0.001)};background:${my>=their?RV_YOU:RV_YOU_LT}"></div>
+      <div class="rv-dbar" style="flex:${Math.max(their,0.001)};background:${their>my?RV_THEM:RV_THEM_LT}"></div>
+    </div>
+  </div>`;
+}
+
+function rvRenderBoard(){
+  const d=rivalsData, me=d.me, them=d.them;
+  const meName=me.name||compMyName(), themName=them.name||'Rival';
+  const mode=rivalsMode;
+  const dates=(mode==='week'?compWeekDaysFor(0):comp28Days()).filter(x=>x<=todayKey());
+  const A=rvAgg(me,dates), B=rvAgg(them,dates);
+  const diff=A.points-B.points;
+  const total=A.points+B.points;
+  const meShare=total>0?Math.round(A.points/total*100):50;
+  const daysLeft=mode==='week'?compDaysLeftWeek():compDaysLeftMonth();
+  const leadTxt = diff>0 ? `You're ahead by ${diff}` : diff<0 ? `${esc(themName)} leads by ${-diff}` : `All square`;
+  const leftTxt = daysLeft<=0 ? (mode==='week'?'final day':'last day') : `${daysLeft} day${daysLeft===1?'':'s'} left`;
+
+  // pct for weight-goal row
+  const mePct = me.pct==null?null:Math.round(me.pct);
+  const themPct = them.pct==null?null:Math.round(them.pct);
+
+  // hero
+  const hero=`<div class="rv-hero">
+    <div class="rv-hero-row">
+      <div class="rv-hero-p">
+        ${rvAvatar(rvInitial(meName),RV_YOU,'#F5EFE6','#fff')}
+        <div class="rv-hero-name">You</div>
+        <div class="rv-hero-pts">${A.points.toLocaleString()}</div>
+        <div class="rv-hero-lbl">points</div>
+      </div>
+      <div class="rv-hero-vs">VS</div>
+      <div class="rv-hero-p" style="opacity:.94">
+        ${rvAvatar(rvInitial(themName),RV_THEM,'#FFE1D8','rgba(255,255,255,.5)')}
+        <div class="rv-hero-name">${esc(themName)}</div>
+        <div class="rv-hero-pts" style="color:rgba(255,255,255,.9)">${B.points.toLocaleString()}</div>
+        <div class="rv-hero-lbl">points</div>
+      </div>
+    </div>
+    <div class="rv-hero-split"><div style="width:${meShare}%"></div></div>
+    <div class="rv-hero-foot">${leadTxt} — ${leftTxt}</div>
+  </div>`;
+
+  // breakdown
+  const breakdown=`<div class="rv-card">
+    <div class="rv-card-h">Where the points came from</div>
+    ${rvBreakRow('Logging streak',A.logging,B.logging,'',A.logging>=B.logging)}
+    ${rvBreakRow('Days under calorie goal',Math.round(A.calorie),Math.round(B.calorie),'',A.calorie>=B.calorie)}
+    ${(mePct!=null||themPct!=null)?rvBreakRow('Weight-goal progress',mePct==null?0:mePct,themPct==null?0:themPct,'%',(mePct||0)>=(themPct||0)):''}
+  </div>`;
+
+  // day-by-day (week) or week-by-week (month)
+  let chart='';
+  if(mode==='week'){
+    const wk=compWeekDaysFor(0), tk=todayKey();
+    const labels=['M','T','W','T','F','S','S'];
+    let mx=1; wk.forEach(dk=>{const em=me.byDate[dk],et=them.byDate[dk];mx=Math.max(mx,em?em.points:0,et?et.points:0);});
+    const bars=wk.map((dk,i)=>{
+      const future=dk>tk;
+      const em=me.byDate[dk], et=them.byDate[dk];
+      const mh=em?Math.max(6,em.points/mx*70):(future?10:6);
+      const th=et?Math.max(6,et.points/mx*70):(future?10:6);
+      const op=future?'opacity:.4':'';
+      const mc=future?'#DED6C8':(em?RV_YOU:RV_YOU_LT);
+      const tc=future?'#DED6C8':(et?RV_THEM:RV_THEM_LT);
+      return `<div class="rv-daycol" style="${op}">
+        <div class="rv-daybars"><div style="height:${mh}px;background:${mc}"></div><div style="height:${th}px;background:${tc}"></div></div>
+        <span>${labels[i]}</span></div>`;
+    }).join('');
+    chart=`<div class="rv-card">
+      <div class="rv-card-h rv-legend"><span>Day by day</span>
+        <span class="rv-leg"><i style="background:${RV_YOU}"></i>You <i style="background:${RV_THEM}"></i>${esc(themName)}</span></div>
+      <div class="rv-daywrap">${bars}</div>
+    </div>`;
+  } else {
+    // week by week (4 weeks, oldest→newest) + weeks-won tally
+    const rows=[]; let mx=1; let meWon=0, themWon=0; const tk=todayKey();
+    for(let off=3; off>=0; off--){
+      const wdays=compWeekDaysFor(off).filter(x=>x<=tk);
+      const a=rvAgg(me,wdays).points, b=rvAgg(them,wdays).points;
+      const hasData=(a+b)>0;
+      if(hasData){ if(a>=b)meWon++; else themWon++; }
+      mx=Math.max(mx,a,b);
+      rows.push({label:'W'+(4-off),a,b,current:off===0,hasData});
+    }
+    const bars=rows.map(r=>{
+      const mh=Math.max(6,r.a/mx*70), th=Math.max(6,r.b/mx*70);
+      return `<div class="rv-daycol">
+        <div class="rv-daybars"><div style="height:${mh}px;background:${r.a>=r.b?RV_YOU:RV_YOU_LT}"></div><div style="height:${th}px;background:${r.b>r.a?RV_THEM:RV_THEM_LT}"></div></div>
+        <span>${r.label}</span></div>`;
+    }).join('');
+    const wins=rows.map(r=>{
+      const bg = !r.hasData ? '#EFE9DF' : (r.a>=r.b?RV_YOU:RV_THEM);
+      return `<div class="rv-wincell" style="background:${bg};${r.current?'':''}"><span>${r.label}</span></div>`;
+    }).join('');
+    chart=`<div class="rv-card">
+        <div class="rv-card-h rv-legend"><span>Week by week</span>
+          <span class="rv-leg"><i style="background:${RV_YOU}"></i>You <i style="background:${RV_THEM}"></i>${esc(themName)}</span></div>
+        <div class="rv-daywrap">${bars}</div>
+      </div>
+      <div class="rv-card">
+        <div class="rv-card-h rv-legend"><span>Weeks won</span>
+          <span class="rv-brow-v">You lead <b style="color:${RV_YOU}">${meWon}</b>–${themWon}</span></div>
+        <div class="rv-winrow">${wins}</div>
+      </div>`;
+  }
+
+  const toggle=`<div class="rv-toggle">
+    <button data-m="week" class="${mode==='week'?'on':''}">This week</button>
+    <button data-m="month" class="${mode==='month'?'on':''}">This month</button>
+  </div>`;
+
+  $('main').innerHTML =
+    rvHeader('Rivals', `You & ${themName}`, true) +
+    toggle + hero + breakdown + chart +
+    `<button class="btn btn-block" id="rv-refresh" style="margin-top:4px">Refresh</button>`;
+
+  rvWireMenu();
+  document.querySelectorAll('.rv-toggle button').forEach(bt=>bt.onclick=()=>{ rivalsMode=bt.dataset.m; rvRenderBoard(); });
+  const rf=$('rv-refresh'); if(rf)rf.onclick=rivalsRefresh;
+}
+
+/* ---- toast ---- */
 function toastComp(msg){
   const t=el(`<div style="position:fixed;left:50%;bottom:90px;transform:translateX(-50%);z-index:200;
     background:var(--text);color:#fff;padding:11px 18px;border-radius:999px;font-size:14px;
@@ -3878,6 +4069,10 @@ function toastComp(msg){
   document.body.appendChild(t);
   setTimeout(()=>{t.style.transition='opacity .3s';t.style.opacity='0';setTimeout(()=>t.remove(),300);},1900);
 }
+
+/* shortcut used by the Settings card */
+function openLeaderboard(){ tab='rivals'; _rivalsStale=true; closeAllModals(); }
+
 
 /* ---------- cloud sync (Supabase) ---------- */
 function initCloud(){
@@ -3955,7 +4150,7 @@ async function boot(){
 }
 
 /* ---------- init ---------- */
-document.querySelectorAll('.tabbar .tab').forEach(t=>t.onclick=()=>{tab=t.dataset.tab;if(tab==='today')viewDate=todayKey();closeAllModals();});
+document.querySelectorAll('.tabbar .tab').forEach(t=>t.onclick=()=>{tab=t.dataset.tab;if(tab==='today')viewDate=todayKey();if(tab==='rivals')_rivalsStale=true;closeAllModals();});
 window.addEventListener('resize',layout);
 window.addEventListener('orientationchange',()=>setTimeout(layout,250));
 if(window.visualViewport)window.visualViewport.addEventListener('resize',layout);
