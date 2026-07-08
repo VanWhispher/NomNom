@@ -778,6 +778,24 @@ function applyTheme(id){
   r.setProperty('--accent-strong',t.strong);
   r.setProperty('--accent-bg',t.itemBg);
   r.setProperty('--bg',`linear-gradient(180deg,${t.gradTop},${t.gradBot})`);
+  rvSyncColors(t);
+}
+/* Rivals palette — "You" follows the active theme, "Rival" stays a neutral slate
+   so the two remain distinguishable side-by-side under every theme. */
+function rvHexMix(hex,amt){ // blend a #rrggbb hex toward white by amt (0..1)
+  const n=parseInt(hex.slice(1),16),R=n>>16&255,G=n>>8&255,B=n&255;
+  const m=c=>Math.round(c+(255-c)*amt).toString(16).padStart(2,'0');
+  return '#'+m(R)+m(G)+m(B);
+}
+let RV_YOU='#E37D9A',RV_YOU_LT='#F3C5D2',RV_THEM='#7B8794',RV_THEM_LT='#C7CDD4',RV_YOU_BG='#FBEFF4',RV_THEM_BG='#EEF0F2';
+function rvSyncColors(t){
+  t=t||THEMES[state.settings.theme]||THEMES.pink;
+  RV_YOU=t.strong;
+  RV_YOU_LT=rvHexMix(t.strong,0.55);
+  RV_YOU_BG=t.itemBg;
+  RV_THEM='#7B8794';               // muted slate — reads as "the other person", clashes with no theme
+  RV_THEM_LT=rvHexMix(RV_THEM,0.55);
+  RV_THEM_BG=rvHexMix(RV_THEM,0.86);
 }
 const GEAR_SVG='<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h9M17 7h3"/><path d="M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.4" fill="#fff" stroke="none"/><circle cx="9" cy="17" r="2.4" fill="#fff" stroke="none"/></svg>';
 const CAL_SVG='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="17" rx="3"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/><path d="M7.5 13h2M11 13h2M14.5 13h2M7.5 17h2M11 17h2"/></svg>';
@@ -3660,8 +3678,7 @@ function openSettings(){
    Only DERIVED scores (points + %-progress) ever leave the device.
    ================================================================ */
 
-/* colours (You = blue, Rival = orange), matching the Rivals design */
-const RV_YOU='#4A82D6', RV_YOU_LT='#CADCF5', RV_THEM='#F0705A', RV_THEM_LT='#F9D3CA';
+/* Rivals colours (RV_YOU / RV_THEM / …) are theme-aware — set in rvSyncColors(), called from applyTheme(). */
 
 /* ----- scoring (pure functions of local state) ----- */
 function compCalorieScore(C,T){                 // 0..80
@@ -3901,19 +3918,19 @@ function openRivalsRules(){
       <p class="rv-rules-lead">You each race your <b>own</b> daily calorie target — so different bodies, genders and goals compete fairly. Points come from sticking to your plan, not from the scale.</p>
 
       <div class="rv-rule">
-        <div class="rv-rule-ic" style="background:#EAF1FB;color:${RV_YOU}">✓</div>
+        <div class="rv-rule-ic" style="background:${RV_YOU_BG};color:${RV_YOU}">✓</div>
         <div><div class="rv-rule-t">Log your day — <b>+20</b></div>
         <div class="rv-rule-s">Any food logged that day earns 20 points. Showing up counts.</div></div>
       </div>
 
       <div class="rv-rule">
-        <div class="rv-rule-ic" style="background:#EAF1FB;color:${RV_YOU}">◎</div>
+        <div class="rv-rule-ic" style="background:${RV_YOU_BG};color:${RV_YOU}">◎</div>
         <div><div class="rv-rule-t">Stay within your target — up to <b>+80</b></div>
-        <div class="rv-rule-s">At or under your daily target${T?` (${fmtN?fmtN(T):T} kcal)`:''} earns the full 80. Going a little over earns less; a big overage tapers to 0. Eating under is never penalised.</div></div>
+        <div class="rv-rule-s">At or under your daily target${T?` (${r0(T).toLocaleString()} kcal)`:''} earns the full 80. Going a little over earns less; a big overage tapers to 0. Eating under is never penalised.</div></div>
       </div>
 
       <div class="rv-rule">
-        <div class="rv-rule-ic" style="background:#FDECE8;color:${RV_THEM}">△</div>
+        <div class="rv-rule-ic" style="background:${RV_THEM_BG};color:${RV_THEM}">△</div>
         <div><div class="rv-rule-t">Progress to goal weight</div>
         <div class="rv-rule-s">Shown separately as how close your latest weigh-in is to your goal, measured from your starting weight. It's a parallel race — it doesn't add to your daily points.</div></div>
       </div>
