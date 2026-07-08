@@ -642,18 +642,19 @@
   .rv-sub{font-size:12.5px;color:var(--text-soft);margin-top:4px;}
   .rv-iconbtn{display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;
     background:var(--surface);border:none;color:#5f5a51;box-shadow:0 1px 4px rgba(43,42,38,.08);cursor:pointer;}
-  .rv-pop{position:absolute;right:0;top:52px;z-index:30;background:var(--surface);border-radius:14px;
+  .rv-topbar{position:relative;}
+  .rv-pop{position:absolute;right:16px;top:60px;z-index:30;background:var(--surface);border-radius:14px;
     box-shadow:0 10px 30px rgba(43,42,38,.18);padding:6px;min-width:180px;}
   .rv-pop button{display:block;width:100%;text-align:left;background:none;border:none;padding:11px 14px;
     border-radius:10px;font-size:14px;font-weight:600;color:var(--text);cursor:pointer;}
   .rv-pop button:hover{background:var(--accent-bg);}
   .rv-pop button.danger{color:#E5533A;}
-  .rv-toggle{display:flex;background:#EAE3D8;border-radius:12px;padding:3px;margin:0 0 14px;}
+  .rv-toggle{display:flex;background:#EAE3D8;border-radius:12px;padding:3px;margin:14px 0;}
   .rv-toggle button{flex:1;text-align:center;padding:8px 0;border:none;background:none;border-radius:9px;
     font-family:var(--display);font-weight:600;font-size:13px;color:var(--text-soft);cursor:pointer;}
   .rv-toggle button.on{background:#fff;color:var(--text);font-weight:700;box-shadow:0 1px 3px rgba(43,42,38,.08);}
-  .rv-hero{background:linear-gradient(165deg,#4A9FD4,#2C6E9E);border-radius:26px;padding:20px 18px 18px;
-    box-shadow:0 8px 22px -8px rgba(62,146,204,.5);margin-bottom:14px;}
+  .rv-hero{background:linear-gradient(155deg,#5A92DD,#3A63AE);border-radius:26px;padding:20px 18px 18px;
+    box-shadow:0 8px 22px -8px rgba(74,130,214,.5);margin-bottom:14px;}
   .rv-hero-row{display:flex;align-items:flex-end;justify-content:space-between;}
   .rv-hero-p{text-align:center;width:108px;}
   .rv-av{width:58px;height:58px;margin:0 auto;border-radius:50%;border:3px solid #fff;display:flex;
@@ -702,6 +703,17 @@
   .rv-note{color:var(--text-soft);font-size:13px;line-height:1.5;text-align:center;margin-top:14px;}
   .rv-leave{width:100%;margin-top:16px;padding:14px 0;border:none;border-radius:16px;background:var(--surface);
     box-shadow:0 3px 14px rgba(43,42,38,.05);font-family:var(--display);font-weight:700;color:#E5533A;cursor:pointer;}
+  .rv-brow-s{font-size:12.5px;color:var(--text-soft);line-height:1.45;}
+  .rv-rules{padding:2px 0 4px;}
+  .rv-rules-lead{font-size:14px;color:var(--text);line-height:1.55;margin:0 0 18px;}
+  .rv-rule{display:flex;gap:12px;align-items:flex-start;margin-bottom:16px;}
+  .rv-rule-ic{flex:none;width:34px;height:34px;border-radius:11px;display:flex;align-items:center;
+    justify-content:center;font-size:17px;font-weight:800;}
+  .rv-rule-t{font-family:var(--display);font-weight:700;font-size:14.5px;color:var(--text);}
+  .rv-rule-t b{color:var(--accent-strong);}
+  .rv-rule-s{font-size:12.5px;color:var(--text-soft);line-height:1.5;margin-top:2px;}
+  .rv-rules-foot{background:var(--accent-bg);border-radius:14px;padding:13px 15px;font-size:13px;
+    color:var(--text);line-height:1.5;margin-top:6px;}
   .rv-spin{width:26px;height:26px;border:3px solid var(--accent-bg);border-top-color:var(--accent-strong);
     border-radius:50%;margin:30px auto;animation:rvspin .8s linear infinite;}
   @keyframes rvspin{to{transform:rotate(360deg)}}
@@ -3643,7 +3655,7 @@ function openSettings(){
    ================================================================ */
 
 /* colours (You = blue, Rival = orange), matching the Rivals design */
-const RV_YOU='#3E92CC', RV_YOU_LT='#C3DEF0', RV_THEM='#FF6B4A', RV_THEM_LT='#F3CFC4';
+const RV_YOU='#4A82D6', RV_YOU_LT='#CADCF5', RV_THEM='#F0705A', RV_THEM_LT='#F9D3CA';
 
 /* ----- scoring (pure functions of local state) ----- */
 function compCalorieScore(C,T){                 // 0..80
@@ -3658,9 +3670,18 @@ function compDailyScore(d){                      // 0..100
   if(!T || !compDayLogged(d)) return 0;          // no log = 0 (showing up is the point)
   return 20 + compCalorieScore(compDayCalories(d), T);
 }
+function earliestWeightKg(){
+  if(!state.weights||!state.weights.length)return null;
+  const w=[...state.weights].sort((a,b)=>a.date<b.date?-1:1)[0];
+  return unitToKg(w.weight, w.unit||'kg');
+}
 function compSeasonPct(){
   const c=state.competition; if(!c)return null;
-  const start=c.startWeightKg, goal=state.profile.goalWeight, cur=latestWeightKg();
+  // start weight was snapshotted at join; if it was missing then (no weigh-in yet),
+  // fall back to the earliest weigh-in on record and backfill so it locks in.
+  let start=c.startWeightKg;
+  if(start==null){ start=earliestWeightKg(); if(start!=null){ c.startWeightKg=start; save(); } }
+  const goal=state.profile.goalWeight, cur=latestWeightKg();
   if(start==null||goal==null||cur==null||start===goal)return null;
   const p=(start-cur)/(start-goal)*100;
   if(!isFinite(p))return null;
@@ -3738,11 +3759,13 @@ async function compFetchAll(){
   const [memR,scR,cmpR]=await Promise.all([
     sb.from('competition_members').select('user_id,display_name').eq('competition_id',c.id),
     sb.from('competition_scores').select('user_id,date,daily_points,logged,progress_pct').eq('competition_id',c.id).in('date',days),
-    sb.from('competitions').select('status,invite_code').eq('id',c.id).maybeSingle()
+    sb.from('competitions').select('status,invite_code,started_at').eq('id',c.id).maybeSingle()
   ]);
   if(memR.error)throw memR.error;
   const members=memR.data||[], scores=scR.data||[];
   const status=(cmpR.data&&cmpR.data.status)||'pending';
+  const startedAt=(cmpR.data&&cmpR.data.started_at)||null;
+  if(startedAt && c.startedAt!==startedAt){ c.startedAt=startedAt; save(); }  // lock in the shared start moment
   const mk=(id,name)=>({id,name,byDate:{},pct:null});
   const users={};
   members.forEach(m=>users[m.user_id]=mk(m.user_id,m.display_name||'Player'));
@@ -3753,12 +3776,24 @@ async function compFetchAll(){
   });
   const me=users[user.id]||mk(user.id,c.name);
   const them=Object.values(users).find(u=>u.id!==user.id)||null;
-  return {status,me,them,invite:(cmpR.data&&cmpR.data.invite_code)||c.code};
+  return {status,me,them,startedAt,invite:(cmpR.data&&cmpR.data.invite_code)||c.code};
 }
 async function compLeave(){
   const c=state.competition; if(!c)return;
   try{ await sb.from('competition_members').delete().eq('competition_id',c.id).eq('user_id',user.id); }catch(e){}
   state.competition=null; save();
+}
+
+/* ----- competition start date (the day both parties joined) ----- */
+function isoToLocalDateKey(iso){ try{ return dateKey(new Date(iso)); }catch(e){ return null; } }
+function compStartDate(){
+  const c=state.competition, s=c&&c.startedAt;
+  return s?isoToLocalDateKey(s):null;
+}
+// keep only days on/after the competition start and on/before today
+function compCountDates(dates){
+  const start=compStartDate(), tk=todayKey();
+  return dates.filter(d=> d<=tk && (!start || d>=start));
 }
 
 /* ----- per-user aggregation over a set of dates ----- */
@@ -3803,11 +3838,53 @@ function rivalsRefresh(){ _rivalsStale=true; renderRivals(); }
 
 /* ---- shared bits ---- */
 const RV_PEOPLE='<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/><path d="M16 6.5a3 3 0 0 1 0 6M17 20a5.5 5.5 0 0 0-2.5-4.6"/></svg>';
+const RV_BOOK='<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 1 6.5 18H20v3H6.5A2.5 2.5 0 0 1 4 20.5z"/><path d="M9 7.5h7M9 11h5"/></svg>';
 function rvHeader(title,sub,menu){
-  return `<div class="rv-head">
-    <div><div class="rv-title">${esc(title)}</div>${sub?`<div class="rv-sub">${esc(sub)}</div>`:''}</div>
-    ${menu?`<button class="rv-iconbtn" id="rv-menu">${RV_PEOPLE}</button>`:''}
+  return `<div class="topbar rv-topbar">
+    <div><h1>${esc(title)}</h1>${sub?`<div class="date">${esc(sub)}</div>`:''}</div>
+    <div class="band-actions">
+      <button class="gear" id="rv-rules" aria-label="How points work">${RV_BOOK}</button>
+      ${menu?`<button class="gear" id="rv-menu" aria-label="Options">${RV_PEOPLE}</button>`:''}
+    </div>
   </div>`;
+}
+function rvWireHeader(){
+  const rb=$('rv-rules'); if(rb)rb.onclick=openRivalsRules;
+  rvWireMenu();
+}
+function openRivalsRules(){
+  const T=state.settings.dailyTarget;
+  openModal('How points work',`
+    <div class="rv-rules">
+      <p class="rv-rules-lead">You each race your <b>own</b> daily calorie target — so different bodies, genders and goals compete fairly. Points come from sticking to your plan, not from the scale.</p>
+
+      <div class="rv-rule">
+        <div class="rv-rule-ic" style="background:#EAF1FB;color:${RV_YOU}">✓</div>
+        <div><div class="rv-rule-t">Log your day — <b>+20</b></div>
+        <div class="rv-rule-s">Any food logged that day earns 20 points. Showing up counts.</div></div>
+      </div>
+
+      <div class="rv-rule">
+        <div class="rv-rule-ic" style="background:#EAF1FB;color:${RV_YOU}">◎</div>
+        <div><div class="rv-rule-t">Stay within your target — up to <b>+80</b></div>
+        <div class="rv-rule-s">At or under your daily target${T?` (${fmtN?fmtN(T):T} kcal)`:''} earns the full 80. Going a little over earns less; a big overage tapers to 0. Eating under is never penalised.</div></div>
+      </div>
+
+      <div class="rv-rule">
+        <div class="rv-rule-ic" style="background:#FDECE8;color:${RV_THEM}">△</div>
+        <div><div class="rv-rule-t">Weight-goal progress</div>
+        <div class="rv-rule-s">Tracked separately as % of the way from your starting weight to your goal. It's a parallel race — it doesn't add to your daily points.</div></div>
+      </div>
+
+      <div class="rv-rule">
+        <div class="rv-rule-ic" style="background:#F1EBE1;color:#8A8172">↻</div>
+        <div><div class="rv-rule-t">Weekly reset</div>
+        <div class="rv-rule-s">The head-to-head points race resets every Monday. "This month" totals the last four weeks.</div></div>
+      </div>
+
+      <div class="rv-rules-foot">Best possible day: <b>100 points</b> (20 for logging + 80 for hitting your target).</div>
+    </div>
+  `);
 }
 function rvAvatar(letter,color,bg,ring){
   return `<div class="rv-av" style="background:${bg};color:${color};border-color:${ring||'#fff'}">${esc(letter)}</div>`;
@@ -3834,6 +3911,7 @@ function rvRenderIntro(){
     catch(e){ cr.disabled=false; cr.textContent='Start a competition'; toastComp((e&&e.message)||'Could not create.'); }
   };
   $('rv-joinbtn').onclick=()=>{ rivalsView='join'; renderRivals(); };
+  const rb=$('rv-rules'); if(rb)rb.onclick=openRivalsRules;
 }
 
 /* ---- join form (fixed NOM- prefix, only 4 chars typed) ---- */
@@ -3867,6 +3945,7 @@ function rvRenderJoin(){
   $('rv-do').onclick=go;
   inp.onkeydown=(e)=>{ if(e.key==='Enter')go(); };
   $('rv-back').onclick=()=>{ rivalsView='intro'; renderRivals(); };
+  const rb=$('rv-rules'); if(rb)rb.onclick=openRivalsRules;
 }
 
 /* ---- pending (waiting for the friend to join) ---- */
@@ -3883,7 +3962,7 @@ function rvRenderPending(){
     <button class="btn btn-block" id="rv-check" style="margin-top:10px">I've shared it — check now</button>
     <button class="rv-leave" id="rv-cancel">Cancel competition</button>
   `;
-  rvWireMenu();
+  rvWireHeader();
   $('rv-share').onclick=()=>rvShare(code);
   $('rv-check').onclick=rivalsRefresh;
   $('rv-cancel').onclick=async()=>{ await compLeave(); rivalsData=null; renderRivals(); };
@@ -3893,7 +3972,7 @@ function rvRenderError(msg){
   $('main').innerHTML=rvHeader('Rivals','',true)+`
     <div class="rv-note" style="color:#E5533A;margin-top:26px">${esc(msg)}</div>
     <button class="btn btn-block" id="rv-retry" style="margin-top:14px">Try again</button>`;
-  rvWireMenu();
+  rvWireHeader();
   $('rv-retry').onclick=rivalsRefresh;
 }
 
@@ -3912,7 +3991,8 @@ function rvWireMenu(){
       <button data-act="refresh">Refresh</button>
       <button data-act="leave" class="danger">Leave competition</button>
     </div>`);
-    b.parentElement.appendChild(pop);
+    const anchor=b.closest('.rv-topbar')||b.parentElement;
+    anchor.appendChild(pop);
     pop.querySelector('[data-act="refresh"]').onclick=()=>{ pop.remove(); rivalsRefresh(); };
     pop.querySelector('[data-act="leave"]').onclick=async()=>{
       pop.remove();
@@ -3943,12 +4023,32 @@ function rvBreakRow(label,my,their,suffix,myLead){
     </div>
   </div>`;
 }
+function rvWeightRow(mePct,themPct){
+  if(mePct==null && themPct==null){
+    return `<div class="rv-brow">
+      <div class="rv-brow-h"><span>Weight-goal progress</span></div>
+      <div class="rv-brow-s">Log your weight and set a goal in the Weight tab to track this.</div>
+    </div>`;
+  }
+  const mv=mePct==null?'—':mePct+'%', tv=themPct==null?'—':themPct+'%';
+  const ma=mePct==null?0:mePct, ta=themPct==null?0:themPct;
+  const lead=ma>=ta;
+  const you=`<b style="color:${RV_YOU}">${mv}</b>`, them=`<b style="color:${RV_THEM}">${tv}</b>`;
+  return `<div class="rv-brow">
+    <div class="rv-brow-h"><span>Weight-goal progress</span>
+      <span class="rv-brow-v">${lead?you:mv} vs ${lead?tv:them}</span></div>
+    <div class="rv-dual">
+      <div class="rv-dbar" style="flex:${Math.max(ma,0.001)};background:${ma>=ta?RV_YOU:RV_YOU_LT}"></div>
+      <div class="rv-dbar" style="flex:${Math.max(ta,0.001)};background:${ta>ma?RV_THEM:RV_THEM_LT}"></div>
+    </div>
+  </div>`;
+}
 
 function rvRenderBoard(){
   const d=rivalsData, me=d.me, them=d.them;
   const meName=me.name||compMyName(), themName=them.name||'Rival';
   const mode=rivalsMode;
-  const dates=(mode==='week'?compWeekDaysFor(0):comp28Days()).filter(x=>x<=todayKey());
+  const dates=compCountDates(mode==='week'?compWeekDaysFor(0):comp28Days());
   const A=rvAgg(me,dates), B=rvAgg(them,dates);
   const diff=A.points-B.points;
   const total=A.points+B.points;
@@ -3987,23 +4087,25 @@ function rvRenderBoard(){
     <div class="rv-card-h">Where the points came from</div>
     ${rvBreakRow('Logging streak',A.logging,B.logging,'',A.logging>=B.logging)}
     ${rvBreakRow('Days under calorie goal',Math.round(A.calorie),Math.round(B.calorie),'',A.calorie>=B.calorie)}
-    ${(mePct!=null||themPct!=null)?rvBreakRow('Weight-goal progress',mePct==null?0:mePct,themPct==null?0:themPct,'%',(mePct||0)>=(themPct||0)):''}
+    ${rvWeightRow(mePct,themPct)}
   </div>`;
 
   // day-by-day (week) or week-by-week (month)
   let chart='';
   if(mode==='week'){
-    const wk=compWeekDaysFor(0), tk=todayKey();
+    const wk=compWeekDaysFor(0), tk=todayKey(), startD=compStartDate();
     const labels=['M','T','W','T','F','S','S'];
-    let mx=1; wk.forEach(dk=>{const em=me.byDate[dk],et=them.byDate[dk];mx=Math.max(mx,em?em.points:0,et?et.points:0);});
+    let mx=1; wk.forEach(dk=>{ if(startD&&dk<startD)return; const em=me.byDate[dk],et=them.byDate[dk];mx=Math.max(mx,em?em.points:0,et?et.points:0);});
     const bars=wk.map((dk,i)=>{
       const future=dk>tk;
-      const em=me.byDate[dk], et=them.byDate[dk];
-      const mh=em?Math.max(6,em.points/mx*70):(future?10:6);
-      const th=et?Math.max(6,et.points/mx*70):(future?10:6);
-      const op=future?'opacity:.4':'';
-      const mc=future?'#DED6C8':(em?RV_YOU:RV_YOU_LT);
-      const tc=future?'#DED6C8':(et?RV_THEM:RV_THEM_LT);
+      const preStart=startD && dk<startD;
+      const inactive=future||preStart;
+      const em=preStart?null:me.byDate[dk], et=preStart?null:them.byDate[dk];
+      const mh=em?Math.max(6,em.points/mx*70):(inactive?10:6);
+      const th=et?Math.max(6,et.points/mx*70):(inactive?10:6);
+      const op=inactive?'opacity:.4':'';
+      const mc=inactive?'#DED6C8':(em?RV_YOU:RV_YOU_LT);
+      const tc=inactive?'#DED6C8':(et?RV_THEM:RV_THEM_LT);
       return `<div class="rv-daycol" style="${op}">
         <div class="rv-daybars"><div style="height:${mh}px;background:${mc}"></div><div style="height:${th}px;background:${tc}"></div></div>
         <span>${labels[i]}</span></div>`;
@@ -4017,7 +4119,7 @@ function rvRenderBoard(){
     // week by week (4 weeks, oldest→newest) + weeks-won tally
     const rows=[]; let mx=1; let meWon=0, themWon=0; const tk=todayKey();
     for(let off=3; off>=0; off--){
-      const wdays=compWeekDaysFor(off).filter(x=>x<=tk);
+      const wdays=compCountDates(compWeekDaysFor(off));
       const a=rvAgg(me,wdays).points, b=rvAgg(them,wdays).points;
       const hasData=(a+b)>0;
       if(hasData){ if(a>=b)meWon++; else themWon++; }
@@ -4056,7 +4158,7 @@ function rvRenderBoard(){
     toggle + hero + breakdown + chart +
     `<button class="btn btn-block" id="rv-refresh" style="margin-top:4px">Refresh</button>`;
 
-  rvWireMenu();
+  rvWireHeader();
   document.querySelectorAll('.rv-toggle button').forEach(bt=>bt.onclick=()=>{ rivalsMode=bt.dataset.m; rvRenderBoard(); });
   const rf=$('rv-refresh'); if(rf)rf.onclick=rivalsRefresh;
 }
