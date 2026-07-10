@@ -570,6 +570,27 @@
   .add-card .seg{background:#fff;}
   .add-card .seg button.on{background:var(--accent-bg);box-shadow:none;}
   .add-card-h{font-family:var(--body);font-weight:600;font-size:14px;color:var(--text);margin-bottom:12px;}
+  /* custom "Other" sport lookup */
+  .other-row{display:flex;gap:8px;margin-top:2px;}
+  .other-row input{flex:1;min-width:0;background:#fff;}
+  .btn-mini{flex:none;border:none;border-radius:12px;background:var(--accent-strong);color:#fff;font-family:var(--display);font-weight:700;font-size:14px;padding:0 18px;cursor:pointer;}
+  .btn-mini:disabled{opacity:.55;}
+  .other-met{font-size:12.5px;color:var(--text);font-weight:600;margin-top:11px;}
+  .other-met s{text-decoration:none;color:var(--text-soft);font-weight:400;}
+  .other-err{font-size:12.5px;color:var(--danger);margin-top:11px;font-weight:600;}
+  .other-hint{font-size:12.5px;color:var(--text-soft);margin-top:11px;}
+  /* logging streak (Today) */
+  .streak{background:var(--surface);border-radius:24px;padding:14px 18px;box-shadow:0 3px 14px rgba(43,42,38,.05);margin-top:14px;display:flex;align-items:center;gap:14px;}
+  .streak-flame{width:44px;height:44px;border-radius:13px;background:var(--accent-bg);display:flex;align-items:center;justify-content:center;color:var(--accent-strong);flex:none;}
+  .streak-flame svg{width:24px;height:24px;}
+  .streak-main{flex:1;min-width:0;}
+  .streak-n{font-family:var(--display);font-weight:800;font-size:22px;color:var(--text);line-height:1;}
+  .streak-n b{color:var(--accent-strong);}
+  .streak-sub{font-size:12.5px;color:var(--text-soft);margin-top:4px;}
+  .streak-dots{display:flex;gap:6px;flex:none;}
+  .streak-dots .sd{width:9px;height:9px;border-radius:50%;background:var(--accent-bg);}
+  .streak-dots .sd.on{background:var(--accent-strong);}
+  .streak-dots .sd.today.off{background:transparent;border:1.5px dashed var(--accent);width:6px;height:6px;}
   .dur-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;font-family:var(--body);font-weight:600;font-size:14px;color:var(--text);}
   .dur-v{color:var(--text-soft);font-size:13px;}
   .dur-v b{font-family:var(--display);font-weight:800;font-size:24px;color:var(--text);}
@@ -882,6 +903,22 @@ function latestWeightKg(){
 function todayFood(){return state.entries.filter(e=>e.date===viewDate);}
 function todayEx(){return state.exercise.filter(e=>e.date===viewDate);}
 function sum(arr,f){return arr.reduce((s,x)=>s+(x[f]||0),0);}
+/* consecutive days (ending today, or yesterday if today isn't logged yet) with any food logged */
+function loggingStreak(){
+  const logged=new Set(state.entries.map(e=>e.date));
+  let cur=todayKey();
+  if(!logged.has(cur)) cur=shiftDay(cur,-1);   // today unlogged — streak still stands through yesterday
+  let n=0;
+  while(logged.has(cur)){ n++; cur=shiftDay(cur,-1); }
+  return n;
+}
+/* last 7 calendar days ending today, marked logged/not — for the streak strip */
+function last7Logged(){
+  const logged=new Set(state.entries.map(e=>e.date)), tk=todayKey(), out=[];
+  let d=tk;
+  for(let i=0;i<7;i++){ out.unshift({date:d,logged:logged.has(d),today:d===tk}); d=shiftDay(d,-1); }
+  return out;
+}
 
 /* ---------- MET table ---------- */
 const MET={
@@ -973,6 +1010,7 @@ function render(){
 /* ---------- TODAY ---------- */
 const MEALCOLOR={Breakfast:'#FFB23E',Lunch:'#18A974',Dinner:'#7C6FE0',Snack:'#E0699A'};
 const ACT_SVG='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="4" r="1.6"/><path d="M7 21l3-5 2-3-1-4 4 2 2 3M9 9l4-2"/></svg>';
+const IC_FLAME='<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12.4 2.2c.5 2.9-1.2 4.4-2.6 5.9C8.3 9.7 6.5 11.4 6.5 14.2A5.5 5.5 0 0 0 17.5 14.2c0-2-.8-3.5-1.8-4.7-.5 1-1.4 1.6-2.1 1.4 1-2.6.3-6.4-1.2-8.7Z"/><path d="M12 20.5a3 3 0 0 1-3-3c0-1.6 1.3-2.6 2-3.6.6.9 1.2 1.3 1.7 1.2-.3 1.2 0 1.9.6 2.4.5.5.7 1 .7 1.6a3 3 0 0 1-2 3.4Z" fill="#fff" opacity=".85"/></svg>';
 function renderToday(){
   const food=todayFood(), ex=todayEx();
   const consumed=sum(food,'calories');
@@ -1007,6 +1045,21 @@ function renderToday(){
       </div>
     </div>`;
 
+  // logging streak (only meaningful for the live day)
+  let streakHtml='';
+  if(atToday){
+    const st=loggingStreak(), days=last7Logged(), loggedToday=days[days.length-1].logged;
+    const nline = st>0 ? `<b>${st}</b>-day streak` : `No streak yet`;
+    const sub = st>0
+      ? (loggedToday ? `Logged today — nice, keep it rolling.` : `Log something today to reach ${st+1} days.`)
+      : `Log any food each day to start a streak.`;
+    const dots = days.map(d=>`<span class="sd ${d.logged?'on':'off'}${d.today?' today':''}"></span>`).join('');
+    streakHtml=`<div class="streak">
+      <div class="streak-flame">${IC_FLAME}</div>
+      <div class="streak-main"><div class="streak-n">${nline}</div><div class="streak-sub">${sub}</div></div>
+      <div class="streak-dots">${dots}</div>
+    </div>`;
+  }
   // macros card
   const macro=(g,ref,color,label)=>{
     const pct=Math.max(0,Math.min(100,Math.round((g/ref)*100)));
@@ -1052,7 +1105,7 @@ function renderToday(){
     <div class="card-head"><div class="card-title">Activity</div><div class="card-sub">${r0(burned)} kcal</div></div>
     ${actRows}</div>`;
 
-  $('main').innerHTML=band+macroCard+foodCard+actCard;
+  $('main').innerHTML=band+streakHtml+macroCard+foodCard+actCard;
   $('open-settings').onclick=openSettings;
   $('open-cal').onclick=openCalendar;
   $('cal-open2').onclick=openCalendar;
@@ -2227,7 +2280,9 @@ function openAdd(){
     const wkg=latestWeightKg();
     const acts=[...QUICK,...Object.keys(MET).filter(a=>!QUICK.includes(a))];
     let activity='Running',intensity='moderate',minutes=28;
-    const calc=()=>Math.round(MET[activity][intensity]*(wkg||60)*(minutes/60));
+    let customName='', customMET=null, customBusy=false, customErr='';   // free-typed "Other" sport
+    const metFor=()=> (activity==='Other' && customMET) ? customMET[intensity] : MET[activity][intensity];
+    const calc=()=>Math.round(metFor()*(wkg||60)*(minutes/60));
 
     function chooseActivity(){
       setTabs(false);
@@ -2247,6 +2302,16 @@ function openAdd(){
         <button class="act-pick" id="ex-actbtn"><span class="act-ic">${actMeta(activity).ic}</span>
           <div class="act-main"><div class="an">${esc(activity)}</div><div class="as">${actMeta(activity).cat}</div></div>
           ${IC_CHEV}</button>
+        ${activity==='Other'?`
+        <div class="add-card"><div class="add-card-h">What sport?</div>
+          <div class="other-row">
+            <input type="text" id="ex-sport" placeholder="e.g. rock climbing, pilates" value="${esc(customName)}" ${customBusy?'disabled':''}>
+            <button class="btn-mini" id="ex-lookup" ${customBusy?'disabled':''}>${customBusy?'…':'Estimate'}</button>
+          </div>
+          ${customMET?`<div class="other-met">${esc(customName)} — <b>${customMET.light}</b> <s>light</s> · <b>${customMET.moderate}</b> <s>moderate</s> · <b>${customMET.vigorous}</b> <s>vigorous</s> MET</div>`
+            :customErr?`<div class="other-err">${esc(customErr)}</div>`
+            :`<div class="other-hint">Type your activity, then Estimate to pull calorie burn from AI.</div>`}
+        </div>`:''}
         <div class="add-card"><div class="add-card-h">Intensity</div>
           <div class="seg" id="ex-int">
             <button data-i="light"${intensity==='light'?' class="on"':''}>Light</button>
@@ -2274,11 +2339,28 @@ function openAdd(){
       sl.addEventListener('pointercancel',()=>{dragging=false;});
       place();
       body.querySelector('#ex-actbtn').onclick=chooseActivity;
+      const spEl=body.querySelector('#ex-sport');
+      if(spEl) spEl.oninput=e=>{ customName=e.target.value; customErr=''; };
+      const lkEl=body.querySelector('#ex-lookup');
+      if(lkEl) lkEl.onclick=async ()=>{
+        const nm=((body.querySelector('#ex-sport')||{}).value||'').trim();
+        if(!nm){ customErr='Type a sport first.'; customMET=null; draw(); return; }
+        if(!state.settings.apiKey){ customErr='Add your Gemini API key in Settings to estimate.'; customMET=null; draw(); return; }
+        customName=nm; customErr=''; customMET=null; customBusy=true; draw();
+        try{ customMET=await aiSportMET(nm); }
+        catch(err){ customErr=err.message||'Could not estimate — try again.'; }
+        customBusy=false; draw();
+      };
       body.querySelectorAll('#ex-int button').forEach(b=>b.onclick=()=>{intensity=b.dataset.i;body.querySelectorAll('#ex-int button').forEach(x=>x.classList.toggle('on',x===b));body.querySelector('#ex-kcal').textContent=calc();});
       body.querySelector('#ex-dec').onclick=()=>{minutes=Math.max(MINm,minutes-1);paint();};
       body.querySelector('#ex-inc').onclick=()=>{minutes=Math.min(MAXm,minutes+1);paint();};
       body.querySelector('#ex-save').onclick=()=>{
-        state.exercise.push({id:uid(),date:viewDate,activity,intensity,minutes,met:MET[activity][intensity],caloriesBurned:calc()});
+        const isCustom = activity==='Other' && customMET && customName.trim();
+        const act = isCustom ? customName.trim() : activity;
+        const met = metFor();
+        const entry={id:uid(),date:viewDate,activity:act,intensity,minutes,met,caloriesBurned:calc()};
+        if(isCustom){ entry.custom=true; entry.metMap={...customMET}; }
+        state.exercise.push(entry);
         save();sh.close();
       };
     }
@@ -2554,6 +2636,19 @@ async function aiNutrition(name){
   let text=cand&&cand.content&&cand.content.parts?cand.content.parts.map(p=>p.text).filter(Boolean).join('\n').trim():'';
   text=text.replace(/```json|```/g,'').trim();const s=text.indexOf('{'),e=text.lastIndexOf('}');if(s>=0&&e>=0)text=text.slice(s,e+1);
   try{ return JSON.parse(text); }catch(err){ throw new Error('Could not read the AI response. Please try again.'); }
+}
+/* ---------- AI: MET lookup for a free-typed "Other" sport ---------- */
+async function aiSportMET(sport){
+  const prompt=`Give the metabolic equivalent (MET) values for the physical activity "${sport}" at three effort levels, using standard Compendium of Physical Activities figures. Reference points: slow walking ~2.8, brisk walking ~4.3, jogging ~7, running ~9.8, cycling ~6-10, vigorous swimming ~9.5. Respond with ONLY JSON, no markdown: {"activity":"","light":0,"moderate":0,"vigorous":0}. If it is not a real physical activity, set all three values to 0.`;
+  const out=await geminiJSON([{text:prompt}],512);
+  const cl=v=>{ const n=+v; return isFinite(n)&&n>0?Math.round(n*10)/10:0; };
+  const met={light:cl(out.light),moderate:cl(out.moderate),vigorous:cl(out.vigorous)};
+  if(!met.light && !met.moderate && !met.vigorous) throw new Error('That doesn’t look like an exercise — try another word.');
+  const base=met.moderate||met.vigorous||met.light;   // fill any gaps sensibly
+  if(!met.light)    met.light=Math.max(1,Math.round(base*0.7*10)/10);
+  if(!met.moderate) met.moderate=base;
+  if(!met.vigorous) met.vigorous=Math.round(base*1.3*10)/10;
+  return met;
 }
 /* ---------- RECIPE: AI + costing helpers (cook with what I have) ---------- */
 async function geminiJSON(parts, maxTok){
@@ -3119,7 +3214,12 @@ function editExercise(id){
   const wkg=latestWeightKg();
   const acts=[...QUICK,...Object.keys(MET).filter(a=>!QUICK.includes(a))];
   let activity=e.activity, intensity=e.intensity, minutes=e.minutes;
-  const calc=()=>Math.round(((MET[activity]&&MET[activity][intensity])||0)*(wkg||60)*(minutes/60));
+  const metFor=()=>{
+    if(MET[activity] && MET[activity][intensity]!=null) return MET[activity][intensity];   // standard activity picked
+    if(e.metMap && e.metMap[intensity]!=null) return e.metMap[intensity];                   // free-typed sport
+    return e.met||0;
+  };
+  const calc=()=>Math.round(metFor()*(wkg||60)*(minutes/60));
   const sh=makeSheet(`<div id="ee-root"></div>`);
   const root=sh.sheet.querySelector('#ee-root');
   function chooseActivity(){
@@ -3167,7 +3267,8 @@ function editExercise(id){
     root.querySelector('#ee-inc').onclick=()=>{minutes=Math.min(MAX,minutes+1);paint();};
     root.querySelector('#ee-del').onclick=()=>{state.exercise=state.exercise.filter(x=>x.id!==id);save();sh.close();};
     root.querySelector('#ee-save').onclick=()=>{
-      e.activity=activity;e.intensity=intensity;e.minutes=minutes;e.met=(MET[activity]&&MET[activity][intensity])||e.met;e.caloriesBurned=calc();
+      e.activity=activity;e.intensity=intensity;e.minutes=minutes;e.met=metFor();e.caloriesBurned=calc();
+      if(MET[activity]){ delete e.custom; delete e.metMap; }   // reverted to a standard activity
       save();sh.close();
     };
   }
@@ -3687,11 +3788,13 @@ function compCalorieScore(C,T){                 // 0..80
   return Math.max(0, 80*(1-(C-T)/(0.25*T)));
 }
 function compDayCalories(d){ return sum(state.entries.filter(e=>e.date===d),'calories'); }
+function compDayExercise(d){ return sum(state.exercise.filter(e=>e.date===d),'caloriesBurned'); }
+function compDayNet(d){ return Math.max(0, compDayCalories(d)-compDayExercise(d)); }  // exercise earns back headroom
 function compDayLogged(d){ return state.entries.some(e=>e.date===d); }
 function compDailyScore(d){                      // 0..100
   const T=state.settings.dailyTarget;
   if(!T || !compDayLogged(d)) return 0;          // no log = 0 (showing up is the point)
-  return 20 + compCalorieScore(compDayCalories(d), T);
+  return 20 + compCalorieScore(compDayNet(d), T);  // net = food − exercise vs target
 }
 function earliestWeightKg(){
   if(!state.weights||!state.weights.length)return null;
@@ -3926,7 +4029,7 @@ function openRivalsRules(){
       <div class="rv-rule">
         <div class="rv-rule-ic" style="background:${RV_YOU_BG};color:${RV_YOU}">◎</div>
         <div><div class="rv-rule-t">Stay within your target — up to <b>+80</b></div>
-        <div class="rv-rule-s">At or under your daily target${T?` (${r0(T).toLocaleString()} kcal)`:''} earns the full 80. Going a little over earns less; a big overage tapers to 0. Eating under is never penalised.</div></div>
+        <div class="rv-rule-s">Scored on food minus exercise. If that net is at or under your daily target${T?` (${r0(T).toLocaleString()} kcal)`:''} you earn the full 80 — so a workout buys back headroom. Going a little over earns less; a big overage tapers to 0. Eating under is never penalised.</div></div>
       </div>
 
       <div class="rv-rule">
@@ -3941,7 +4044,7 @@ function openRivalsRules(){
         <div class="rv-rule-s">The head-to-head points race resets every Monday. "This month" totals the last four weeks.</div></div>
       </div>
 
-      <div class="rv-rules-foot">Best possible day: <b>100 points</b> (20 for logging + 80 for hitting your target).</div>
+      <div class="rv-rules-foot">Best possible day: <b>100 points</b> (20 for logging + 80 for keeping food − exercise within your target).</div>
     </div>
   `);
 }
