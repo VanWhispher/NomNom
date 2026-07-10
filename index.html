@@ -579,6 +579,16 @@
   .other-met s{text-decoration:none;color:var(--text-soft);font-weight:400;}
   .other-err{font-size:12.5px;color:var(--danger);margin-top:11px;font-weight:600;}
   .other-hint{font-size:12.5px;color:var(--text-soft);margin-top:11px;}
+  /* portion (S/M/L) picker + quantity stepper */
+  .pchips{display:flex;gap:6px;}
+  .pchip{flex:1;border:none;border-radius:12px;background:var(--accent-bg);color:var(--text-soft);font-family:var(--body);font-weight:700;font-size:13px;padding:8px 0;cursor:pointer;display:flex;flex-direction:column;gap:2px;line-height:1.15;}
+  .pchip span{font-weight:600;font-size:11px;opacity:.8;}
+  .pchip.on{background:var(--accent-strong);color:#fff;}
+  .pchip.on span{opacity:.9;}
+  .qstep{display:flex;align-items:center;gap:10px;}
+  .qstep button{width:40px;height:40px;border:none;border-radius:12px;background:var(--accent-bg);color:var(--accent-strong);font-size:22px;font-weight:700;cursor:pointer;flex:none;}
+  .qstep input{flex:1;text-align:center;min-width:0;}
+  .ai-badge{font-size:11px;font-weight:700;color:var(--accent-strong);background:var(--accent-bg);border-radius:999px;padding:2px 8px;margin-left:6px;}
   /* logging streak (Today) */
   .streak{background:var(--surface);border-radius:24px;padding:14px 18px;box-shadow:0 3px 14px rgba(43,42,38,.05);margin-top:14px;display:flex;align-items:center;gap:14px;}
   .streak-flame{width:44px;height:44px;border-radius:13px;background:var(--accent-bg);display:flex;align-items:center;justify-content:center;color:var(--accent-strong);flex:none;}
@@ -878,6 +888,32 @@ function wireServing(root,per,initGrams){
   recompute();
   return {grams,desc:()=>{const u=unitSel.value,q=+qty.value||0;return (u==='gram')?`${r1(grams())} g`:(u==='ml')?`${r1(grams())} ml`:`${q} ${u} (${r1(grams())} g)`;}};
 }
+/* Portion picker: Small / Medium (avg) / Large chips + a count stepper. p={label,small,medium,large}. */
+function portionPicker(p){
+  const label=esc(p.label||'serving');
+  return `<div class="field"><label>Portion <span class="ai-badge">typical</span></label>
+    <div class="pchips">
+      <button type="button" class="pchip" data-g="${p.small}" data-s="small">Small<span>${p.small} g</span></button>
+      <button type="button" class="pchip on" data-g="${p.medium}" data-s="medium">Medium<span>${p.medium} g</span></button>
+      <button type="button" class="pchip" data-g="${p.large}" data-s="large">Large<span>${p.large} g</span></button>
+    </div></div>
+    <div class="field"><label>How many ${label}?</label>
+      <div class="qstep"><button type="button" id="pp-dec" aria-label="Fewer">−</button><input id="pp-qty" type="number" inputmode="decimal" value="1"><button type="button" id="pp-inc" aria-label="More">+</button></div>
+    </div>
+    <div class="hint" id="pp-total"></div>
+    <button type="button" class="linkbtn" id="pp-manual" style="margin-top:2px">Enter exact grams instead</button>`;
+}
+function wirePortion(root,per,p){
+  let gpc=p.medium, size='medium';
+  const qEl=root.querySelector('#pp-qty'), tot=root.querySelector('#pp-total'), chips=[...root.querySelectorAll('.pchip')];
+  const grams=()=>Math.max(0,(+qEl.value||0))*gpc;
+  const recompute=()=>{const g=grams();tot.textContent=`= ${r0(g)} g · ${r0(per.calories*g/100)} kcal`;};
+  chips.forEach(c=>c.onclick=()=>{chips.forEach(x=>x.classList.toggle('on',x===c));gpc=+c.dataset.g;size=c.dataset.s;recompute();});
+  root.querySelector('#pp-dec').onclick=()=>{qEl.value=Math.max(1,(+qEl.value||1)-1);recompute();};
+  root.querySelector('#pp-inc').onclick=()=>{qEl.value=(+qEl.value||0)+1;recompute();};
+  qEl.oninput=recompute; recompute();
+  return {grams,desc:()=>{const q=+qEl.value||0,lbl=p.label||'serving';return `${q} ${size} ${lbl}${q!==1?'s':''} (${r0(grams())} g)`;}};
+}
 
 /* ---------- helpers ---------- */
 const $=(id)=>document.getElementById(id);
@@ -1011,6 +1047,7 @@ function render(){
 const MEALCOLOR={Breakfast:'#FFB23E',Lunch:'#18A974',Dinner:'#7C6FE0',Snack:'#E0699A'};
 const ACT_SVG='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="4" r="1.6"/><path d="M7 21l3-5 2-3-1-4 4 2 2 3M9 9l4-2"/></svg>';
 const IC_FLAME='<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12.4 2.2c.5 2.9-1.2 4.4-2.6 5.9C8.3 9.7 6.5 11.4 6.5 14.2A5.5 5.5 0 0 0 17.5 14.2c0-2-.8-3.5-1.8-4.7-.5 1-1.4 1.6-2.1 1.4 1-2.6.3-6.4-1.2-8.7Z"/><path d="M12 20.5a3 3 0 0 1-3-3c0-1.6 1.3-2.6 2-3.6.6.9 1.2 1.3 1.7 1.2-.3 1.2 0 1.9.6 2.4.5.5.7 1 .7 1.6a3 3 0 0 1-2 3.4Z" fill="#fff" opacity=".85"/></svg>';
+const IC_SPARK='<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l1.8 4.9L18.7 8.7l-4.9 1.8L12 15.4l-1.8-4.9L5.3 8.7l4.9-1.8L12 2z"/><path d="M18.5 13.5l.9 2.4 2.4.9-2.4.9-.9 2.4-.9-2.4-2.4-.9 2.4-.9.9-2.4z" opacity=".7"/></svg>';
 function renderToday(){
   const food=todayFood(), ex=todayEx();
   const consumed=sum(food,'calories');
@@ -1465,6 +1502,7 @@ function openAdd(){
       <div class="add-search"><span class="as-ic">${IC_SEARCH}</span><input id="af-q" placeholder="Search for a food…" autocomplete="off"></div>
       <div id="af-main"></div>`;
     const qEl=body.querySelector('#af-q'), main=body.querySelector('#af-main');
+    let _searchSeq=0, _offT=null, _aiT=null;   // debounce + staleness guard for online avenues
     const rowHtml=(name,sub,attr,ic)=>`<div class="recent-row" ${attr}><span class="recent-ic">${ic||IC_FORK}</span><div class="recent-main"><div class="rn">${esc(name)}</div><div class="rs">${esc(sub)}</div></div><button class="recent-add" tabindex="-1" aria-label="Add">${IC_PLUS}</button></div>`;
     function showHome(){
       const recents=recentFoods(8);
@@ -1488,6 +1526,8 @@ function openAdd(){
     }
     function showResults(term){
       const low=term.toLowerCase(), isBC=/^\d{8,14}$/.test(term);
+      const seq=++_searchSeq;                       // invalidate any in-flight online lookups
+      clearTimeout(_offT); clearTimeout(_aiT);
       let html='';
       if(isBC) html+=`<div class="add-label">Barcode</div>`+rowHtml('Look up barcode '+term,'Search packaged products','data-bc="1"',IC_BARCODE);
       const libM=state.library.filter(l=>l.name.toLowerCase().includes(low)).slice(0,8);
@@ -1499,41 +1539,84 @@ function openAdd(){
         if(ONDB){ onM=ONDB.filter(a=>a[0].toLowerCase().includes(low)).slice(0,25); if(onM.length) html+=`<div class="add-label">OpenNutrition</div>`+onM.map((f,i)=>rowHtml(f[0],`${r0(f[1])} kcal/100g`,`data-on="${i}"`)).join(''); }
         else html+=`<div class="add-label">OpenNutrition</div><div class="empty" style="border:none" id="af-onload">Loading food database (first time, ~10 MB)…</div>`;
       }
-      if(!isBC && low.length>=2) html+=`<div class="add-label">Packaged &amp; branded</div><button class="btn btn-block" id="af-off" style="margin-top:2px">Search Open Food Facts for “${esc(term)}”</button><div id="af-offbox"></div>`;
-      if(!isBC && low.length>=1) html+=`<div class="add-label">Not what you want?</div><button class="btn btn-block" id="af-ai" style="margin-top:2px">Estimate “${esc(term)}” with AI</button>`;
+      // online avenues fill in here after a short debounce — no buttons
+      if(!isBC && low.length>=2) html+=`<div id="af-offsec"></div>`;
+      if(!isBC && low.length>=1) html+=`<div id="af-aisec"></div>`;
       if(!html) html=`<div class="empty" style="border:none">Type a food name to search or estimate with AI.</div>`;
       main.innerHTML=html;
-      const aiBtn=main.querySelector('#af-ai'); if(aiBtn) aiBtn.onclick=()=>addItemView(st=>{
-        const runAiEst=async()=>{
-          if(!state.settings.apiKey){ st.innerHTML=`<div class="err">Add your Google Gemini API key in Settings to estimate foods with AI.</div><button class="btn btn-block" id="af-aiset" style="margin-top:10px">Open Settings</button>`; const b=st.querySelector('#af-aiset'); if(b)b.onclick=()=>{sh.close();setTimeout(openSettings,200);}; return; }
-          st.innerHTML=`<div class="spinner">Estimating “${esc(term)}” with AI…</div>`;
-          try{ const ai=await aiNutrition(term); if(!ai||!ai.per_100g||!(+ai.per_100g.calories)){ st.innerHTML=`<div class="err">AI couldn’t estimate that. Try a different name, or enter it manually.</div>`; return; } weighAndLog(null,st,ai.name||term,ai.per_100g,'ai',null,()=>sh.close()); }
-          catch(e){ st.innerHTML=`<div class="err">${esc(e.message||'AI lookup failed.')}</div><button class="btn btn-block" id="af-airt" style="margin-top:10px">Try again</button>`; const rb=st.querySelector('#af-airt'); if(rb)rb.onclick=runAiEst; }
-        };
-        runAiEst();
-      });
+
       const bc=main.querySelector('[data-bc]'); if(bc)bc.onclick=()=>addItemView(async st=>{ st.innerHTML=`<div class="spinner">Looking up…</div>`; const r=await barcodeLookup(term); if(!r){st.innerHTML=`<div class="err">No product found for barcode ${esc(term)}.</div>`;return;} logPackaged(null,st,r,()=>sh.close()); });
       main.querySelectorAll('[data-lib]').forEach(n=>n.onclick=()=>{const l=state.library.find(x=>x.id===n.dataset.lib);addItemView(st=>{ if(l.perServing)logServing(null,st,l.name,l.perServing.calories,l.perServing.portion,'library',()=>sh.close()); else weighAndLog(null,st,l.name,l.per_100g,'library',l.lastGrams,()=>sh.close()); });});
       main.querySelectorAll('[data-db]').forEach(n=>n.onclick=()=>{const f=dbM[+n.dataset.db];addItemView(st=>logServing(null,st,f.name,f.calories,f.portion,'local',()=>sh.close()));});
-      main.querySelectorAll('[data-on]').forEach(n=>n.onclick=()=>{const f=onM[+n.dataset.on];addItemView(st=>weighAndLog(null,st,f[0],{calories:f[1],protein_g:f[2],carbs_g:f[3],fat_g:f[4],sugar_g:f[5]},'opennutrition',f[6],()=>sh.close()));});
-      const offBtn=main.querySelector('#af-off');
-      if(offBtn) offBtn.onclick=async()=>{
-        const box=main.querySelector('#af-offbox');
-        offBtn.disabled=true; box.innerHTML=`<div class="empty" style="border:none">Searching Open Food Facts…</div>`;
-        try{
-          const items=await offTextSearch(term);
-          if(!items.length){ box.innerHTML=`<div class="empty" style="border:none">No Open Food Facts matches for “${esc(term)}”.</div>`; offBtn.disabled=false; offBtn.textContent='Search again'; return; }
-          box.innerHTML=items.map((it,i)=>{
-            const sub=it.grams
-              ? `${it.brands?esc(it.brands)+' · ':''}${r0(it.grams)} g · ${r0(it.per.calories*it.grams/100)} kcal · Open Food Facts`
-              : `${it.brands?esc(it.brands)+' · ':''}${r0(it.per.calories)} kcal/100g · Open Food Facts`;
-            return rowHtml(it.name,sub,`data-off="${i}"`);
-          }).join('');
-          box.querySelectorAll('[data-off]').forEach(n=>n.onclick=()=>{const it=items[+n.dataset.off];addItemView(st=>weighAndLog(null,st,it.name,it.per,'packaged',it.grams||null,()=>sh.close()));});
-          offBtn.disabled=false; offBtn.textContent='Search Open Food Facts again';
-        }catch(e){ box.innerHTML=`<div class="err">${esc(e.message||'Open Food Facts search failed.')}</div>`; offBtn.disabled=false; }
-      };
-      if(low.length>=2 && !ONDB) ensureONDB().then(()=>{ if(qEl.value.trim()===term) showResults(term); }).catch(()=>{const ld=main.querySelector('#af-onload'); if(ld)ld.textContent='Offline database unavailable here — use Open Food Facts or AI below, or check it’s deployed next to the app over https.';});
+      main.querySelectorAll('[data-on]').forEach(n=>n.onclick=()=>{const f=onM[+n.dataset.on];addItemView(st=>openWeighPer(st,f[0],{calories:f[1],protein_g:f[2],carbs_g:f[3],fat_g:f[4],sugar_g:f[5]},'opennutrition',(+f[6]>0)?+f[6]:null,()=>sh.close()));});
+
+      if(low.length>=2 && !ONDB) ensureONDB().then(()=>{ if(qEl.value.trim()===term) showResults(term); }).catch(()=>{const ld=main.querySelector('#af-onload'); if(ld)ld.textContent='Offline database unavailable here — Open Food Facts and AI below still work, or check it’s deployed next to the app over https.';});
+
+      // debounced online lookups (Open Food Facts always; AI as a smart fallback)
+      if(!isBC && low.length>=3) _offT=setTimeout(()=>runOff(term,seq),450);
+      if(!isBC && low.length>=2) _aiT=setTimeout(()=>runAI(term,seq),780);
+    }
+
+    async function runOff(term,seq){
+      if(seq!==_searchSeq) return;
+      const sec=main.querySelector('#af-offsec'); if(!sec) return;
+      sec.innerHTML=`<div class="add-label">Packaged &amp; branded</div><div class="empty" style="border:none">Searching Open Food Facts…</div>`;
+      try{
+        const items=await offTextSearch(term);
+        if(seq!==_searchSeq || qEl.value.trim()!==term) return;
+        const box=main.querySelector('#af-offsec'); if(!box) return;
+        if(!items.length){ box.innerHTML=''; return; }        // quietly omit when nothing found
+        box.innerHTML=`<div class="add-label">Packaged &amp; branded</div>`+items.map((it,i)=>{
+          const sub=it.grams
+            ? `${it.brands?esc(it.brands)+' · ':''}${r0(it.grams)} g · ${r0(it.per.calories*it.grams/100)} kcal · Open Food Facts`
+            : `${it.brands?esc(it.brands)+' · ':''}${r0(it.per.calories)} kcal/100g · Open Food Facts`;
+          return rowHtml(it.name,sub,`data-off="${i}"`);
+        }).join('');
+        box.querySelectorAll('[data-off]').forEach(n=>n.onclick=()=>{const it=items[+n.dataset.off];addItemView(st=>weighAndLog(null,st,it.name,it.per,'packaged',it.grams||null,()=>sh.close()));});
+      }catch(e){ const box=main.querySelector('#af-offsec'); if(box&&seq===_searchSeq) box.innerHTML=''; }   // quiet fail
+    }
+
+    function aiEstimate(term){
+      addItemView(st=>{
+        const run=async()=>{
+          if(!state.settings.apiKey){ st.innerHTML=`<div class="err">Add your Google Gemini API key in Settings to estimate foods with AI.</div><button class="btn btn-block" id="af-aiset" style="margin-top:10px">Open Settings</button>`; const b=st.querySelector('#af-aiset'); if(b)b.onclick=()=>{sh.close();setTimeout(openSettings,200);}; return; }
+          st.innerHTML=`<div class="spinner">Estimating “${esc(term)}” with AI…</div>`;
+          try{ const ai=await aiNutrition(term); if(!ai||!ai.per_100g||!(+ai.per_100g.calories)){ st.innerHTML=`<div class="err">AI couldn’t estimate that. Try a different name, or enter it manually.</div>`; return; } weighAndLog(null,st,ai.name||term,ai.per_100g,'ai',null,()=>sh.close(),ai.portion||null); }
+          catch(e){ st.innerHTML=`<div class="err">${esc(e.message||'AI lookup failed.')}</div><button class="btn btn-block" id="af-airt" style="margin-top:10px">Try again</button>`; const rb=st.querySelector('#af-airt'); if(rb)rb.onclick=run; }
+        };
+        run();
+      });
+    }
+
+    async function runAI(term,seq){
+      if(seq!==_searchSeq) return;
+      const sec=main.querySelector('#af-aisec'); if(!sec) return;
+      const low=term.toLowerCase();
+      const localCount=state.library.filter(l=>l.name.toLowerCase().includes(low)).length
+        + (DB||[]).filter(f=>f.name.toLowerCase().includes(low)).length
+        + (ONDB?ONDB.filter(a=>a[0].toLowerCase().includes(low)).length:0);
+      // plenty of results already, or no key -> offer AI as a single one-tap row (don't spend a call)
+      if(localCount>=3 || !state.settings.apiKey){
+        sec.innerHTML=`<div class="add-label">Not what you want?</div>`+rowHtml(`Estimate “${term}” with AI`,'AI nutrition estimate','data-aigo="1"',IC_SPARK);
+        const g=sec.querySelector('[data-aigo]'); if(g)g.onclick=()=>aiEstimate(term);
+        return;
+      }
+      // thin results -> auto-estimate
+      sec.innerHTML=`<div class="add-label">AI estimate</div><div class="empty" style="border:none">Estimating “${esc(term)}” with AI…</div>`;
+      try{
+        const ai=await aiNutrition(term);
+        if(seq!==_searchSeq || qEl.value.trim()!==term) return;
+        const box=main.querySelector('#af-aisec'); if(!box) return;
+        if(!ai||!ai.per_100g||!(+ai.per_100g.calories)){ box.innerHTML=''; return; }
+        box.innerHTML=`<div class="add-label">AI estimate</div>`+rowHtml(ai.name||term,`${r0(ai.per_100g.calories)} kcal/100g · AI estimate`,'data-aihit="1"',IC_SPARK);
+        const row=box.querySelector('[data-aihit]');
+        if(row)row.onclick=()=>addItemView(st=>weighAndLog(null,st,ai.name||term,ai.per_100g,'ai',null,()=>sh.close(),ai.portion||null));
+      }catch(e){
+        if(seq!==_searchSeq) return;
+        const box=main.querySelector('#af-aisec'); if(!box) return;
+        box.innerHTML=`<div class="add-label">AI estimate</div>`+rowHtml('Couldn’t reach AI — tap to retry',esc(term),'data-airetry="1"',IC_SPARK);
+        const rt=box.querySelector('[data-airetry]'); if(rt)rt.onclick=()=>runAI(term,_searchSeq);
+      }
     }
     qEl.oninput=()=>{ const t=qEl.value.trim(); t?showResults(t):showHome(); };
     showHome();
@@ -2627,7 +2710,7 @@ async function analyzePhoto(b64){
 async function aiNutrition(name){
   const model=state.settings.model||'gemini-2.5-flash';
   const url=`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(state.settings.apiKey)}`;
-  const prompt=`Give typical nutrition per 100 grams for this food, assuming the common Singapore version if relevant: "${name}". Respond with ONLY JSON, no markdown: {"name":"","per_100g":{"calories":0,"protein_g":0,"carbs_g":0,"fat_g":0,"sugar_g":0}}. If it is not a food, set calories to 0.`;
+  const prompt=`Give typical nutrition per 100 grams for this food, assuming the common Singapore version if relevant: "${name}", and the typical weight in grams of one small, one medium (average), and one large single serving or piece, with a short unit label like "apple","banana","bowl","plate","slice". Respond with ONLY JSON, no markdown: {"name":"","per_100g":{"calories":0,"protein_g":0,"carbs_g":0,"fat_g":0,"sugar_g":0},"serving":{"label":"","small_g":0,"medium_g":0,"large_g":0}}. If it is not a food, set calories to 0.`;
   const res=await fetch(url,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:genConfig(model)})});
   if(!res.ok){let msg='Gemini API error '+res.status;try{const e=await res.json();if(e.error&&e.error.message)msg=e.error.message;}catch(_){}throw new Error(msg);}
   const data=await res.json();
@@ -2635,7 +2718,40 @@ async function aiNutrition(name){
   if(cand && cand.finishReason==='MAX_TOKENS') throw new Error('The AI response was cut off. Please try again.');
   let text=cand&&cand.content&&cand.content.parts?cand.content.parts.map(p=>p.text).filter(Boolean).join('\n').trim():'';
   text=text.replace(/```json|```/g,'').trim();const s=text.indexOf('{'),e=text.lastIndexOf('}');if(s>=0&&e>=0)text=text.slice(s,e+1);
-  try{ return JSON.parse(text); }catch(err){ throw new Error('Could not read the AI response. Please try again.'); }
+  let out; try{ out=JSON.parse(text); }catch(err){ throw new Error('Could not read the AI response. Please try again.'); }
+  const p=normPortion(out.serving);
+  if(p && out.name) portionCacheSet(out.name, p);   // reuse this weight for future logs of the same food
+  out.portion=p;
+  return out;
+}
+/* Normalise an AI serving object -> {label, small, medium, large} grams (medium = average). */
+function normPortion(o){
+  if(!o) return null;
+  const g=v=>{ const n=Math.round(+v); return isFinite(n)&&n>0?n:0; };
+  let s=g(o.small_g), m=g(o.medium_g), l=g(o.large_g);
+  const base=m||s||l; if(!base) return null;
+  if(!m)m=base; if(!s)s=Math.max(1,Math.round(m*0.7)); if(!l)l=Math.round(m*1.35);
+  s=Math.min(s,m); l=Math.max(l,m);   // keep S ≤ M ≤ L
+  let label=(typeof o.label==='string'&&o.label.trim())?o.label.trim().slice(0,24):'serving';
+  return {label,small:s,medium:m,large:l};
+}
+/* Persisted, capped cache of typical portion weights, keyed by lowercased food name. */
+function portionCacheGet(name){ const k=(name||'').toLowerCase().trim(); return (k&&state.portionCache&&state.portionCache[k])||null; }
+function portionCacheSet(name,val){
+  const k=(name||'').toLowerCase().trim(); if(!k||!val) return;
+  if(!state.portionCache) state.portionCache={};
+  state.portionCache[k]=val;
+  const keys=Object.keys(state.portionCache);
+  if(keys.length>400){ for(const kk of keys.slice(0,keys.length-400)) delete state.portionCache[kk]; }
+  save();
+}
+/* One cached AI call for just a typical portion weight (used for DB foods with no serving weight). */
+async function aiServingWeight(name){
+  const cached=portionCacheGet(name); if(cached) return cached;
+  const prompt=`For the food "${name}" (common Singapore version if relevant), give the typical weight in grams of one small, one medium (average) and one large single serving or piece, plus a short unit label like "apple","banana","bowl","plate","slice". Respond with ONLY JSON, no markdown: {"label":"","small_g":0,"medium_g":0,"large_g":0}.`;
+  const out=await geminiJSON([{text:prompt}],256);
+  const p=normPortion(out); if(!p) throw new Error('No weight estimate available.');
+  portionCacheSet(name,p); return p;
 }
 /* ---------- AI: MET lookup for a free-typed "Other" sport ---------- */
 async function aiSportMET(sport){
@@ -2958,15 +3074,28 @@ function openBarcode(){
 }
 
 /* shared: weigh a known per-100g item and log */
-function weighAndLog(m,stage,name,per,source,defGrams,onDone){
+function weighAndLog(m,stage,name,per,source,defGrams,onDone,portion){
   per={calories:+per.calories||0,protein_g:+per.protein_g||0,carbs_g:+per.carbs_g||0,fat_g:+per.fat_g||0,sugar_g:+per.sugar_g||0};
   stage.innerHTML=`
     <div class="item-edit"><div class="nm">${esc(name)} <span style="color:var(--text-soft);font-weight:400">· ${r0(per.calories)} kcal/100g</span></div></div>
-    ${servingWidget()}
+    <div id="wl-serve"></div>
     ${mealChips(defaultMeal())}
     <div class="toggle-row"><input type="checkbox" id="wl-lib" style="width:auto"><label for="wl-lib" style="margin:0">Save to library</label></div>
     <div class="field"><button class="btn btn-primary btn-block" id="wl-save">Log item</button></div>`;
-  const sv=wireServing(stage,per,defGrams);
+  const serve=stage.querySelector('#wl-serve');
+  let sv;
+  function mount(mode){
+    if(mode==='portion' && portion){
+      serve.innerHTML=portionPicker(portion);
+      sv=wirePortion(serve,per,portion);
+      const mb=serve.querySelector('#pp-manual'); if(mb)mb.onclick=()=>mount('manual');
+    }else{
+      serve.innerHTML=servingWidget()+(portion?`<button type="button" class="linkbtn" id="wl-back2p" style="margin-top:2px">Back to portion sizes</button>`:'');
+      sv=wireServing(serve,per,defGrams);
+      const bp=serve.querySelector('#wl-back2p'); if(bp)bp.onclick=()=>mount('portion');
+    }
+  }
+  mount(portion?'portion':'manual');
   const getMeal=wireMealChips(stage);
   stage.querySelector('#wl-save').onclick=()=>{
     const g=sv.grams();
@@ -2975,6 +3104,19 @@ function weighAndLog(m,stage,name,per,source,defGrams,onDone){
     if(stage.querySelector('#wl-lib').checked)addToLibrary(name,per,g);
     save(); onDone?onDone():closeModal(m);
   };
+}
+/* Decide how to open the weigh screen for a per-100g food:
+   known serving weight -> manual default; else use a cached/AI typical portion (S/M/L chips);
+   no key / lookup fails -> plain manual. Costs at most one cached AI call per unique food. */
+function openWeighPer(stage,name,per,source,defGrams,onDone){
+  if(defGrams){ weighAndLog(null,stage,name,per,source,defGrams,onDone); return; }
+  const cached=portionCacheGet(name);
+  if(cached){ weighAndLog(null,stage,name,per,source,null,onDone,cached); return; }
+  if(!state.settings.apiKey){ weighAndLog(null,stage,name,per,source,null,onDone); return; }
+  stage.innerHTML=`<div class="spinner">Estimating a typical portion…</div>`;
+  aiServingWeight(name)
+    .then(p=>weighAndLog(null,stage,name,per,source,null,onDone,p))
+    .catch(()=>weighAndLog(null,stage,name,per,source,null,onDone));
 }
 
 /* Log a packaged / barcode item, serving-first.
