@@ -800,7 +800,7 @@ function load(){
   catch(e){return structuredClone(DEFAULT);}
 }
 function saveLocal(){localStorage.setItem(KEY,JSON.stringify(state));}
-function save(){saveLocal();scheduleCloudPush();}
+function save(){saveLocal();scheduleCloudPush();scheduleRivalsPush();}
 if(!state.settings.model || /claude/i.test(state.settings.model)) state.settings.model='gemini-2.5-flash';
 if(!state.settings.theme) state.settings.theme='pink';
 const THEMES={
@@ -4548,6 +4548,9 @@ function initCloud(){
 let _pushT=null;
 function scheduleCloudPush(){ if(!CLOUD||!user)return; clearTimeout(_pushT); _pushT=setTimeout(pushCloud,800); }
 async function pushCloud(){ if(!CLOUD||!user)return; try{ await sb.from('profiles').upsert({id:user.id,data:state,updated_at:new Date().toISOString()}); }catch(e){} }
+let _rvPushT=null;
+// keep a rival's scoreboard + diary fresh as you log, instead of only when you open the Rivals tab
+function scheduleRivalsPush(){ if(!CLOUD||!user||!state.competition)return; clearTimeout(_rvPushT); _rvPushT=setTimeout(()=>{ compPushMine().catch(()=>{}); },1000); }
 function hasData(){ return (state.entries&&state.entries.length)||(state.weights&&state.weights.length)||(state.exercise&&state.exercise.length)||(state.library&&state.library.length); }
 async function loadCloudIntoState(){
   let row=null;
