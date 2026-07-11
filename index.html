@@ -754,6 +754,15 @@
   .rv-spin{width:26px;height:26px;border:3px solid var(--accent-bg);border-top-color:var(--accent-strong);
     border-radius:50%;margin:30px auto;animation:rvspin .8s linear infinite;}
   @keyframes rvspin{to{transform:rotate(360deg)}}
+  .rv-daycol.tap{cursor:pointer;border-radius:10px;transition:background .15s;}
+  .rv-daycol.tap:active{background:var(--accent-bg);}
+  .rv-daytip{margin-top:12px;font-size:12px;color:var(--text-soft);text-align:center;}
+  .rv-diary-head{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;margin:0 0 14px;}
+  .rv-diary-date{font-size:13px;color:var(--text-soft);}
+  .rv-diary-tot{font-family:var(--display);font-weight:800;font-size:20px;color:var(--text);}
+  .rv-diary-you{font-size:12px;color:var(--text-soft);text-align:right;line-height:1.4;}
+  .rv-diary-you b{font-family:var(--display);color:var(--text);}
+  .rv-diary-load{min-height:80px;display:flex;align-items:center;justify-content:center;}
 </style>
 </head>
 <body>
@@ -4009,15 +4018,37 @@ async function compJoin(code){
   save();
   return data;
 }
+// compact food entry for sharing with a rival (short keys keep the payload small)
+function rvDiaryEntry(e){
+  return {m:e.meal||'Snack', n:e.name||'', s:e.servingLabel||(r0(e.grams)+' g'),
+    c:r0(e.calories||0), p:r1(e.protein_g||0), cb:r1(e.carbs_g||0), f:r1(e.fat_g||0)};
+}
 async function compPushMine(){
   const c=state.competition; if(!c||!CLOUD||!user)return;
   const days=comp28Days(), tk=todayKey(), pct=compProgressPct(), now=new Date().toISOString();
-  const rows=days.filter(d=>d<=tk).map(d=>({
+  const past=days.filter(d=>d<=tk);
+  const rows=past.map(d=>({
     competition_id:c.id, user_id:user.id, date:d,
     daily_points:Math.round(compDailyScore(d)), logged:compDayLogged(d),
     progress_pct:pct, updated_at:now
   }));
   if(rows.length) await sb.from('competition_scores').upsert(rows,{onConflict:'competition_id,user_id,date'});
+  // share the actual food diary (overwrites each day, so deletions propagate). Degrades quietly if the table isn't set up yet.
+  try{
+    const drows=past.map(d=>({
+      competition_id:c.id, user_id:user.id, date:d,
+      entries:state.entries.filter(e=>e.date===d).map(rvDiaryEntry), updated_at:now
+    }));
+    if(drows.length) await sb.from('competition_diary').upsert(drows,{onConflict:'competition_id,user_id,date'});
+  }catch(e){}
+}
+// lazy: pull one rival-day's diary only when the user opens it
+async function compFetchDiary(userId,date){
+  const c=state.competition; if(!c)return [];
+  const {data,error}=await sb.from('competition_diary').select('entries')
+    .eq('competition_id',c.id).eq('user_id',userId).eq('date',date).maybeSingle();
+  if(error)throw error;
+  return (data&&Array.isArray(data.entries))?data.entries:[];
 }
 async function compFetchAll(){
   const c=state.competition; if(!c)return null;
@@ -4339,6 +4370,41 @@ function rvGoalCard(mePct,themPct,themName){
   </div>`;
 }
 
+function rvFmtDay(dk){
+  try{ return new Date(dk+'T00:00:00').toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long'}); }
+  catch(e){ return dk; }
+}
+/* ---- view a rival's food diary for one day (lazy-loaded) ---- */
+async function rvOpenDiary(userId,name,dk){
+  const m=openModal(`${name}'s day`,`<div class="rv-diary-load"><div class="rv-spin"></div></div>`);
+  const body=m.querySelector('#m-body');
+  let items;
+  try{ items=await compFetchDiary(userId,dk); }
+  catch(e){ body.innerHTML=`<div class="rv-note" style="color:#E5533A">Couldn't load their day. Pull to refresh and try again.</div>`; return; }
+  if(!m.parentNode)return;                                   // closed while loading
+  const total=items.reduce((s,x)=>s+(+x.c||0),0);
+  const myTotal=r0(sum(state.entries.filter(e=>e.date===dk),'calories'));
+  let groups='';
+  MEALS.forEach(mn=>{
+    const its=items.filter(x=>(x.m||'Snack')===mn); if(!its.length)return;
+    const sub=its.reduce((s,x)=>s+(+x.c||0),0);
+    groups+=`<div class="mealgroup">
+      <div class="meal-line"><div class="ml-left"><span class="meal-dot" style="background:${MEALCOLOR[mn]}"></span><span class="meal-name">${mn}</span></div><span class="meal-sub">${r0(sub)} kcal</span></div>
+      <div class="fooditems">${its.map(x=>`
+        <div class="fooditem" style="cursor:default">
+          <span style="min-width:0;display:flex;flex-direction:column;gap:2px"><span class="fi-name">${esc(x.n)}</span><span class="fi-sub">${esc(x.s||'')}</span></span>
+          <span class="fi-right"><span class="fi-cal">${r0(x.c)}</span></span>
+        </div>`).join('')}</div>
+    </div>`;
+  });
+  if(!groups) groups=`<div class="empty" style="margin-top:6px">No food logged this day.</div>`;
+  body.innerHTML=`
+    <div class="rv-diary-head">
+      <div><div class="rv-diary-date">${esc(rvFmtDay(dk))}</div><div class="rv-diary-tot">${total.toLocaleString()} kcal</div></div>
+      <div class="rv-diary-you">Your total<br><b>${myTotal.toLocaleString()} kcal</b></div>
+    </div>${groups}`;
+}
+
 function rvRenderBoard(){
   const d=rivalsData, me=d.me, them=d.them;
   const meName=me.name||compMyName(), themName=them.name||'Rival';
@@ -4403,7 +4469,8 @@ function rvRenderBoard(){
       const op=inactive?'opacity:.4':'';
       const mc=inactive?'#DED6C8':(em?RV_YOU:RV_YOU_LT);
       const tc=inactive?'#DED6C8':(et?RV_THEM:RV_THEM_LT);
-      return `<div class="rv-daycol" style="${op}">
+      const tap=!inactive;
+      return `<div class="rv-daycol${tap?' tap':''}" style="${op}"${tap?` data-rvday="${dk}"`:''}>
         <div class="rv-daybars"><div style="height:${mh}px;background:${mc}"></div><div style="height:${th}px;background:${tc}"></div></div>
         <span>${labels[i]}</span></div>`;
     }).join('');
@@ -4411,6 +4478,7 @@ function rvRenderBoard(){
       <div class="rv-card-h rv-legend"><span>Day by day</span>
         <span class="rv-leg"><i style="background:${RV_YOU}"></i>You <i style="background:${RV_THEM}"></i>${esc(themName)}</span></div>
       <div class="rv-daywrap">${bars}</div>
+      <div class="rv-daytip">Tap a day to see ${esc(themName)}'s food</div>
     </div>`;
   } else {
     // week by week (4 weeks, oldest→newest) + weeks-won tally
@@ -4455,6 +4523,7 @@ function rvRenderBoard(){
     toggle + hero + breakdown + goalCard + chart;
 
   document.querySelectorAll('.rv-toggle button').forEach(bt=>bt.onclick=()=>{ rivalsMode=bt.dataset.m; rvRenderBoard(); });
+  document.querySelectorAll('#main [data-rvday]').forEach(c=>c.onclick=()=>rvOpenDiary(them.id,themName,c.dataset.rvday));
 }
 
 /* ---- toast ---- */
