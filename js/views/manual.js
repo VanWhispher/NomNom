@@ -41,7 +41,8 @@ export function editFood(id){
   const e=state.entries.find(x=>x.id===id);if(!e)return;
   const perServing=(e.unitCal!=null);
   const per100=(!perServing&&e.grams)?{calories:e.calories/e.grams*100,protein_g:(e.protein_g||0)/e.grams*100,carbs_g:(e.carbs_g||0)/e.grams*100,fat_g:(e.fat_g||0)/e.grams*100,sugar_g:(e.sugar_g||0)/e.grams*100}:null;
-  let size=perServing?0:Math.max(5,Math.round(e.grams||100));   // grams per serving
+  const SZ_MIN=5,SZ_MAX=600;
+  let size=perServing?0:Math.max(SZ_MIN,Math.round(e.grams||100));   // grams per serving
   let servings=perServing?(e.unitCal?r1(e.calories/e.unitCal):1):1; if(!servings)servings=1;
   let meal=e.meal||defaultMeal(), saveLib=false;
   const fmtServ=(v)=>{const w=Math.floor(v);if(v-w===0.5)return w?`${w}½`:'½';return String(r1(v));};
@@ -53,7 +54,7 @@ export function editFood(id){
       <div class="efh-cal"><span id="ef-kcal">0</span><small>kcal</small></div>
     </div>
     ${perServing?'':`<div class="add-card">
-      <div class="dur-h"><span>Serving size</span><span class="dur-v"><b id="ef-szv">${size}</b> g</span></div>
+      <div class="dur-h"><span>Serving size</span><span class="dur-v"><input id="ef-szv" class="dur-v-input" type="number" inputmode="decimal" min="${SZ_MIN}" max="${SZ_MAX}" value="${size}"> g</span></div>
       <div class="dur-row"><button class="step" id="ef-szdec">${IC_MINUS}</button>
         <div class="nn-slider" id="ef-slider"><div class="nn-track"></div><div class="nn-fill" id="ef-fill"></div><div class="nn-thumb" id="ef-thumb"></div></div>
         <button class="step" id="ef-szinc">${IC_PLUS}</button></div></div>`}
@@ -72,12 +73,12 @@ export function editFood(id){
     root.querySelector('#ef-kcal').textContent=r0(kcal());
     root.querySelector('#ef-sub').textContent=sub();
     root.querySelector('#ef-svv').textContent=fmtServ(servings);
-    if(!perServing){const z=root.querySelector('#ef-szv');if(z)z.textContent=r0(size);placeSize();}
+    if(!perServing){const z=root.querySelector('#ef-szv');if(z&&document.activeElement!==z)z.value=r0(size);placeSize();}
     root.querySelectorAll('#ef-q button').forEach(b=>b.classList.toggle('on',+b.dataset.q===servings));
   };
   if(!perServing){
-    const MIN=5,MAX=600;
-    const sl=root.querySelector('#ef-slider'),fillEl=root.querySelector('#ef-fill'),thumbEl=root.querySelector('#ef-thumb');
+    const MIN=SZ_MIN,MAX=SZ_MAX;
+    const sl=root.querySelector('#ef-slider'),fillEl=root.querySelector('#ef-fill'),thumbEl=root.querySelector('#ef-thumb'),szEl=root.querySelector('#ef-szv');
     placeSize=()=>{const f=Math.max(0,Math.min(1,(size-MIN)/(MAX-MIN)));fillEl.style.width=(f*100)+'%';thumbEl.style.left='calc('+f+' * (100% - 26px))';};
     const setFromX=(x)=>{const r=sl.getBoundingClientRect();let f=(x-r.left-13)/(r.width-26);f=Math.max(0,Math.min(1,f));size=Math.round((MIN+f*(MAX-MIN))/5)*5;repaint();};
     let drag=false;
@@ -86,6 +87,9 @@ export function editFood(id){
     sl.addEventListener('pointerup',()=>{drag=false;});sl.addEventListener('pointercancel',()=>{drag=false;});
     root.querySelector('#ef-szdec').onclick=()=>{size=Math.max(MIN,size-5);repaint();};
     root.querySelector('#ef-szinc').onclick=()=>{size=Math.min(MAX,size+5);repaint();};
+    szEl.oninput=()=>{const n=parseFloat(szEl.value);if(!isNaN(n))size=n;repaint();};
+    szEl.onblur=()=>{size=Math.max(MIN,Math.min(MAX,Math.round(size)||MIN));repaint();};
+    szEl.onkeydown=(ev)=>{if(ev.key==='Enter'){ev.preventDefault();szEl.blur();}};
   }
   root.querySelector('#ef-svdec').onclick=()=>{servings=Math.max(0.5,r1(servings-0.5));repaint();};
   root.querySelector('#ef-svinc').onclick=()=>{servings=Math.min(20,r1(servings+0.5));repaint();};
@@ -100,9 +104,10 @@ export function editFood(id){
       e.calories=e.unitCal*servings; e.servingLabel=`${fmtServ(servings)} ${e.portion||'serving'}`;
       if(saveLib)addToLibraryServing(e.name,e.unitCal,e.portion||'serving');
     }else{
+      size=Math.max(SZ_MIN,Math.min(SZ_MAX,Math.round(size)||SZ_MIN));
       const g=size*servings;
       e.grams=g; e.calories=per100.calories*g/100; e.protein_g=per100.protein_g*g/100; e.carbs_g=per100.carbs_g*g/100; e.fat_g=per100.fat_g*g/100; e.sugar_g=per100.sugar_g*g/100; e.servingLabel=`${r0(g)} g`;
-      if(saveLib&&g)addToLibrary(e.name,per100,Math.round(size));
+      if(saveLib&&g)addToLibrary(e.name,per100,size);
     }
     save();sh.close();
   };

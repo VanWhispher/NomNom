@@ -21,7 +21,7 @@ export function openCalendar(){
   const lum=(c)=>(0.299*c[0]+0.587*c[1]+0.114*c[2])/255;
   const GLO=[150,226,197],GHI=[16,150,101],RLO=[249,178,180],RHI=[222,54,60];
   const signed=(k)=>{ if(target==null)return r0(metric(k)); const v=metric(k); return (v>0?'+':'')+r0(v); };
-  const dayStatCard=(label,day,color)=>`<div class="cal-stat"><div class="sh"><span class="cal-dot" style="background:${color}"></span>${label}</div><div class="sv" style="color:${color}">${day?signed(day):'—'}</div><div class="sl">${day?shortLabel(day):'No data yet'}</div>${day?`<div class="sl">Food ${r0(consumedOf(day))} · Exercise ${r0(burnedOf(day))}</div>`:''}</div>`;
+  const dayStatCard=(label,day,color)=>`<div class="cal-stat"><div class="stat-hrow"><div class="sh"><span class="cal-dot" style="background:${color}"></span>${label}</div>${day?`<span class="sh-date">${shortLabel(day)}</span>`:''}</div><div class="sv" style="color:${color}">${day?signed(day):'—'}</div>${day?`<div class="stat-mini"><div class="stat-box"><div class="l">Food</div><div class="v">${r0(consumedOf(day))}</div></div><div class="stat-box"><div class="l">Exercise</div><div class="v">${r0(burnedOf(day))}</div></div></div>`:`<div class="sl">No data yet</div>`}</div>`;
   const heat=(k)=>{
     const st=statusOf(k);
     if((st==='under'||st==='over')&&target){

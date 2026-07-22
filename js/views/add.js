@@ -1,6 +1,6 @@
 import {aiSportMET} from '../ai/met-ai.js';
 import {costRecipe, detectIngredients, lookupPer100} from '../ai/recipe.js';
-import {HPB_NAMES, SGDB, _norm} from '../data/hpb.js';
+import {HPB_NAMES, SGDB, _norm, ensureSGDB} from '../data/hpb.js';
 import {DB, MET, QUICK} from '../data/met-table.js';
 import {ONDB, ensureONDB} from '../data/opennutrition.js';
 import {$, el, esc, latestWeightKg, r0, r1, sum, todayEx, todayFood, uid} from '../helpers.js';
@@ -76,7 +76,7 @@ export function openAdd(){
       if(hpbM.length) sections.push(`<div class="add-label">Singapore (HPB)</div>`+hpbM.map((f,i)=>{const g=(+f[6]>0)?+f[6]:null; const sub=g?`${r0(f[1]*g/100)} kcal · ${esc(f[8]||(g+' g'))}`:`${r0(f[1])} kcal/100g`; return rowHtml(f[0],sub,`data-hpb="${i}"`);}).join(''));
       const libM=state.library.filter(l=>l.name.toLowerCase().includes(low)).slice(0,8);
       if(libM.length) sections.push(`<div class="add-label">Saved</div>`+libM.map(l=>{const sub=l.perServing?`${r0(l.perServing.calories)} kcal per ${esc(l.perServing.portion)}`:`${r0(l.per_100g.calories)} kcal/100g`;return rowHtml(l.name,sub,`data-lib="${l.id}"`);}).join(''));
-      const dbM=(DB||[]).filter(f=>f.name.toLowerCase().includes(low) && !HPB_NAMES.has(_norm(f.name))).slice(0,12);
+      const dbM=(DB||[]).filter(f=>f.name.toLowerCase().includes(low) && !(HPB_NAMES&&HPB_NAMES.has(_norm(f.name)))).slice(0,12);
       if(dbM.length) sections.push(`<div class="add-label">Local database</div>`+dbM.map((f,i)=>rowHtml(f.name,`${r0(f.calories)} kcal · ${esc(f.portion)}`,`data-db="${i}"`)).join(''));
       let onM=[];
       if(low.length>=2){
@@ -100,6 +100,7 @@ export function openAdd(){
       main.querySelectorAll('[data-on]').forEach(n=>n.onclick=()=>{const f=onM[+n.dataset.on];addItemView(st=>openWeighPer(st,f[0],{calories:f[1],protein_g:f[2],carbs_g:f[3],fat_g:f[4],sugar_g:f[5]},'opennutrition',(+f[6]>0)?+f[6]:null,()=>sh.close()));});
 
       if(low.length>=2 && !ONDB) ensureONDB().then(()=>{ if(qEl.value.trim()===term) showResults(term); }).catch(()=>{const ld=main.querySelector('#af-onload'); if(ld)ld.textContent='Offline database unavailable here — Open Food Facts and AI below still work, or check it’s deployed next to the app over https.';});
+      if(!SGDB) ensureSGDB().then(()=>{ if(qEl.value.trim()===term) showResults(term); }).catch(()=>{});
 
       // debounced online lookups (Open Food Facts always; AI as a smart fallback)
       if(!isBC && low.length>=3) _offT=setTimeout(()=>runOff(term,seq),450);

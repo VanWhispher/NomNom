@@ -119,7 +119,13 @@ export async function compPushMine(){
     const myTgt=state.settings.dailyTarget||null;                 // so a rival can see how much you were over/under
     const drows=past.map(d=>{
       const items=state.entries.filter(e=>e.date===d).map(rvDiaryEntry);
-      if(myTgt!=null && items.length) items[0].dt=myTgt;           // stash target on the first item; old clients ignore unknown keys
+      const dayEx=r0(compDayExercise(d));                          // derived total only — no workout detail leaves the device
+      if(items.length){
+        if(myTgt!=null) items[0].dt=myTgt;                         // stash target/exercise on the first item; old clients ignore unknown keys
+        if(dayEx) items[0].eb=dayEx;
+      } else if(myTgt!=null || dayEx){
+        items.push({m:'',n:'',s:'',c:0, ...(myTgt!=null?{dt:myTgt}:{}), ...(dayEx?{eb:dayEx}:{})});   // metadata-only sentinel for a no-food day
+      }
       return { competition_id:c.id, user_id:user.id, date:d, entries:items, updated_at:now };
     });
     if(drows.length) await sb.from('competition_diary').upsert(drows,{onConflict:'competition_id,user_id,date'});
@@ -127,13 +133,15 @@ export async function compPushMine(){
 }
 // lazy: pull one rival-day's diary only when the user opens it
 export async function compFetchDiary(userId,date){
-  const c=state.competition; if(!c)return {items:[],target:null};
+  const c=state.competition; if(!c)return {items:[],target:null,exerciseBurned:0};
   const {data,error}=await sb.from('competition_diary').select('entries')
     .eq('competition_id',c.id).eq('user_id',userId).eq('date',date).maybeSingle();
   if(error)throw error;
-  const items=(data&&Array.isArray(data.entries))?data.entries:[];
-  let target=null; for(const x of items){ if(x&&x.dt!=null){ target=+x.dt; break; } }
-  return {items, target};
+  const raw=(data&&Array.isArray(data.entries))?data.entries:[];
+  let target=null, exerciseBurned=0;
+  for(const x of raw){ if(x){ if(x.dt!=null && target==null)target=+x.dt; if(x.eb!=null)exerciseBurned=+x.eb; } }
+  const items=raw.filter(x=>x&&x.n);                               // drop the no-food sentinel from the food list
+  return {items, target, exerciseBurned};
 }
 export async function compFetchAll(){
   const c=state.competition; if(!c)return null;
@@ -470,12 +478,30 @@ export async function rvOpenDiary(userId,name,dk){
   if(!m.parentNode)return;                                   // closed while loading
   const items=res.items||[];
   const theirTarget=res.target;
+  const theirExercise=res.exerciseBurned||0;
   const total=items.reduce((s,x)=>s+(+x.c||0),0);
   const myTotal=r0(sum(state.entries.filter(e=>e.date===dk),'calories'));
   const myTarget=state.settings.dailyTarget||null;
-  // "1,850 over" / "320 under" for a total vs a target
-  const ou=(tot,tgt)=>{ if(tgt==null)return ''; const diff=Math.round(tot-tgt); return diff>0?`<b style="color:#E5747A">${diff.toLocaleString()} over</b>`:`<b style="color:#18A974">${Math.abs(diff).toLocaleString()} under</b>`; };
-  const subLine=(tot,tgt,noneMsg)=> tgt!=null ? `target ${Math.round(tgt).toLocaleString()} · ${ou(tot,tgt)}` : noneMsg;
+  const myExercise=r0(compDayExercise(dk));
+  const dash=(v)=>v==null?'—':Math.round(v).toLocaleString();
+  const diaryCard=(label,tot,tgt,ex)=>{
+    // score = food - exercise - target (net of exercise earned back), same red/under-green coding as before
+    let color='var(--text)', scoreHtml=`${tot.toLocaleString()} <span>kcal</span>`;
+    if(tgt!=null){
+      const diff=Math.round(tot-ex-tgt), over=diff>0;
+      color=over?'#E5747A':'#18A974';
+      scoreHtml=`${Math.abs(diff).toLocaleString()} <span>${over?'over':'under'}</span>`;
+    }
+    return `<div class="rv-dc">
+      <div class="rv-dc-tot" style="color:${color}">${scoreHtml}</div>
+      <div class="rv-dc-name">${esc(label)}</div>
+      <div class="rv-dc-mini">
+        <div class="rv-dc-box"><div class="l">Food</div><div class="v">${tot.toLocaleString()}</div></div>
+        <div class="rv-dc-box"><div class="l">Exercise</div><div class="v">${dash(ex)}</div></div>
+        <div class="rv-dc-box"><div class="l">Target</div><div class="v">${dash(tgt)}</div></div>
+      </div>
+    </div>`;
+  };
   let groups='';
   MEALS.forEach(mn=>{
     const its=items.filter(x=>(x.m||'Snack')===mn); if(!its.length)return;
@@ -492,16 +518,8 @@ export async function rvOpenDiary(userId,name,dk){
   if(!groups) groups=`<div class="empty" style="margin-top:6px">No food logged this day.</div>`;
   body.innerHTML=`
     <div class="rv-diary-head2">
-      <div class="rv-dc">
-        <div class="rv-dc-name">${esc(name)}</div>
-        <div class="rv-dc-tot">${total.toLocaleString()} <span>kcal</span></div>
-        <div class="rv-dc-sub">${subLine(total,theirTarget,'target not shared yet')}</div>
-      </div>
-      <div class="rv-dc">
-        <div class="rv-dc-name">You</div>
-        <div class="rv-dc-tot">${myTotal.toLocaleString()} <span>kcal</span></div>
-        <div class="rv-dc-sub">${subLine(myTotal,myTarget,'no target set')}</div>
-      </div>
+      ${diaryCard(name,total,theirTarget,theirExercise)}
+      ${diaryCard('You',myTotal,myTarget,myExercise)}
     </div>
     <div class="rv-diary-date2">${esc(rvFmtDay(dk))}</div>${groups}`;
 }

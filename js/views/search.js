@@ -1,4 +1,4 @@
-import {HPB_NAMES, SGDB, _norm} from '../data/hpb.js';
+import {HPB_NAMES, SGDB, _norm, ensureSGDB} from '../data/hpb.js';
 import {DB} from '../data/met-table.js';
 import {ONBYEAN, ONDB, ensureONDB} from '../data/opennutrition.js';
 import {el, esc, r0, r1} from '../helpers.js';
@@ -87,7 +87,7 @@ export function openSearch(){
     if(libM.length)html+=`<div class="section-label">Personal library</div>`+libM.map(l=>{
       const sub=l.perServing?`${r0(l.perServing.calories)} kcal per ${esc(l.perServing.portion)}`:`${r0(l.per_100g.calories)} kcal/100g`;
       return `<div class="row tappable" data-lib="${l.id}"><div><div class="name">${esc(l.name)}</div><div class="sub">${sub} · personal library</div></div></div>`;}).join('');
-    dbMatches=term?(DB||[]).filter(f=>f.name.toLowerCase().includes(term) && !HPB_NAMES.has(_norm(f.name))).slice(0,20):[];
+    dbMatches=term?(DB||[]).filter(f=>f.name.toLowerCase().includes(term) && !(HPB_NAMES&&HPB_NAMES.has(_norm(f.name)))).slice(0,20):[];
     if(dbMatches.length)html+=`<div class="section-label">Local database</div>`+dbMatches.map((f,i)=>`<div class="row tappable" data-db="${i}"><div><div class="name">${esc(f.name)}</div><div class="sub">${r0(f.calories)} kcal per ${esc(f.portion)} · local database</div></div></div>`).join('');
     onMatches=[];
     if(term.length>=2){
@@ -110,6 +110,7 @@ export function openSearch(){
       ensureONDB().then(()=>{ if(q.value.trim().toLowerCase()===term) renderLocal(); })
         .catch(()=>{const ld=libBox.querySelector('#on-load'); if(ld)ld.textContent='Couldn\'t load opennutrition.json — it must be uploaded next to the app (it won\'t load in the preview or a local file).';});
     }
+    if(term && !SGDB) ensureSGDB().then(()=>{ if(q.value.trim().toLowerCase()===term) renderLocal(); }).catch(()=>{});
   }
   function offerAI(term){
     const wrap=el(`<div><div class="empty">No match in your library, the local database, or Open Food Facts for "${esc(term)}".</div><div class="field"><button class="btn btn-primary btn-block" id="sf-aigo">Estimate "${esc(term)}" with AI</button></div></div>`);
