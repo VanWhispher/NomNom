@@ -1,5 +1,5 @@
 import {ONDB} from '../data/opennutrition.js';
-import {esc, r0, r1, uid} from '../helpers.js';
+import {esc, r1, rCal, uid} from '../helpers.js';
 import {defaultMeal, mealChips, portionPicker, save, servingWidget, state, viewDate, wireMealChips, wirePortion, wireServing} from '../state.js';
 import {closeModal, openModal} from '../ui/nav.js';
 import {IC_MINUS, IC_PLUS} from './add-shared.js';
@@ -45,7 +45,7 @@ export function openBarcode(){
 export function weighAndLog(m,stage,name,per,source,defGrams,onDone,portion){
   per={calories:+per.calories||0,protein_g:+per.protein_g||0,carbs_g:+per.carbs_g||0,fat_g:+per.fat_g||0,sugar_g:+per.sugar_g||0};
   stage.innerHTML=`
-    <div class="item-edit"><div class="nm">${esc(name)} <span style="color:var(--text-soft);font-weight:400">· ${r0(per.calories)} kcal/100g</span></div></div>
+    <div class="item-edit"><div class="nm">${esc(name)} <span style="color:var(--text-soft);font-weight:400">· ${rCal(per.calories)} kcal/100g</span></div></div>
     <div id="wl-serve"></div>
     ${mealChips(defaultMeal())}
     <div class="toggle-row"><input type="checkbox" id="wl-lib" style="width:auto"><label for="wl-lib" style="margin:0">Save to library</label></div>
@@ -97,7 +97,7 @@ export function logPackaged(m,stage,r,onDone){
   const pkg=(+r.packageGrams>0)?+r.packageGrams:null;
   if(!sg){ return weighAndLog(m,stage,r.name,per,r.source,pkg||undefined,onDone); }   // no serving info -> old behaviour
   const sLabel=r.servingLabel||`${r1(sg)} g`;
-  const kcalFor=g=>r0(per.calories*g/100);
+  const kcalFor=g=>rCal(per.calories*g/100);
   let basis='serving', count=1;                     // count = number of servings
   const bases=[['serving','1 serving']];
   if(pkg) bases.push(['package','Whole package']);
@@ -121,7 +121,7 @@ export function logPackaged(m,stage,r,onDone){
   const curGrams=()=> basis==='serving' ? sg*count : basis==='package' ? pkg : sv.grams();
   const curDesc=()=> basis==='serving' ? `${r1(count)} serving${count===1?'':'s'} (${r1(sg*count)} g)`
                     : basis==='package' ? `whole package (${r1(pkg)} g)` : sv.desc();
-  const recompute=()=>{ const g=curGrams(); total.textContent=`= ${r0(per.calories*g/100)} kcal · ${r1(g)} g`; };
+  const recompute=()=>{ const g=curGrams(); total.textContent=`= ${rCal(per.calories*g/100)} kcal · ${r1(g)} g`; };
   const syncBasis=()=>{ svWrap.style.display=basis==='serving'?'':'none'; customWrap.style.display=basis==='custom'?'':'none'; recompute(); };
   stage.querySelectorAll('#pk-basis .chip').forEach(c=>c.onclick=()=>{ basis=c.dataset.b; stage.querySelectorAll('#pk-basis .chip').forEach(x=>x.classList.toggle('sel',x===c)); syncBasis(); });
   stage.querySelector('#pk-up').onclick=()=>{ count=r1(Math.min(50,count+0.5)); ctEl.textContent=r1(count); recompute(); };

@@ -1,4 +1,4 @@
-import {esc, r0, r1, uid} from '../helpers.js';
+import {esc, r0, r1, rCal, uid} from '../helpers.js';
 import {MEALS, defaultMeal, save, state, viewDate} from '../state.js';
 import {makeSheet} from '../ui/bottom-sheet.js';
 import {closeModal, openModal} from '../ui/nav.js';
@@ -70,7 +70,7 @@ export function editFood(id){
   const root=sh.sheet;
   let placeSize=()=>{};
   const repaint=()=>{
-    root.querySelector('#ef-kcal').textContent=r0(kcal());
+    root.querySelector('#ef-kcal').textContent=rCal(kcal());
     root.querySelector('#ef-sub').textContent=sub();
     root.querySelector('#ef-svv').textContent=fmtServ(servings);
     if(!perServing){const z=root.querySelector('#ef-szv');if(z&&document.activeElement!==z)z.value=r0(size);placeSize();}

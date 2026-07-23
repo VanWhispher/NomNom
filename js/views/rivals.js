@@ -1,5 +1,5 @@
 import {hasData} from '../cloud-sync.js';
-import {$, dateKey, el, esc, latestWeightKg, r0, r1, sum, todayKey, unitToKg} from '../helpers.js';
+import {$, dateKey, el, esc, latestWeightKg, r0, r1, rCal, sum, todayKey, unitToKg} from '../helpers.js';
 import {CLOUD, MEALS, RV_THEM, RV_THEM_BG, RV_THEM_LT, RV_YOU, RV_YOU_BG, RV_YOU_LT, applyTheme, load, rvSyncColors, save, sb, setTab, state, tab, user} from '../state.js';
 import {_navStack, closeAllModals, openModal} from '../ui/nav.js';
 import {MEALCOLOR} from './today.js';
@@ -296,7 +296,7 @@ export function openRivalsRules(){
       <div class="rv-rule">
         <div class="rv-rule-ic" style="background:${RV_YOU_BG};color:${RV_YOU}">◎</div>
         <div><div class="rv-rule-t">Stay within your target — up to <b>+80</b></div>
-        <div class="rv-rule-s">Scored on food minus exercise. If that net is at or under your daily target${T?` (${r0(T).toLocaleString()} kcal)`:''} you earn the full 80 — so a workout buys back headroom. Going a little over earns less; a big overage tapers to 0. Eating under is never penalised.</div></div>
+        <div class="rv-rule-s">Scored on food minus exercise. If that net is at or under your daily target${T?` (${rCal(T,{group:true})} kcal)`:''} you earn the full 80 — so a workout buys back headroom. Going a little over earns less; a big overage tapers to 0. Eating under is never penalised.</div></div>
       </div>
 
       <div class="rv-rule">
@@ -480,23 +480,23 @@ export async function rvOpenDiary(userId,name,dk){
   const theirTarget=res.target;
   const theirExercise=res.exerciseBurned||0;
   const total=items.reduce((s,x)=>s+(+x.c||0),0);
-  const myTotal=r0(sum(state.entries.filter(e=>e.date===dk),'calories'));
+  const myTotal=sum(state.entries.filter(e=>e.date===dk),'calories');
   const myTarget=state.settings.dailyTarget||null;
-  const myExercise=r0(compDayExercise(dk));
-  const dash=(v)=>v==null?'—':Math.round(v).toLocaleString();
+  const myExercise=compDayExercise(dk);
+  const dash=(v)=>v==null?'—':rCal(v,{group:true});
   const diaryCard=(label,tot,tgt,ex)=>{
     // score = food - exercise - target (net of exercise earned back), same red/under-green coding as before
-    let color='var(--text)', scoreHtml=`${tot.toLocaleString()} <span>kcal</span>`;
+    let color='var(--text)', scoreHtml=`${rCal(tot,{group:true})} <span>kcal</span>`;
     if(tgt!=null){
-      const diff=Math.round(tot-ex-tgt), over=diff>0;
+      const diff=tot-ex-tgt, over=diff>0;
       color=over?'#E5747A':'#18A974';
-      scoreHtml=`${Math.abs(diff).toLocaleString()} <span>${over?'over':'under'}</span>`;
+      scoreHtml=`${rCal(Math.abs(diff),{group:true})} <span>${over?'over':'under'}</span>`;
     }
     return `<div class="rv-dc">
       <div class="rv-dc-tot" style="color:${color}">${scoreHtml}</div>
       <div class="rv-dc-name">${esc(label)}</div>
       <div class="rv-dc-mini">
-        <div class="rv-dc-box"><div class="l">Food</div><div class="v">${tot.toLocaleString()}</div></div>
+        <div class="rv-dc-box"><div class="l">Food</div><div class="v">${rCal(tot,{group:true})}</div></div>
         <div class="rv-dc-box"><div class="l">Exercise</div><div class="v">${dash(ex)}</div></div>
         <div class="rv-dc-box"><div class="l">Target</div><div class="v">${dash(tgt)}</div></div>
       </div>
@@ -507,11 +507,11 @@ export async function rvOpenDiary(userId,name,dk){
     const its=items.filter(x=>(x.m||'Snack')===mn); if(!its.length)return;
     const sub=its.reduce((s,x)=>s+(+x.c||0),0);
     groups+=`<div class="mealgroup">
-      <div class="meal-line"><div class="ml-left"><span class="meal-dot" style="background:${MEALCOLOR[mn]}"></span><span class="meal-name">${mn}</span></div><span class="meal-sub">${r0(sub)} kcal</span></div>
+      <div class="meal-line"><div class="ml-left"><span class="meal-dot" style="background:${MEALCOLOR[mn]}"></span><span class="meal-name">${mn}</span></div><span class="meal-sub">${rCal(sub)} kcal</span></div>
       <div class="fooditems">${its.map(x=>`
         <div class="fooditem" style="cursor:default">
           <span style="min-width:0;display:flex;flex-direction:column;gap:2px"><span class="fi-name">${esc(x.n)}</span><span class="fi-sub">${esc(x.s||'')}</span></span>
-          <span class="fi-right"><span class="fi-cal">${r0(x.c)}</span></span>
+          <span class="fi-right"><span class="fi-cal">${rCal(x.c)}</span></span>
         </div>`).join('')}</div>
     </div>`;
   });

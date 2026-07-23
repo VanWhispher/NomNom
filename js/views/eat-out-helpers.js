@@ -1,5 +1,5 @@
 import {geminiJSON} from '../ai/recipe.js';
-import {esc, r0, uid} from '../helpers.js';
+import {esc, rCal, uid} from '../helpers.js';
 import {defaultMeal, mealChips, save, state, user, viewDate, wireMealChips} from '../state.js';
 import {closeModal} from '../ui/nav.js';
 import {IC_REFRESH, IC_TRASH} from './add-shared.js';
@@ -110,7 +110,7 @@ export function showConfirm(m,stage,result,onDone,presetMeal){
     estName:it.name||'Item'   // name the current nutrition was estimated for
   }));
   function rowHtml(it,i){
-    const cal=r0(it.per.calories*it.grams/100);
+    const cal=rCal(it.per.calories*it.grams/100);
     const dirty=it.name.trim() && it.name.trim()!==it.estName;
     const lowTag=it.conf==='low'?`<span class="conf-tag">Low confidence</span>`:'';
     return `<div class="item-edit" data-row="${i}">
@@ -119,7 +119,7 @@ export function showConfirm(m,stage,result,onDone,presetMeal){
         <button class="ie-del" data-del="${i}" aria-label="Remove item">${IC_TRASH}</button>
       </div>
       <div class="ie-meta">
-        <span class="ie-per">${r0(it.per.calories)} kcal/100g</span>
+        <span class="ie-per">${rCal(it.per.calories)} kcal/100g</span>
         ${lowTag}
         <button class="ie-reest" data-reest="${i}" style="${dirty?'':'display:none'}">${IC_REFRESH}Re-estimate</button>
       </div>
@@ -144,7 +144,7 @@ export function showConfirm(m,stage,result,onDone,presetMeal){
     // weight -> recompute calories live
     stage.querySelectorAll('[data-g]').forEach(inp=>inp.oninput=()=>{
       const i=+inp.dataset.g; items[i].grams=+inp.value||0;
-      stage.querySelector(`[data-c="${i}"]`).value=r0(items[i].per.calories*items[i].grams/100);
+      stage.querySelector(`[data-c="${i}"]`).value=rCal(items[i].per.calories*items[i].grams/100);
     });
     // name edits -> update model + toggle this row's Re-estimate button (no repaint, keeps focus)
     stage.querySelectorAll('[data-n]').forEach(inp=>inp.oninput=()=>{
@@ -204,7 +204,7 @@ export function addToLibraryServing(name,calories,portion){
 /* log a per-serving item (local database / per-serving library) */
 export function logServing(m,stage,name,calories,portion,source,onDone){
   stage.innerHTML=`
-    <div class="item-edit"><div class="nm">${esc(name)} <span style="color:var(--text-soft);font-weight:400">· ${r0(calories)} kcal per ${esc(portion)}</span></div></div>
+    <div class="item-edit"><div class="nm">${esc(name)} <span style="color:var(--text-soft);font-weight:400">· ${rCal(calories)} kcal per ${esc(portion)}</span></div></div>
     <div class="field"><label>Quantity (number of ${esc(portion)})</label><input type="number" inputmode="decimal" id="ls-q" value="1"></div>
     <div class="hint" id="ls-total"></div>
     ${mealChips(defaultMeal())}
@@ -212,7 +212,7 @@ export function logServing(m,stage,name,calories,portion,source,onDone){
     <div class="field"><button class="btn btn-primary btn-block" id="ls-save">Log item</button></div>`;
   const getMeal=wireMealChips(stage);
   const qi=stage.querySelector('#ls-q');
-  const rc=()=>stage.querySelector('#ls-total').textContent=`= ${r0((+qi.value||0)*calories)} kcal`;
+  const rc=()=>stage.querySelector('#ls-total').textContent=`= ${rCal((+qi.value||0)*calories)} kcal`;
   qi.oninput=rc; rc();
   stage.querySelector('#ls-save').onclick=()=>{
     const qty=+qi.value||0;

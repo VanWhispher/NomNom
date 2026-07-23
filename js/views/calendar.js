@@ -1,5 +1,5 @@
 import {hasData} from '../cloud-sync.js';
-import {$, dateKey, el, esc, r0, sum, todayKey} from '../helpers.js';
+import {$, dateKey, el, esc, rCal, sum, todayKey} from '../helpers.js';
 import {MEALS, dayLabel, defaultMeal, setTab, setViewDate, shiftDay, state, tab, viewDate} from '../state.js';
 import {navClose, navOpen} from '../ui/nav.js';
 import {render} from '../ui/router.js';
@@ -20,8 +20,8 @@ export function openCalendar(){
   const lerp=(a,b,t)=>[Math.round(a[0]+(b[0]-a[0])*t),Math.round(a[1]+(b[1]-a[1])*t),Math.round(a[2]+(b[2]-a[2])*t)];
   const lum=(c)=>(0.299*c[0]+0.587*c[1]+0.114*c[2])/255;
   const GLO=[150,226,197],GHI=[16,150,101],RLO=[249,178,180],RHI=[222,54,60];
-  const signed=(k)=>{ if(target==null)return r0(metric(k)); const v=metric(k); return (v>0?'+':'')+r0(v); };
-  const dayStatCard=(label,day,color)=>`<div class="cal-stat"><div class="stat-hrow"><div class="sh"><span class="cal-dot" style="background:${color}"></span>${label}</div>${day?`<span class="sh-date">${shortLabel(day)}</span>`:''}</div><div class="sv" style="color:${color}">${day?signed(day):'—'}</div>${day?`<div class="stat-mini"><div class="stat-box"><div class="l">Food</div><div class="v">${r0(consumedOf(day))}</div></div><div class="stat-box"><div class="l">Exercise</div><div class="v">${r0(burnedOf(day))}</div></div></div>`:`<div class="sl">No data yet</div>`}</div>`;
+  const signed=(k)=>{ if(target==null)return rCal(metric(k)); const v=metric(k); return (v>0?'+':'')+rCal(v); };
+  const dayStatCard=(label,day,color)=>`<div class="cal-stat"><div class="stat-hrow"><div class="sh"><span class="cal-dot" style="background:${color}"></span>${label}</div>${day?`<span class="sh-date">${shortLabel(day)}</span>`:''}</div><div class="sv" style="color:${color}">${day?signed(day):'—'}</div>${day?`<div class="stat-mini"><div class="stat-box"><div class="l">Food</div><div class="v">${rCal(consumedOf(day))}</div></div><div class="stat-box"><div class="l">Exercise</div><div class="v">${rCal(burnedOf(day))}</div></div></div>`:`<div class="sl">No data yet</div>`}</div>`;
   const heat=(k)=>{
     const st=statusOf(k);
     if((st==='under'||st==='over')&&target){
@@ -102,7 +102,7 @@ export function openCalendar(){
     ov.querySelectorAll('#cal-seg button').forEach(b=>b.classList.toggle('on',b.dataset.m===mode));
     const pk=periodKeys().filter(hasData), daysLogged=pk.length;
     const avg=daysLogged?Math.round(pk.reduce((s,k)=>s+metric(k),0)/daysLogged):0;
-    ov.querySelector('#cal-net').textContent=daysLogged?r0(avg):'—';
+    ov.querySelector('#cal-net').textContent=daysLogged?rCal(avg):'—';
     const pill=ov.querySelector('#cal-pill');
     if(daysLogged&&target){
       const under=avg>=0;
@@ -189,24 +189,24 @@ export function openDayDetail(key){
     const exs=state.exercise.filter(e=>e.date===cur);
     const consumed=sum(food,'calories'), burned=sum(exs,'caloriesBurned');
     ov.querySelector('#dd-date').textContent=dayLabel(cur);
-    if(target!=null){ const v=target-consumed+burned; ov.querySelector('#dd-net').textContent=r0(Math.abs(v)); ov.querySelector('#dd-word').textContent=v>=0?'calories left':'over target'; }
-    else { ov.querySelector('#dd-net').textContent=r0(consumed-burned); ov.querySelector('#dd-word').textContent='net intake'; }
-    ov.querySelector('#dd-food').textContent=r0(consumed);
-    ov.querySelector('#dd-burn').textContent=r0(burned);
-    ov.querySelector('#dd-tgt').textContent=target!=null?r0(target):'—';
+    if(target!=null){ const v=target-consumed+burned; ov.querySelector('#dd-net').textContent=rCal(Math.abs(v)); ov.querySelector('#dd-word').textContent=v>=0?'calories left':'over target'; }
+    else { ov.querySelector('#dd-net').textContent=rCal(consumed-burned); ov.querySelector('#dd-word').textContent='net intake'; }
+    ov.querySelector('#dd-food').textContent=rCal(consumed);
+    ov.querySelector('#dd-burn').textContent=rCal(burned);
+    ov.querySelector('#dd-tgt').textContent=target!=null?rCal(target):'—';
     let foodHtml='';
     MEALS.forEach(mn=>{
       const items=food.filter(e=>(e.meal||defaultMeal())===mn);
       if(!items.length)return;
-      foodHtml+=`<div class="dd-meal"><div class="dd-meal-h"><div class="nm"><span class="dot" style="background:${MC[mn]||'#999'}"></span>${mn}</div><div class="sub">${r0(sum(items,'calories'))} kcal</div></div>${items.map(it=>`<div class="dd-item"><span class="nm">${esc(it.name)}</span><span class="kc">${r0(it.calories)}</span></div>`).join('')}</div>`;
+      foodHtml+=`<div class="dd-meal"><div class="dd-meal-h"><div class="nm"><span class="dot" style="background:${MC[mn]||'#999'}"></span>${mn}</div><div class="sub">${rCal(sum(items,'calories'))} kcal</div></div>${items.map(it=>`<div class="dd-item"><span class="nm">${esc(it.name)}</span><span class="kc">${rCal(it.calories)}</span></div>`).join('')}</div>`;
     });
     if(!foodHtml)foodHtml=`<div class="dd-rest" style="padding-top:10px"><div class="ic">${IC_FORK}</div>No food logged</div>`;
     const exHtml = exs.length
-      ? exs.map(e=>`<div class="dd-ex"><div class="ic">${actMeta(e.activity).ic}</div><div class="mn"><div class="n">${esc(e.activity)}</div><div class="s">${e.minutes} min · ${e.intensity}</div></div><div class="kc">${r0(e.caloriesBurned)}</div></div>`).join('')
+      ? exs.map(e=>`<div class="dd-ex"><div class="ic">${actMeta(e.activity).ic}</div><div class="mn"><div class="n">${esc(e.activity)}</div><div class="s">${e.minutes} min · ${e.intensity}</div></div><div class="kc">${rCal(e.caloriesBurned)}</div></div>`).join('')
       : `<div class="dd-rest"><div class="ic">${REST}</div>Rest day — no activity logged</div>`;
     ov.querySelector('#dd-body').innerHTML=`
-      <div class="dd-card"><div class="dd-card-h"><div class="t">Food</div><div class="s">${r0(consumed)} kcal</div></div>${foodHtml}</div>
-      <div class="dd-card"><div class="dd-card-h"><div class="t">Activity</div><div class="s">${r0(burned)} kcal</div></div><div style="margin-top:12px">${exHtml}</div></div>`;
+      <div class="dd-card"><div class="dd-card-h"><div class="t">Food</div><div class="s">${rCal(consumed)} kcal</div></div>${foodHtml}</div>
+      <div class="dd-card"><div class="dd-card-h"><div class="t">Activity</div><div class="s">${rCal(burned)} kcal</div></div><div style="margin-top:12px">${exHtml}</div></div>`;
   }
   paint();
 }

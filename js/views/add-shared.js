@@ -1,4 +1,4 @@
-import {r0, uid} from '../helpers.js';
+import {r0, rCal, uid} from '../helpers.js';
 import {defaultMeal, save, state, viewDate} from '../state.js';
 
 /* ---------- Add sheet icons ---------- */
@@ -30,7 +30,7 @@ export const IC_FOLDER='<svg viewBox="0 0 24 24" fill="none" stroke="currentColo
 export const IC_FOLDERADD='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 012-2h4l2 2.5h8a2 2 0 012 2V18a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M12 11.5v4M10 13.5h4"/></svg>';
 export function mealItemKcal(it){ return it.kind==='serving' ? (it.unitCal||0)*(it.servings||0) : (it.per?.calories||0)*(it.grams||0)/100; }
 export function mealTotal(meal){ return (meal.items||[]).reduce((s,it)=>s+mealItemKcal(it),0); }
-export function mealSummary(meal){ const n=(meal.items||[]).length; return `${n} item${n===1?'':'s'} · ${r0(mealTotal(meal))} kcal`; }
+export function mealSummary(meal){ const n=(meal.items||[]).length; return `${n} item${n===1?'':'s'} · ${rCal(mealTotal(meal))} kcal`; }
 export function libToMealItem(l){
   if(l.perServing) return {id:uid(),name:l.name,kind:'serving',servings:1,unitCal:l.perServing.calories,portion:l.perServing.portion};
   return {id:uid(),name:l.name,kind:'weight',grams:l.lastGrams||100,per:{calories:l.per_100g.calories||0,protein_g:l.per_100g.protein_g||0,carbs_g:l.per_100g.carbs_g||0,fat_g:l.per_100g.fat_g||0,sugar_g:l.per_100g.sugar_g||0}};
@@ -65,7 +65,7 @@ export function recentFoods(n){
   for(let i=state.entries.length-1;i>=0 && out.length<n;i--){
     const e=state.entries[i]; const key=(e.name||'').toLowerCase();
     if(!e.name||seen.has(key))continue; seen.add(key);
-    const sub=`${e.servingLabel||(e.grams?r0(e.grams)+' g':'')} · ${r0(e.calories)} kcal`;
+    const sub=`${e.servingLabel||(e.grams?r0(e.grams)+' g':'')} · ${rCal(e.calories)} kcal`;
     out.push({name:e.name,sub,entry:e});
   }
   return out;

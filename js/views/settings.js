@@ -17,6 +17,7 @@ export function openSettings(){
   const IC_SPARK=I('<path d="M12 3l1.8 4.2L18 9l-4.2 1.8L12 15l-1.8-4.2L6 9l4.2-1.8z"/><path d="M18 14l.9 2.1L21 17l-2.1.9L18 20l-.9-2.1L15 17l2.1-.9z"/>');
   const IC_DB=I('<ellipse cx="12" cy="5.5" rx="7" ry="2.5"/><path d="M5 5.5v6c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5v-6M5 11.5v6c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5v-6"/>');
   const IC_EXPORT=I('<path d="M12 4v11M8 11l4 4 4-4"/><path d="M5 18v1a2 2 0 002 2h10a2 2 0 002-2v-1"/>');
+  const IC_FLAME=I('<path d="M12 3c1.2 3-1.6 4.6-3 6.6A5 5 0 0012 17a5 5 0 003.2-8.9C13.6 6.9 12.4 5.2 12 3z"/>');
   const IC_CHEVR='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>';
   const IC_CHEVD='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
   const IC_CHECK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M20 6L9 17l-5-5"/></svg>';
@@ -34,7 +35,7 @@ export function openSettings(){
 
   const overlay=el(`<div class="sheet-overlay"><div class="sheet set-sheet" id="sheet">
     <div class="sheet-handle" id="sheet-handle"><div class="sheet-grip"></div></div>
-    <h2>Settings</h2>
+    <h2>Account</h2>
 
     ${(CLOUD&&user)?`<div class="set-card set-prof" style="margin-top:10px">
       <div class="set-av">${esc(initials)}</div>
@@ -66,6 +67,15 @@ export function openSettings(){
         <div class="seg" id="seg-h">
           <button class="seg-btn${s.heightUnit==='cm'?' active':''}" data-h="cm">cm</button>
           <button class="seg-btn${s.heightUnit==='in'?' active':''}" data-h="in">in</button>
+        </div>
+      </div>
+      <div class="set-row">
+        <div class="set-ico">${IC_FLAME}</div>
+        <div class="grow"><div class="set-rt">Calorie decimals</div></div>
+        <div class="seg" id="seg-cd">
+          <button class="seg-btn${(s.calorieDecimals||0)===0?' active':''}" data-cd="0">0</button>
+          <button class="seg-btn${s.calorieDecimals===1?' active':''}" data-cd="1">1</button>
+          <button class="seg-btn${s.calorieDecimals===2?' active':''}" data-cd="2">2</button>
         </div>
       </div>
     </div>
@@ -156,6 +166,8 @@ export function openSettings(){
     overlay.querySelectorAll('#seg-w .seg-btn').forEach(x=>x.classList.toggle('active',x===b)); });
   overlay.querySelectorAll('#seg-h .seg-btn').forEach(b=>b.onclick=()=>{ s.heightUnit=b.dataset.h; save();
     overlay.querySelectorAll('#seg-h .seg-btn').forEach(x=>x.classList.toggle('active',x===b)); });
+  overlay.querySelectorAll('#seg-cd .seg-btn').forEach(b=>b.onclick=()=>{ s.calorieDecimals=+b.dataset.cd; save();
+    overlay.querySelectorAll('#seg-cd .seg-btn').forEach(x=>x.classList.toggle('active',x===b)); });
 
   // ---- theme (apply live on tap) ----
   overlay.querySelectorAll('#set-themes .set-sw').forEach(b=>b.onclick=()=>{

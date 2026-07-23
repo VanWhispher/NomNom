@@ -1,7 +1,6 @@
 import {$, cmToUnit, kgToUnit, latestWeightKg, r0, r1, unitToCm, unitToKg} from '../helpers.js';
-import {GEAR_SVG, MEALS, mealsEnabledMap, save, state} from '../state.js';
+import {MEALS, mealsEnabledMap, save, state} from '../state.js';
 import {IC_MINUS, IC_PLUS} from './add-shared.js';
-import {openSettings} from './settings.js';
 
 /* ---------- PLAN ---------- */
 export function renderPlan(){
@@ -20,7 +19,7 @@ export function renderPlan(){
   const MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
   $('main').innerHTML=`
-    <div class="topbar"><div><h1>Plan</h1><div class="date">Set your targets</div></div><button class="gear" id="open-settings-p">${GEAR_SVG}</button></div>
+    <div class="topbar"><div><h1>Plan</h1><div class="date">Set your targets</div></div></div>
 
     <div class="scard" style="margin-top:14px">
       <div class="scard-h">About you</div>
@@ -74,7 +73,6 @@ export function renderPlan(){
     <button class="cta" id="p-set">Set as daily target</button>
     <div id="p-saved"></div>
   `;
-  $('open-settings-p').onclick=openSettings;
 
   function paint(){
     $('p-agev').textContent=ageNow();

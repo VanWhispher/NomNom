@@ -1,10 +1,9 @@
-import {$, esc, last7Logged, loggingStreak, r0, sum, todayEx, todayFood, todayKey} from '../helpers.js';
-import {CAL_SVG, GEAR_SVG, LOGO_SVG, MEALS, dayLabel, setViewDate, shiftDay, state, viewDate} from '../state.js';
+import {$, esc, last7Logged, loggingStreak, r0, rCal, sum, todayEx, todayFood, todayKey} from '../helpers.js';
+import {CAL_SVG, LOGO_SVG, MEALS, dayLabel, setViewDate, shiftDay, state, viewDate} from '../state.js';
 import {render} from '../ui/router.js';
 import {actMeta} from './add-shared.js';
 import {openCalendar} from './calendar.js';
 import {editFood} from './manual.js';
-import {openSettings} from './settings.js';
 import {editExercise} from './weight.js';
 
 /* ---------- TODAY ---------- */
@@ -19,7 +18,7 @@ export function renderToday(){
   const target=state.settings.dailyTarget;
   const atToday = viewDate===todayKey();
   const subdate=new Date(viewDate+'T00:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
-  const heroNum = target ? r0(target-consumed+burned) : r0(consumed);
+  const heroNum = target ? rCal(target-consumed+burned) : rCal(consumed);
   const heroLabel = target ? 'calories remaining' : 'calories eaten';
   let progressHtml='';
   if(target){
@@ -28,7 +27,7 @@ export function renderToday(){
   }
   const band=`
     <div class="band">
-      <div class="band-top"><span class="logo"><span class="logo-cat">${LOGO_SVG}</span>NomNom</span><div class="band-actions"><button class="gear" id="open-cal">${CAL_SVG}</button><button class="gear" id="open-settings">${GEAR_SVG}</button></div></div>
+      <div class="band-top"><span class="logo"><span class="logo-cat">${LOGO_SVG}</span>NomNom</span><div class="band-actions"><button class="gear" id="open-cal">${CAL_SVG}</button></div></div>
       <div class="bandnav">
         <button class="navbtn" id="day-prev">&#8249;</button>
         <button id="cal-open2" style="background:none;border:none;cursor:pointer;padding:0"><div class="d1">${dayLabel(viewDate)}</div><div class="d2">${subdate}</div></button>
@@ -39,9 +38,9 @@ export function renderToday(){
         <div class="hero-label">${heroLabel}</div>
         ${progressHtml}
         <div class="statchips">
-          <div class="statchip"><div class="l">Target</div><div class="v">${target?r0(target):'—'}</div></div>
-          <div class="statchip"><div class="l">Food</div><div class="v">${r0(consumed)}</div></div>
-          <div class="statchip"><div class="l">Exercise</div><div class="v">${r0(burned)}</div></div>
+          <div class="statchip"><div class="l">Target</div><div class="v">${target?rCal(target):'—'}</div></div>
+          <div class="statchip"><div class="l">Food</div><div class="v">${rCal(consumed)}</div></div>
+          <div class="statchip"><div class="l">Exercise</div><div class="v">${rCal(burned)}</div></div>
         </div>
       </div>
     </div>`;
@@ -81,17 +80,17 @@ export function renderToday(){
     if(!items.length)return;
     const subtotal=sum(items,'calories');
     groups+=`<div class="mealgroup">
-      <div class="meal-line"><div class="ml-left"><span class="meal-dot" style="background:${MEALCOLOR[mealName]}"></span><span class="meal-name">${mealName}</span></div><span class="meal-sub">${r0(subtotal)} kcal</span></div>
+      <div class="meal-line"><div class="ml-left"><span class="meal-dot" style="background:${MEALCOLOR[mealName]}"></span><span class="meal-name">${mealName}</span></div><span class="meal-sub">${rCal(subtotal)} kcal</span></div>
       <div class="fooditems">${items.map(e=>`
         <button class="fooditem" data-edit-food="${e.id}">
           <span style="min-width:0;display:flex;flex-direction:column;gap:2px"><span class="fi-name">${esc(e.name)}</span><span class="fi-sub">${esc(e.servingLabel||r0(e.grams)+' g')}</span></span>
-          <span class="fi-right"><span class="fi-cal">${r0(e.calories)}</span><svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></span>
+          <span class="fi-right"><span class="fi-cal">${rCal(e.calories)}</span><svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></span>
         </button>`).join('')}</div>
     </div>`;
   });
   if(!groups)groups=`<div class="empty" style="margin-top:6px">No food logged${atToday?' yet':''}. Tap Add to start.</div>`;
   const foodCard=`<div class="card">
-    <div class="card-head"><div class="card-title">Food</div><div class="card-sub">${r0(consumed)} kcal</div></div>
+    <div class="card-head"><div class="card-title">Food</div><div class="card-sub">${rCal(consumed)} kcal</div></div>
     ${groups}</div>`;
 
   // activity card
@@ -99,15 +98,14 @@ export function renderToday(){
     <div class="act-item${i===0?' first':''}" data-edit-ex="${e.id}">
       <div class="act-icon">${actMeta(e.activity).ic}</div>
       <div style="flex:1;min-width:0"><div class="act-name">${esc(e.activity)}</div><div class="act-sub">${e.minutes} min · ${e.intensity}</div></div>
-      <div class="act-cal">${r0(e.caloriesBurned)}</div>
+      <div class="act-cal">${rCal(e.caloriesBurned)}</div>
       <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-soft);flex:none;margin-left:6px"><path d="M9 18l6-6-6-6"/></svg>
     </div>`).join('') : `<div class="empty" style="margin-top:0">No exercise logged.</div>`;
   const actCard=`<div class="card">
-    <div class="card-head"><div class="card-title">Activity</div><div class="card-sub">${r0(burned)} kcal</div></div>
+    <div class="card-head"><div class="card-title">Activity</div><div class="card-sub">${rCal(burned)} kcal</div></div>
     ${actRows}</div>`;
 
   $('main').innerHTML=band+streakHtml+macroCard+foodCard+actCard;
-  $('open-settings').onclick=openSettings;
   $('open-cal').onclick=openCalendar;
   $('cal-open2').onclick=openCalendar;
   $('day-prev').onclick=()=>{setViewDate(shiftDay(viewDate,-1));render();};

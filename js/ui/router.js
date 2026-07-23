@@ -15,6 +15,17 @@ export function layout(){
   const root=document.documentElement.style;
   root.setProperty('--fab-bottom',(h+14)+'px');
   root.setProperty('--reserve',(h+_fabH+30)+'px');
+  root.setProperty('--tabbar-h',h+'px');
+  updateScrollFade();
+}
+// subtle bottom fade above the tab bar — only shown while the page (Today/Weight/Plan/Rivals)
+// actually has more content below the fold, and hidden once scrolled to the very bottom.
+export function updateScrollFade(){
+  const el=document.getElementById('scroll-fade'); if(!el)return;
+  const doc=document.documentElement;
+  const scrollable=doc.scrollHeight>window.innerHeight+4;
+  const atBottom=window.innerHeight+window.scrollY>=doc.scrollHeight-4;
+  el.classList.toggle('show',scrollable&&!atBottom);
 }
 export function render(){
   applyTheme(state.settings.theme);

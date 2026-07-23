@@ -1,9 +1,8 @@
 import {MET, QUICK} from '../data/met-table.js';
-import {$, el, esc, kgToUnit, latestWeightKg, r1, todayKey, weightDisp} from '../helpers.js';
-import {GEAR_SVG, save, state, tab} from '../state.js';
+import {$, el, esc, kgToUnit, latestWeightKg, r1, rCal, todayKey, weightDisp} from '../helpers.js';
+import {save, state, tab} from '../state.js';
 import {makeSheet} from '../ui/bottom-sheet.js';
 import {IC_BACK, IC_CHECK, IC_CHEV, IC_CHEVR, IC_MINUS, IC_PLUS, IC_TRASH, IC_X, actMeta} from './add-shared.js';
-import {openSettings} from './settings.js';
 
 /* ---------- WEIGHT ---------- */
 export function editExercise(id){
@@ -16,7 +15,7 @@ export function editExercise(id){
     if(e.metMap && e.metMap[intensity]!=null) return e.metMap[intensity];                   // free-typed sport
     return e.met||0;
   };
-  const calc=()=>Math.round(metFor()*(wkg||60)*(minutes/60));
+  const calc=()=>metFor()*(wkg||60)*(minutes/60);
   const sh=makeSheet(`<div id="ee-root"></div>`);
   const root=sh.sheet.querySelector('#ee-root');
   function chooseActivity(){
@@ -42,7 +41,7 @@ export function editExercise(id){
         <div class="dur-row"><button class="step" id="ee-dec">${IC_MINUS}</button>
           <div class="nn-slider" id="ee-slider"><div class="nn-track"></div><div class="nn-fill" id="ee-fill"></div><div class="nn-thumb" id="ee-thumb"></div></div>
           <button class="step" id="ee-inc">${IC_PLUS}</button></div></div>
-      <div class="burned"><div class="burned-l">Calories burned</div><div class="burned-n" id="ee-kcal">${calc()}</div>
+      <div class="burned"><div class="burned-l">Calories burned</div><div class="burned-n" id="ee-kcal">${rCal(calc())}</div>
         <div class="burned-s">kcal · estimated from intensity, time${wkg?' &amp; weight':''}</div></div>
       ${wkg?'':'<div class="hint" style="text-align:center;margin-top:8px">Using an estimated 60&nbsp;kg — log your weight for a more accurate burn.</div>'}
       <button class="btn-del-soft" id="ee-del">${IC_TRASH}<span>Delete this entry</span></button>
@@ -50,7 +49,7 @@ export function editExercise(id){
     const MIN=5,MAX=120;
     const sl=root.querySelector('#ee-slider'),fillEl=root.querySelector('#ee-fill'),thumbEl=root.querySelector('#ee-thumb');
     const place=()=>{const f=(minutes-MIN)/(MAX-MIN);fillEl.style.width=(f*100)+'%';thumbEl.style.left='calc('+f+' * (100% - 26px))';};
-    const paint=()=>{root.querySelector('#ee-minv').textContent=minutes;root.querySelector('#ee-kcal').textContent=calc();place();};
+    const paint=()=>{root.querySelector('#ee-minv').textContent=minutes;root.querySelector('#ee-kcal').textContent=rCal(calc());place();};
     const setFromX=(x)=>{const r=sl.getBoundingClientRect();let f=(x-r.left-13)/(r.width-26);f=Math.max(0,Math.min(1,f));minutes=Math.round(MIN+f*(MAX-MIN));paint();};
     let drag=false;
     sl.addEventListener('pointerdown',ev=>{drag=true;try{sl.setPointerCapture(ev.pointerId);}catch(_){}setFromX(ev.clientX);});
@@ -59,7 +58,7 @@ export function editExercise(id){
     place();
     root.querySelector('#ee-x').onclick=()=>sh.close();
     root.querySelector('#ee-actbtn').onclick=chooseActivity;
-    root.querySelectorAll('#ee-int button').forEach(b=>b.onclick=()=>{intensity=b.dataset.i;root.querySelectorAll('#ee-int button').forEach(x=>x.classList.toggle('on',x===b));root.querySelector('#ee-kcal').textContent=calc();});
+    root.querySelectorAll('#ee-int button').forEach(b=>b.onclick=()=>{intensity=b.dataset.i;root.querySelectorAll('#ee-int button').forEach(x=>x.classList.toggle('on',x===b));root.querySelector('#ee-kcal').textContent=rCal(calc());});
     root.querySelector('#ee-dec').onclick=()=>{minutes=Math.max(MIN,minutes-1);paint();};
     root.querySelector('#ee-inc').onclick=()=>{minutes=Math.min(MAX,minutes+1);paint();};
     root.querySelector('#ee-del').onclick=()=>{state.exercise=state.exercise.filter(x=>x.id!==id);save();sh.close();};
@@ -139,7 +138,7 @@ export function renderWeight(){
 
   const ranges=[[7,'1W'],[30,'1M'],[90,'3M'],[9999,'All']];
   $('main').innerHTML=`
-    <div class="topbar"><div><h1>Weight</h1><div class="date">${wu}</div></div><button class="gear" id="open-settings-w">${GEAR_SVG}</button></div>
+    <div class="topbar"><div><h1>Weight</h1><div class="date">${wu}</div></div></div>
 
     ${cur!=null?`<div class="scard whero" style="margin-top:14px">
       <div class="wring">${ringSVG(progPct)}<div class="ctr"><span class="n">${r1(cur)}</span><span class="u">${wu} now</span></div></div>
@@ -186,7 +185,6 @@ export function renderWeight(){
       ${pages>1?`<div class="whpager"><button class="whpg" id="wh-prev"${wHistPage===0?' disabled':''}>${IC_BACK}</button><span class="whpg-lbl">Page ${wHistPage+1} / ${pages}</span><button class="whpg" id="wh-next"${wHistPage>=pages-1?' disabled':''}>${IC_CHEVR}</button></div>`:''}
     </div>`;})():''}
   `;
-  $('open-settings-w').onclick=openSettings;
 
   function renderLog(){
     const host=$('w-log'); if(!host)return;

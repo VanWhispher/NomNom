@@ -41,12 +41,13 @@ export async function costRecipe(recipe){
     const g=+ing.grams||0; let kcal=null,p=0,c=0,f=0,matched=false;
     if(g>0){ const m=bestFoodMatch(ing.name); if(m){ kcal=m.per100.calories*g/100; p=m.per100.protein_g*g/100; c=m.per100.carbs_g*g/100; f=m.per100.fat_g*g/100; matched=true; } }
     if(kcal==null){ kcal=+ing.kcal||0; p=+ing.protein_g||0; if(g>0&&kcal>0)anyEst=true; }
-    ing._kcal=Math.round(kcal); ing._matched=matched; ing._prot=Math.round(p); ing._carb=Math.round(c); ing._fat=Math.round(f);
+    // keep these raw (unrounded) — rounding happens once, at display time, so scaled totals/ingredients stay consistent
+    ing._kcal=kcal; ing._matched=matched; ing._prot=p; ing._carb=c; ing._fat=f;
     tk+=kcal; tp+=p; tc+=c; tf+=f;
   }
   const sv=Math.max(1,Math.round(+recipe.servings||1));
-  recipe._total={calories:Math.round(tk),protein_g:Math.round(tp),carbs_g:Math.round(tc),fat_g:Math.round(tf)};
-  recipe._per={calories:Math.round(tk/sv),protein_g:Math.round(tp/sv),carbs_g:Math.round(tc/sv),fat_g:Math.round(tf/sv)};
+  recipe._total={calories:tk,protein_g:tp,carbs_g:tc,fat_g:tf};
+  recipe._per={calories:tk/sv,protein_g:tp/sv,carbs_g:tc/sv,fat_g:tf/sv};
   recipe._estimated=anyEst;
   return recipe;
 }

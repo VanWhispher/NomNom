@@ -1,7 +1,7 @@
 import {HPB_NAMES, SGDB, _norm, ensureSGDB} from '../data/hpb.js';
 import {DB} from '../data/met-table.js';
 import {ONBYEAN, ONDB, ensureONDB} from '../data/opennutrition.js';
-import {el, esc, r0, r1} from '../helpers.js';
+import {el, esc, r1, rCal} from '../helpers.js';
 import {load, state} from '../state.js';
 import {openModal} from '../ui/nav.js';
 import {logPackaged, openBarcode, weighAndLog} from './barcode.js';
@@ -82,18 +82,18 @@ export function openSearch(){
     let html='';
     if(isBC) html+=`<div class="section-label">Barcode</div><div class="row tappable" data-bc="1"><div><div class="name">Look up barcode ${esc(raw)}</div><div class="sub">Search packaged products by number</div></div></div>`;
     hpbMatches=term?(SGDB||[]).filter(f=>f[0].toLowerCase().includes(term)).slice(0,30):[];
-    if(hpbMatches.length)html+=`<div class="section-label">Singapore (HPB)</div>`+hpbMatches.map((f,i)=>{const g=(+f[6]>0)?+f[6]:null; const sub=g?`${r0(f[1]*g/100)} kcal · ${esc(f[8]||(g+' g'))} · SG FoodID`:`${r0(f[1])} kcal/100g · SG FoodID`; return `<div class="row tappable" data-hpb="${i}"><div><div class="name">${esc(f[0])}</div><div class="sub">${sub}</div></div></div>`;}).join('');
+    if(hpbMatches.length)html+=`<div class="section-label">Singapore (HPB)</div>`+hpbMatches.map((f,i)=>{const g=(+f[6]>0)?+f[6]:null; const sub=g?`${rCal(f[1]*g/100)} kcal · ${esc(f[8]||(g+' g'))} · SG FoodID`:`${rCal(f[1])} kcal/100g · SG FoodID`; return `<div class="row tappable" data-hpb="${i}"><div><div class="name">${esc(f[0])}</div><div class="sub">${sub}</div></div></div>`;}).join('');
     const libM=term?state.library.filter(l=>l.name.toLowerCase().includes(term)):[];
     if(libM.length)html+=`<div class="section-label">Personal library</div>`+libM.map(l=>{
-      const sub=l.perServing?`${r0(l.perServing.calories)} kcal per ${esc(l.perServing.portion)}`:`${r0(l.per_100g.calories)} kcal/100g`;
+      const sub=l.perServing?`${rCal(l.perServing.calories)} kcal per ${esc(l.perServing.portion)}`:`${rCal(l.per_100g.calories)} kcal/100g`;
       return `<div class="row tappable" data-lib="${l.id}"><div><div class="name">${esc(l.name)}</div><div class="sub">${sub} · personal library</div></div></div>`;}).join('');
     dbMatches=term?(DB||[]).filter(f=>f.name.toLowerCase().includes(term) && !(HPB_NAMES&&HPB_NAMES.has(_norm(f.name)))).slice(0,20):[];
-    if(dbMatches.length)html+=`<div class="section-label">Local database</div>`+dbMatches.map((f,i)=>`<div class="row tappable" data-db="${i}"><div><div class="name">${esc(f.name)}</div><div class="sub">${r0(f.calories)} kcal per ${esc(f.portion)} · local database</div></div></div>`).join('');
+    if(dbMatches.length)html+=`<div class="section-label">Local database</div>`+dbMatches.map((f,i)=>`<div class="row tappable" data-db="${i}"><div><div class="name">${esc(f.name)}</div><div class="sub">${rCal(f.calories)} kcal per ${esc(f.portion)} · local database</div></div></div>`).join('');
     onMatches=[];
     if(term.length>=2){
       if(ONDB){
         onMatches=ONDB.filter(a=>a[0].toLowerCase().includes(term)).slice(0,30);
-        if(onMatches.length)html+=`<div class="section-label">OpenNutrition</div>`+onMatches.map((f,i)=>`<div class="row tappable" data-on="${i}"><div><div class="name">${esc(f[0])}</div><div class="sub">${r0(f[1])} kcal/100g · OpenNutrition</div></div></div>`).join('');
+        if(onMatches.length)html+=`<div class="section-label">OpenNutrition</div>`+onMatches.map((f,i)=>`<div class="row tappable" data-on="${i}"><div><div class="name">${esc(f[0])}</div><div class="sub">${rCal(f[1])} kcal/100g · OpenNutrition</div></div></div>`).join('');
       }else{
         html+=`<div class="section-label">OpenNutrition</div><div class="empty" id="on-load">Loading the food database (first time only, ~10 MB)…</div>`;
       }
@@ -124,7 +124,7 @@ export function openSearch(){
       const ai=await aiNutrition(term);
       if(!ai.per_100g || !ai.per_100g.calories){res.innerHTML=`<div class="err">AI couldn't estimate that. Try a different name or enter it manually.</div>`;return;}
       res.innerHTML=`<div class="section-label">AI estimate</div>`;
-      const node=el(`<div class="row tappable"><div><div class="name">${esc(ai.name||term)}</div><div class="sub">${r0(ai.per_100g.calories)} kcal/100g · AI estimate</div></div></div>`);
+      const node=el(`<div class="row tappable"><div><div class="name">${esc(ai.name||term)}</div><div class="sub">${rCal(ai.per_100g.calories)} kcal/100g · AI estimate</div></div></div>`);
       node.onclick=()=>pickPer(ai.name||term,ai.per_100g,'ai');
       res.appendChild(node);
     }catch(e){res.innerHTML=`<div class="err">${esc(e.message||'AI lookup failed.')}</div><button class="btn btn-block" id="sf-airt" style="margin-top:10px">Try again</button>`;const rb=res.querySelector('#sf-airt');if(rb)rb.onclick=()=>runAI(term);}
@@ -141,7 +141,7 @@ export function openSearch(){
       const prods=(data.hits||[]).filter(p=>p.product_name && p.nutriments && p.nutriments['energy-kcal_100g']!=null);
       if(!prods.length){ if(localHas){res.innerHTML='';} else {offerAI(term);} return; }
       res.innerHTML=`<div class="section-label">Open Food Facts</div>`+prods.map((p,i)=>{
-        const cal=r0(p.nutriments['energy-kcal_100g']);
+        const cal=rCal(p.nutriments['energy-kcal_100g']);
         return `<div class="row tappable" data-off="${i}"><div><div class="name">${esc(p.product_name)}</div><div class="sub">${p.brands?esc(p.brands)+' · ':''}${cal} kcal/100g · Open Food Facts</div></div></div>`;
       }).join('')+`<div class="field"><button class="btn btn-block" id="sf-aibtn">None of these — estimate with AI</button></div>`;
       res.querySelectorAll('[data-off]').forEach(node=>node.onclick=()=>{

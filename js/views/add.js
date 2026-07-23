@@ -3,7 +3,7 @@ import {costRecipe, detectIngredients, lookupPer100} from '../ai/recipe.js';
 import {HPB_NAMES, SGDB, _norm, ensureSGDB} from '../data/hpb.js';
 import {DB, MET, QUICK} from '../data/met-table.js';
 import {ONDB, ensureONDB} from '../data/opennutrition.js';
-import {$, el, esc, latestWeightKg, r0, r1, sum, todayEx, todayFood, uid} from '../helpers.js';
+import {$, el, esc, latestWeightKg, r0, r1, rCal, sum, todayEx, todayFood, uid} from '../helpers.js';
 import {MEALS, UNITS, defaultMeal, mealChips, mealFraction, save, state, tab, viewDate, wireMealChips} from '../state.js';
 import {makeSheet} from '../ui/bottom-sheet.js';
 import {navClose, navOpen} from '../ui/nav.js';
@@ -73,14 +73,14 @@ export function openAdd(){
       const sections=[];
       if(isBC) sections.push(`<div class="add-label">Barcode</div>`+rowHtml('Look up barcode '+term,'Search packaged products','data-bc="1"',IC_BARCODE));
       const hpbM=(SGDB||[]).filter(f=>f[0].toLowerCase().includes(low)).slice(0,20);
-      if(hpbM.length) sections.push(`<div class="add-label">Singapore (HPB)</div>`+hpbM.map((f,i)=>{const g=(+f[6]>0)?+f[6]:null; const sub=g?`${r0(f[1]*g/100)} kcal · ${esc(f[8]||(g+' g'))}`:`${r0(f[1])} kcal/100g`; return rowHtml(f[0],sub,`data-hpb="${i}"`);}).join(''));
+      if(hpbM.length) sections.push(`<div class="add-label">Singapore (HPB)</div>`+hpbM.map((f,i)=>{const g=(+f[6]>0)?+f[6]:null; const sub=g?`${rCal(f[1]*g/100)} kcal · ${esc(f[8]||(g+' g'))}`:`${rCal(f[1])} kcal/100g`; return rowHtml(f[0],sub,`data-hpb="${i}"`);}).join(''));
       const libM=state.library.filter(l=>l.name.toLowerCase().includes(low)).slice(0,8);
-      if(libM.length) sections.push(`<div class="add-label">Saved</div>`+libM.map(l=>{const sub=l.perServing?`${r0(l.perServing.calories)} kcal per ${esc(l.perServing.portion)}`:`${r0(l.per_100g.calories)} kcal/100g`;return rowHtml(l.name,sub,`data-lib="${l.id}"`);}).join(''));
+      if(libM.length) sections.push(`<div class="add-label">Saved</div>`+libM.map(l=>{const sub=l.perServing?`${rCal(l.perServing.calories)} kcal per ${esc(l.perServing.portion)}`:`${rCal(l.per_100g.calories)} kcal/100g`;return rowHtml(l.name,sub,`data-lib="${l.id}"`);}).join(''));
       const dbM=(DB||[]).filter(f=>f.name.toLowerCase().includes(low) && !(HPB_NAMES&&HPB_NAMES.has(_norm(f.name)))).slice(0,12);
-      if(dbM.length) sections.push(`<div class="add-label">Local database</div>`+dbM.map((f,i)=>rowHtml(f.name,`${r0(f.calories)} kcal · ${esc(f.portion)}`,`data-db="${i}"`)).join(''));
+      if(dbM.length) sections.push(`<div class="add-label">Local database</div>`+dbM.map((f,i)=>rowHtml(f.name,`${rCal(f.calories)} kcal · ${esc(f.portion)}`,`data-db="${i}"`)).join(''));
       let onM=[];
       if(low.length>=2){
-        if(ONDB){ onM=ONDB.filter(a=>a[0].toLowerCase().includes(low)).slice(0,25); if(onM.length) sections.push(`<div class="add-label">OpenNutrition</div>`+onM.map((f,i)=>rowHtml(f[0],`${r0(f[1])} kcal/100g`,`data-on="${i}"`)).join('')); }
+        if(ONDB){ onM=ONDB.filter(a=>a[0].toLowerCase().includes(low)).slice(0,25); if(onM.length) sections.push(`<div class="add-label">OpenNutrition</div>`+onM.map((f,i)=>rowHtml(f[0],`${rCal(f[1])} kcal/100g`,`data-on="${i}"`)).join('')); }
         else sections.push(`<div class="add-label">OpenNutrition</div><div class="empty" style="border:none" id="af-onload">Loading food database (first time, ~10 MB)…</div>`);
       }
       // AI search sits right after the first results section (2nd choice), not buried at the bottom
@@ -118,8 +118,8 @@ export function openAdd(){
         if(!items.length){ box.innerHTML=''; return; }        // quietly omit when nothing found
         box.innerHTML=`<div class="add-label">Packaged &amp; branded</div>`+items.map((it,i)=>{
           const sub=it.grams
-            ? `${it.brands?esc(it.brands)+' · ':''}${r0(it.grams)} g · ${r0(it.per.calories*it.grams/100)} kcal · Open Food Facts`
-            : `${it.brands?esc(it.brands)+' · ':''}${r0(it.per.calories)} kcal/100g · Open Food Facts`;
+            ? `${it.brands?esc(it.brands)+' · ':''}${r0(it.grams)} g · ${rCal(it.per.calories*it.grams/100)} kcal · Open Food Facts`
+            : `${it.brands?esc(it.brands)+' · ':''}${rCal(it.per.calories)} kcal/100g · Open Food Facts`;
           return rowHtml(it.name,sub,`data-off="${i}"`);
         }).join('');
         box.querySelectorAll('[data-off]').forEach(n=>n.onclick=()=>{const it=items[+n.dataset.off];addItemView(st=>weighAndLog(null,st,it.name,it.per,'packaged',it.grams||null,()=>sh.close()));});
@@ -159,7 +159,7 @@ export function openAdd(){
         if(seq!==_searchSeq || qEl.value.trim()!==term) return;
         const box=main.querySelector('#af-aisec'); if(!box) return;
         if(!ai||!ai.per_100g||!(+ai.per_100g.calories)){ box.innerHTML=''; return; }
-        box.innerHTML=`<div class="add-label">AI estimate</div>`+rowHtml(ai.name||term,`${r0(ai.per_100g.calories)} kcal/100g · AI estimate`,'data-aihit="1"',IC_SPARK);
+        box.innerHTML=`<div class="add-label">AI estimate</div>`+rowHtml(ai.name||term,`${rCal(ai.per_100g.calories)} kcal/100g · AI estimate`,'data-aihit="1"',IC_SPARK);
         const row=box.querySelector('[data-aihit]');
         if(row)row.onclick=()=>addItemView(st=>weighAndLog(null,st,ai.name||term,ai.per_100g,'ai',null,()=>sh.close(),ai.portion||null));
       }catch(e){
@@ -395,21 +395,23 @@ export function openAdd(){
       ing._rp=(g>0&&ing.protein_g!=null)?(+ing.protein_g)/g:null;
       ing._rc=(g>0&&ing.carbs_g!=null)?(+ing.carbs_g)/g:null;
       ing._rf=(g>0&&ing.fat_g!=null)?(+ing.fat_g)/g:null; });
+    // work.total/work.per/ing.kcal etc are kept RAW (unrounded) here; every read-site below
+    // rounds with r0() at display time so scaled totals and ingredient sums stay consistent.
     function recompute(){
       let tk=0,tp=0,tc=0,tf=0,allMac=work.ingredients.length>0;
-      work.ingredients.forEach(ing=>{ const g=+ing.grams||0; ing.kcal=Math.round(ing._rk*g); tk+=ing._rk*g;
+      work.ingredients.forEach(ing=>{ const g=+ing.grams||0; ing.kcal=ing._rk*g; tk+=ing._rk*g;
         if(ing._rp!=null)tp+=ing._rp*g; else allMac=false;
         if(ing._rc!=null)tc+=ing._rc*g; if(ing._rf!=null)tf+=ing._rf*g; });
       const sv=Math.max(1,Math.round(+work.servings||1));
       let TP,TC,TF;
       if(allMac){TP=tp;TC=tc;TF=tf;} else { const r=oCal>0?tk/oCal:0; TP=oP*r;TC=oC*r;TF=oF*r; }
-      work.total={calories:Math.round(tk),protein_g:Math.round(TP),carbs_g:Math.round(TC),fat_g:Math.round(TF)};
-      work.per={calories:Math.round(tk/sv),protein_g:Math.round(TP/sv),carbs_g:Math.round(TC/sv),fat_g:Math.round(TF/sv)};
+      work.total={calories:tk,protein_g:TP,carbs_g:TC,fat_g:TF};
+      work.per={calories:tk/sv,protein_g:TP/sv,carbs_g:TC/sv,fat_g:TF/sv};
     }
     function preview(){ const per=work.per||{calories:0}, tot=work.total||{calories:0}, sv=Math.max(1,Math.round(+work.servings||1));
-      return `<div class="rc-top"><div><div class="rc-meta">makes ${sv} serving${sv===1?'':'s'} · ${tot.calories} kcal total</div></div><div class="rc-kcal"><b>${per.calories}</b><span>kcal/serving</span></div></div><div class="fitlabel" style="margin-top:6px">${per.protein_g||0} g protein/serving</div>`; }
+      return `<div class="rc-top"><div><div class="rc-meta">makes ${sv} serving${sv===1?'':'s'} · ${rCal(tot.calories)} kcal total</div></div><div class="rc-kcal"><b>${rCal(per.calories)}</b><span>kcal/serving</span></div></div><div class="fitlabel" style="margin-top:6px">${r0(per.protein_g||0)} g protein/serving</div>`; }
     function refreshNums(){ recompute();
-      work.ingredients.forEach((ing,i)=>{ const k=body.querySelector('.ei-k[data-i="'+i+'"]'); if(k)k.textContent=ing.kcal+' kcal'; });
+      work.ingredients.forEach((ing,i)=>{ const k=body.querySelector('.ei-k[data-i="'+i+'"]'); if(k)k.textContent=rCal(ing.kcal)+' kcal'; });
       const pv=body.querySelector('#re-prev'); if(pv)pv.innerHTML=preview(); }
     function draw(){
       recompute();
@@ -427,7 +429,7 @@ export function openAdd(){
               <div class="ei-name">${esc(ing.name)}</div>
               <div class="ei-right">
                 <input class="ei-g" type="number" inputmode="decimal" min="0" data-i="${i}" value="${r0(ing.grams)}"><span class="ei-u">g</span>
-                <span class="ei-k" data-i="${i}">${ing.kcal} kcal</span>
+                <span class="ei-k" data-i="${i}">${rCal(ing.kcal)} kcal</span>
                 <button class="ei-rm" data-rm="${i}" aria-label="Remove">${IC_X}</button>
               </div>
             </div>`).join('')}</div>
@@ -464,7 +466,7 @@ export function openAdd(){
           else { stat.textContent='Estimating calories…'; go.disabled=true; per100=await lookupPer100(name); go.disabled=false;
             if(!per100){ stat.textContent='Couldn’t estimate — enter a kcal/100g value above, or add a Gemini API key in Settings.'; return; } }
           work.ingredients.push({name,grams:g,have:true,
-            kcal:Math.round((per100.cal||0)*g/100),protein_g:Math.round((per100.prot||0)*g/100),carbs_g:Math.round((per100.carb||0)*g/100),fat_g:Math.round((per100.fat||0)*g/100),
+            kcal:(per100.cal||0)*g/100,protein_g:(per100.prot||0)*g/100,carbs_g:(per100.carb||0)*g/100,fat_g:(per100.fat||0)*g/100,
             _rk:(per100.cal||0)/100,_rp:(per100.prot||0)/100,_rc:(per100.carb||0)/100,_rf:(per100.fat||0)/100});
           adding=false; draw();
         };
@@ -474,10 +476,10 @@ export function openAdd(){
         const name=(work.name||'').trim()||rec.name, svv=Math.max(1,Math.round(+work.servings||1));
         const clean=JSON.parse(JSON.stringify(rec));
         clean.name=name; clean.servings=svv;
-        clean.ingredients=work.ingredients.map(ing=>{ const g=+ing.grams||0; return {name:ing.name,grams:g,have:!!ing.have,kcal:Math.round(ing._rk*g),
-          protein_g:ing._rp!=null?Math.round(ing._rp*g):(ing.protein_g||0),
-          carbs_g:ing._rc!=null?Math.round(ing._rc*g):(ing.carbs_g||0),
-          fat_g:ing._rf!=null?Math.round(ing._rf*g):(ing.fat_g||0)}; });
+        clean.ingredients=work.ingredients.map(ing=>{ const g=+ing.grams||0; return {name:ing.name,grams:g,have:!!ing.have,kcal:ing._rk*g,
+          protein_g:ing._rp!=null?ing._rp*g:(ing.protein_g||0),
+          carbs_g:ing._rc!=null?ing._rc*g:(ing.carbs_g||0),
+          fat_g:ing._rf!=null?ing._rf*g:(ing.fat_g||0)}; });
         clean.total=work.total; clean.per=work.per;
         const idx=state.recipes.findIndex(x=>x.id===rec.id); if(idx>=0)state.recipes[idx]=clean; else state.recipes.push(clean);
         save();
@@ -493,17 +495,17 @@ export function openAdd(){
     function draw(){
       const f=cur/base, ings=rec.ingredients||[];
       const have=ings.filter(x=>x.have), buy=ings.filter(x=>!x.have);
-      const row=(ing)=>`<div class="rc-ing"><div><span class="nm">${esc(ing.name)}</span> <span class="g">${ing.grams?r0(ing.grams*f)+' g':''}</span></div><span class="kc">${ing.kcal?r0(ing.kcal*f)+' kcal':''}</span></div>`;
-      const totCal=Math.round(((rec.total&&rec.total.calories)||0)*f);
+      const row=(ing)=>`<div class="rc-ing"><div><span class="nm">${esc(ing.name)}</span> <span class="g">${ing.grams?r0(ing.grams*f)+' g':''}</span></div><span class="kc">${ing.kcal?rCal(ing.kcal*f)+' kcal':''}</span></div>`;
+      const totCal=rCal(((rec.total&&rec.total.calories)||0)*f);
       const per=rec.per||{calories:0,protein_g:0};
       body.innerHTML=`
         <div class="sub-head"><button class="circ-back" id="rd-back">${IC_BACK}</button><h3>${esc(rec.name)}</h3></div>
         <div class="rc-card">
           <div class="rc-top">
             <div><div class="rc-meta">${rec.time_min?r0(rec.time_min)+' min · ':''}makes ${cur} serving${cur===1?'':'s'} · ${totCal} kcal total</div></div>
-            <div class="rc-kcal"><b>${per.calories}</b><span>kcal/serving</span></div>
+            <div class="rc-kcal"><b>${rCal(per.calories)}</b><span>kcal/serving</span></div>
           </div>
-          <div class="fitlabel" style="margin-top:6px">${per.protein_g||0} g protein/serving</div>
+          <div class="fitlabel" style="margin-top:6px">${r0(per.protein_g||0)} g protein/serving</div>
           <div class="prow" style="margin-top:14px"><span class="lab">Scale recipe</span><div class="pstep"><button id="rd-dn">${IC_MINUS}</button><span class="val" id="rd-sv">${cur}</span><button id="rd-up">${IC_PLUS}</button></div></div>
           <div class="rc-sec">You have</div>${have.length?have.map(row).join(''):`<div class="rc-empty">—</div>`}
           ${buy.length?`<div class="rc-sec">Shopping list</div>`+buy.map(row).join(''):''}
@@ -533,7 +535,7 @@ export function openAdd(){
     body.querySelector('#rl-back').onclick=backFn;
     const lb=body.querySelector('#rl-body');
     if(!recs.length){ lb.innerHTML=`<div class="empty" style="border:none">No saved recipes yet. Generate a recipe and tap Save to keep it here.</div>`; return; }
-    lb.innerHTML=recs.map(r=>`<button class="meal-folder" data-rec="${r.id}"><span class="mf-ic">${IC_RECIPE}</span><span class="mf-main"><span class="mf-name">${esc(r.name)}</span><span class="mf-sum">${r0(r.servings||1)} servings · ${r.per?r0(r.per.calories):0} kcal/serving</span></span><span class="mf-chev">${IC_CHEVR}</span></button>`).join('');
+    lb.innerHTML=recs.map(r=>`<button class="meal-folder" data-rec="${r.id}"><span class="mf-ic">${IC_RECIPE}</span><span class="mf-main"><span class="mf-name">${esc(r.name)}</span><span class="mf-sum">${r0(r.servings||1)} servings · ${r.per?rCal(r.per.calories):rCal(0)} kcal/serving</span></span><span class="mf-chev">${IC_CHEVR}</span></button>`).join('');
     lb.querySelectorAll('[data-rec]').forEach(b=>b.onclick=()=>{ const r=state.recipes.find(x=>x.id===b.dataset.rec); if(r)openRecipeDetail(r,()=>recipeList(backFn)); });
   }
 
@@ -622,21 +624,21 @@ export function openAdd(){
       const swaps=(ing.alts||[]).filter(a=>a&&a.name).slice(0,3);
       return `<div class="rc-ing">
         <div><span class="nm">${esc(ing.name)}</span> <span class="g">${ing.grams?r0(ing.grams)+' g':''}</span></div>
-        <div style="display:flex;align-items:center;gap:8px">${ing._kcal?`<span class="kc">${ing._kcal} kcal${ing._matched?'':' ≈'}</span>`:''}${swaps.length?`<button class="swapbtn" data-sw="${i}:${gi}">swap</button>`:''}</div>
-      </div>${swaps.length?`<div class="swaps" id="sw-${i}-${gi}" style="display:none">${swaps.map((a,ai)=>`<div class="swaprow"><span class="jb">${a.job==='cut'?'lighter':a.job==='diet'?'dietary':'on hand'}</span><span>${esc(a.name)}</span>${a.kcalDelta?`<span class="dl">${a.kcalDelta>0?'+':''}${r0(a.kcalDelta)} kcal</span>`:''}<button data-apply="${i}:${gi}:${ai}">Use</button></div>`).join('')}</div>`:''}`;
+        <div style="display:flex;align-items:center;gap:8px">${ing._kcal?`<span class="kc">${rCal(ing._kcal)} kcal${ing._matched?'':' ≈'}</span>`:''}${swaps.length?`<button class="swapbtn" data-sw="${i}:${gi}">swap</button>`:''}</div>
+      </div>${swaps.length?`<div class="swaps" id="sw-${i}-${gi}" style="display:none">${swaps.map((a,ai)=>`<div class="swaprow"><span class="jb">${a.job==='cut'?'lighter':a.job==='diet'?'dietary':'on hand'}</span><span>${esc(a.name)}</span>${a.kcalDelta?`<span class="dl">${a.kcalDelta>0?'+':''}${rCal(a.kcalDelta)} kcal</span>`:''}<button data-apply="${i}:${gi}:${ai}">Use</button></div>`).join('')}</div>`:''}`;
     }
     function recipeCard(r,i){
       const per=r._per?r._per.calories:0, prot=r._per?r._per.protein_g:0, ings=r.ingredients||[];
       const have=ings.filter(x=>x.have), buy=ings.filter(x=>!x.have);
       const pct=rc.budget?Math.min(100,Math.round(per/rc.budget*100)):Math.min(100,Math.round(per/800*100));
-      const fitTxt=rc.budget?(per<=rc.budget?`Fits your ${rc.budget} kcal budget`:`${per-rc.budget} kcal over budget`):'';
+      const fitTxt=rc.budget?(per<=rc.budget?`Fits your ${rc.budget} kcal budget`:`${rCal(per-rc.budget)} kcal over budget`):'';
       return `<div class="rc-card">
         <div class="rc-top">
           <div><div class="rc-name">${esc(r.name)}</div><div class="rc-meta">${r0(r.servings||rc.servings)} servings${r.time_min?' · '+r0(r.time_min)+' min':''}${r._estimated?' · some values estimated':''}</div></div>
-          <div class="rc-kcal"><b>${per}</b><span>kcal/serving</span></div>
+          <div class="rc-kcal"><b>${rCal(per)}</b><span>kcal/serving</span></div>
         </div>
         <div class="fitbar"><div style="width:${pct}%;background:${fitColor(per)}"></div></div>
-        <div class="fitlabel">${fitTxt}${fitTxt?' · ':''}${prot} g protein/serving</div>
+        <div class="fitlabel">${fitTxt}${fitTxt?' · ':''}${r0(prot)} g protein/serving</div>
         <div class="rc-sec">You have</div>${have.length?have.map(ing=>ingRow(ing,i,ings.indexOf(ing))).join(''):`<div class="rc-empty">—</div>`}
         ${buy.length?`<div class="rc-sec">Add to make it</div>`+buy.map(ing=>ingRow(ing,i,ings.indexOf(ing))).join(''):''}
         <div class="rc-sec">Method</div><ol class="steps">${(r.steps||[]).map(s=>`<li>${esc(s)}</li>`).join('')}</ol>
@@ -717,7 +719,7 @@ export function openAdd(){
       html+=`<div class="lib-sec">Recipes</div>`;
       html+=recs.map(r=>`<button class="meal-folder" data-rec="${r.id}">
         <span class="mf-ic">${IC_RECIPE}</span>
-        <span class="mf-main"><span class="mf-name">${esc(r.name)}</span><span class="mf-sum">${r0(r.servings||1)} servings · ${r.per?r0(r.per.calories):0} kcal/serving</span></span>
+        <span class="mf-main"><span class="mf-name">${esc(r.name)}</span><span class="mf-sum">${r0(r.servings||1)} servings · ${r.per?rCal(r.per.calories):rCal(0)} kcal/serving</span></span>
         <span class="mf-chev">${IC_CHEVR}</span>
       </button>`).join('');
     }
@@ -732,7 +734,7 @@ export function openAdd(){
     if(lib2.length){
       html+=`<div class="lib-sec">${meals.length?'Single foods':'Saved foods'}</div>`;
       html+=lib2.map(l=>{
-        const sub=l.perServing?`${r0(l.perServing.calories)} kcal per ${esc(l.perServing.portion)}`:`${r0(l.per_100g.calories)} kcal/100g`;
+        const sub=l.perServing?`${rCal(l.perServing.calories)} kcal per ${esc(l.perServing.portion)}`:`${rCal(l.per_100g.calories)} kcal/100g`;
         return `<div class="swipe-wrap" data-id="${l.id}">
           <div class="swipe-actions">
             <button class="swipe-meal" data-meal-add="${l.id}" aria-label="Add to meal">${IC_FOLDERADD}<span>＋ Meal</span></button>
@@ -825,11 +827,11 @@ export function openAdd(){
     function paint(){
       const m=meal(); if(!m){renderLibrary();return;}
       const tot=mealTotal(m);
-      body.querySelector('#ml-hero').innerHTML=`<div class="meal-hero"><div><div class="mh-l">${m.items.length} ingredient${m.items.length===1?'':'s'}</div><div class="mh-s">Adjust portions below</div></div><div style="display:flex;align-items:baseline;gap:5px"><span class="mh-tot">${r0(tot)}</span><span class="mh-u">kcal</span></div></div>`;
+      body.querySelector('#ml-hero').innerHTML=`<div class="meal-hero"><div><div class="mh-l">${m.items.length} ingredient${m.items.length===1?'':'s'}</div><div class="mh-s">Adjust portions below</div></div><div style="display:flex;align-items:baseline;gap:5px"><span class="mh-tot">${rCal(tot)}</span><span class="mh-u">kcal</span></div></div>`;
       const box=body.querySelector('#ml-items');
       if(!m.items.length){ box.innerHTML=`<div class="empty" style="border:none">No items yet. Swipe a saved food left in the Library and tap ＋ Meal to add it here.</div>`; }
       else box.innerHTML=m.items.map((it,i)=>{
-        const kcal=r0(mealItemKcal(it));
+        const kcal=rCal(mealItemKcal(it));
         const val=it.kind==='serving'?`${r1(it.servings)}<small> × ${esc(it.portion||'serving')}</small>`:`${r0(it.grams)}<small> g</small>`;
         return `<div class="ming">
           <button class="mg-rm" data-rm="${i}" aria-label="Remove">${IC_TRASH}</button>
@@ -843,7 +845,7 @@ export function openAdd(){
       box.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{m.items.splice(+b.dataset.rm,1);save();paint();});
       const addBtn=body.querySelector('#ml-add');
       addBtn.disabled=!m.items.length;
-      addBtn.textContent=`Add ${m.items.length} item${m.items.length===1?'':'s'} · ${r0(tot)} kcal`;
+      addBtn.textContent=`Add ${m.items.length} item${m.items.length===1?'':'s'} · ${rCal(tot)} kcal`;
     }
     body.querySelector('#ml-add').onclick=()=>{
       const m=meal(); if(!m||!m.items.length)return; const meal2=getMeal();
@@ -916,7 +918,7 @@ export function openAdd(){
     let activity='Running',intensity='moderate',minutes=28;
     let customName='', customMET=null, customBusy=false, customErr='';   // free-typed "Other" sport
     const metFor=()=> (activity==='Other' && customMET) ? customMET[intensity] : MET[activity][intensity];
-    const calc=()=>Math.round(metFor()*(wkg||60)*(minutes/60));
+    const calc=()=>metFor()*(wkg||60)*(minutes/60);
 
     function chooseActivity(){
       setTabs(false);
@@ -957,14 +959,14 @@ export function openAdd(){
             <div class="nn-slider" id="ex-slider"><div class="nn-track"></div><div class="nn-fill" id="ex-fill"></div><div class="nn-thumb" id="ex-thumb"></div></div>
             <button class="step" id="ex-inc">${IC_PLUS}</button></div></div>
         <div class="burned"><div class="burned-l">Calories burned</div>
-          <div class="burned-n" id="ex-kcal">${calc()}</div>
+          <div class="burned-n" id="ex-kcal">${rCal(calc())}</div>
           <div class="burned-s">kcal · estimated from intensity, time${wkg?' &amp; weight':''}</div></div>
         ${wkg?'':'<div class="hint" style="text-align:center;margin-top:8px">Using an estimated 60&nbsp;kg — log your weight for a more accurate burn.</div>'}
         <button class="btn btn-primary btn-block" id="ex-save" style="margin-top:16px">Save exercise</button>`;
       const MINm=5,MAXm=120;
       const sl=body.querySelector('#ex-slider'), fillEl=body.querySelector('#ex-fill'), thumbEl=body.querySelector('#ex-thumb');
       const place=()=>{const f=(minutes-MINm)/(MAXm-MINm);fillEl.style.width=(f*100)+'%';thumbEl.style.left='calc('+f+' * (100% - 26px))';};
-      const paint=()=>{body.querySelector('#ex-minv').textContent=minutes;body.querySelector('#ex-kcal').textContent=calc();place();};
+      const paint=()=>{body.querySelector('#ex-minv').textContent=minutes;body.querySelector('#ex-kcal').textContent=rCal(calc());place();};
       const setFromX=(x)=>{const r=sl.getBoundingClientRect();let f=(x-r.left-13)/(r.width-26);f=Math.max(0,Math.min(1,f));minutes=Math.round(MINm+f*(MAXm-MINm));paint();};
       let dragging=false;
       sl.addEventListener('pointerdown',e=>{dragging=true;try{sl.setPointerCapture(e.pointerId);}catch(_){}setFromX(e.clientX);});
@@ -985,7 +987,7 @@ export function openAdd(){
         catch(err){ customErr=err.message||'Could not estimate — try again.'; }
         customBusy=false; draw();
       };
-      body.querySelectorAll('#ex-int button').forEach(b=>b.onclick=()=>{intensity=b.dataset.i;body.querySelectorAll('#ex-int button').forEach(x=>x.classList.toggle('on',x===b));body.querySelector('#ex-kcal').textContent=calc();});
+      body.querySelectorAll('#ex-int button').forEach(b=>b.onclick=()=>{intensity=b.dataset.i;body.querySelectorAll('#ex-int button').forEach(x=>x.classList.toggle('on',x===b));body.querySelector('#ex-kcal').textContent=rCal(calc());});
       body.querySelector('#ex-dec').onclick=()=>{minutes=Math.max(MINm,minutes-1);paint();};
       body.querySelector('#ex-inc').onclick=()=>{minutes=Math.min(MAXm,minutes+1);paint();};
       body.querySelector('#ex-save').onclick=()=>{

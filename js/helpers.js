@@ -8,6 +8,13 @@ export function todayKey(){return dateKey(new Date());}
 export function fmtDate(){return new Date().toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long'});}
 export function r0(n){return Math.round(n||0);}
 export function r1(n){return Math.round((n||0)*10)/10;}
+// calorie display formatter — decimal places are user-configurable in Settings (0/1/2); everything
+// stores raw unrounded calories, this is the one place that turns a raw number into display text.
+export function rCal(n,opts){
+  const d=Math.min(2,Math.max(0,+state.settings.calorieDecimals||0));
+  const v=+n||0;
+  return (opts&&opts.group)?v.toLocaleString(undefined,{minimumFractionDigits:d,maximumFractionDigits:d}):v.toFixed(d);
+}
 export function uid(){return Math.random().toString(36).slice(2,9);}
 export function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 export const KG_PER_LB=0.45359237, CM_PER_IN=2.54;
